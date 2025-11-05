@@ -52,7 +52,7 @@
       // Mémoriser la sérialisation du layout pour éviter les re-renders inutiles
       const layoutKey = useMemo(
         () => JSON.stringify(attributes.layout),
-        [attributes.layout?.type, attributes.layout?.columnCount, attributes.layout?.minimumColumnWidth]
+        [attributes.layout?.type, attributes.layout?.columnCount, attributes.layout?.minimumColumnWidth, attributes.layout?.gridItemPosition]
       );
 
       /**
@@ -103,13 +103,18 @@
           ) {
             const columnCount = attributes.layout?.columnCount;
             const minimumColumnWidth = attributes.layout?.minimumColumnWidth;
+            const gridItemPosition = attributes.layout?.gridItemPosition;
 
-            // Si un nombre de colonnes est défini (jusqu'à 16 colonnes)
-            if (columnCount && columnCount >= 1 && columnCount <= 16) {
+            // Vérifier si on est en mode Auto (gridItemPosition === 'auto')
+            // ou si minimumColumnWidth est défini (mode Auto implicite)
+            const isAutoMode = gridItemPosition === 'auto' || (minimumColumnWidth && !columnCount);
+
+            // Si un nombre de colonnes est défini (jusqu'à 16 colonnes) ET qu'on n'est pas en mode Auto
+            if (columnCount && columnCount >= 1 && columnCount <= 16 && !isAutoMode) {
               filteredClasses.push(`nbc-carousel-cols-${columnCount}`);
             }
-            // Si une largeur minimale est définie, ajouter une classe spéciale
-            else if (minimumColumnWidth) {
+            // Si une largeur minimale est définie OU qu'on est en mode Auto
+            else if (minimumColumnWidth || isAutoMode) {
               filteredClasses.push('nbc-carousel-min-width');
             }
             // Sinon, utiliser 3 colonnes par défaut
@@ -172,14 +177,19 @@
         ) {
           const columnCount = attributes.layout?.columnCount;
           const minimumColumnWidth = attributes.layout?.minimumColumnWidth;
+          const gridItemPosition = attributes.layout?.gridItemPosition;
 
-          // Si un nombre de colonnes est défini (jusqu'à 16 colonnes)
-          if (columnCount && columnCount >= 1 && columnCount <= 16) {
+          // Vérifier si on est en mode Auto (gridItemPosition === 'auto')
+          // ou si minimumColumnWidth est défini (mode Auto implicite)
+          const isAutoMode = gridItemPosition === 'auto' || (minimumColumnWidth && !columnCount);
+
+          // Si un nombre de colonnes est défini (jusqu'à 16 colonnes) ET qu'on n'est pas en mode Auto
+          if (columnCount && columnCount >= 1 && columnCount <= 16 && !isAutoMode) {
             expectedColsClass = `nbc-carousel-cols-${columnCount}`;
             shouldHaveMinWidthClass = false;
           }
-          // Si une largeur minimale est définie
-          else if (minimumColumnWidth) {
+          // Si une largeur minimale est définie OU qu'on est en mode Auto
+          else if (minimumColumnWidth || isAutoMode) {
             expectedColsClass = null;
             shouldHaveMinWidthClass = true;
           }
@@ -244,16 +254,26 @@
                     'native-blocks-carousel'
                   )
                   : (name === 'core/group' || name === 'core/post-template') && attributes.layout?.type === 'grid'
-                  ? __(
-                    'Le carousel est activé. Le nombre de colonnes visibles est détecté automatiquement depuis les paramètres de la grille.',
-                    'native-blocks-carousel'
-                  )
+                  ? attributes.layout?.minimumColumnWidth
+                    ? __(
+                      'Le carousel est activé en mode Auto. La largeur des slides est définie par la "Largeur minimale de colonne" (' + attributes.layout.minimumColumnWidth + ').',
+                      'native-blocks-carousel'
+                    )
+                    : attributes.layout?.columnCount
+                    ? __(
+                      'Le carousel est activé en mode Manual. Le nombre de colonnes visibles (' + attributes.layout.columnCount + ') est détecté depuis les paramètres de la grille.',
+                      'native-blocks-carousel'
+                    )
+                    : __(
+                      'Le carousel est activé. Configurez le nombre de colonnes ou la largeur minimale dans les paramètres de la grille.',
+                      'native-blocks-carousel'
+                    )
                   : __(
                     'Le carousel est activé. Les éléments défilent horizontalement.',
                     'native-blocks-carousel'
                   )
                 : __(
-                  'Activez pour transformer ce bloc en carousel avec navigation.',
+                  'Activez pour transformer ce bloc en carousel avec navigation. Vous pouvez ensuite choisir entre le mode Manual (nombre de colonnes) ou Auto (largeur minimale de colonne).',
                   'native-blocks-carousel'
                 ),
             })

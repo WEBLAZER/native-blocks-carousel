@@ -1,0 +1,33 @@
+# Fichiers macOS
+._*
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Fichiers de compression
+*.zip
+*.tar.gz
+
+# Fichiers d'éditeur
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Fichiers temporaires
+*.tmp
+*.log
+
+# Dossiers de développement
+node_modules/
+vendor/
+
+# Fichiers de configuration sensibles
+.env
+.env.local
+
+# Fichiers de build
+dist/
+build/
+

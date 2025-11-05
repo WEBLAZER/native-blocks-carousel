@@ -52,7 +52,8 @@
 	flex-flow: row nowrap;
 	align-items: stretch;
 	justify-content: flex-start;
-	gap: var(--wp--style--block-gap);
+	/* Utiliser le gap pour l'espacement entre les slides */
+	gap: var(--wp--style--block-gap, 1rem);
 	padding: 1rem 0;
 
 	/* Scroll */
@@ -98,12 +99,6 @@
 	/* Spacing */
 	margin: 0 !important;
 	padding: 0;
-}
-
-.nbc-carousel>*:first-child,
-.block-editor-block-list__layout .nbc-carousel>*:first-child,
-.editor-styles-wrapper .nbc-carousel>*:first-child {
-	scroll-snap-align: center;
 }
 
 /* Arrière-plans */
@@ -305,16 +300,36 @@
 
 /* nbc-carousel-min-width : Utiliser la largeur minimale définie dans le Grid */
 /* WordPress génère : grid-template-columns: repeat(auto-fill, minmax(XXXpx, 1fr)) */
-/* On doit extraire cette valeur et l'utiliser comme min-width en mode Flexbox */
+/* On doit extraire cette valeur et l'utiliser comme largeur fixe en mode Flexbox */
 .is-layout-grid.nbc-carousel.nbc-carousel-min-width>*,
 .block-editor-block-list__layout .is-layout-grid.nbc-carousel.nbc-carousel-min-width>*,
 .editor-styles-wrapper .is-layout-grid.nbc-carousel.nbc-carousel-min-width>* {
-	/* Largeur flexible avec minimum respecté */
-	flex: 1 1 auto;
-	width: auto;
-	/* La valeur sera injectée via --carousel-min-width par JavaScript/PHP */
-	min-width: var(--carousel-min-width, 200px);
-	max-width: 100%;
+	/* Largeur fixe avec adaptation sur mobile */
+	flex: 0 0 auto !important;
+	/* Utiliser min() pour respecter la largeur fixe sauf si l'écran est plus petit */
+	width: min(var(--carousel-min-width, 200px), 100%) !important;
+	min-width: min(var(--carousel-min-width, 200px), 100%) !important;
+	max-width: 100% !important;
+}
+
+/* Règles spécifiques pour Post Template (enfants sont des <li class="wp-block-post">) */
+.wp-block-post-template.nbc-carousel.nbc-carousel-min-width .wp-block-post,
+.block-editor-block-list__layout .wp-block-post-template.nbc-carousel.nbc-carousel-min-width .wp-block-post,
+.editor-styles-wrapper .wp-block-post-template.nbc-carousel.nbc-carousel-min-width .wp-block-post {
+	flex: 0 0 auto !important;
+	width: min(var(--carousel-min-width, 200px), 100%) !important;
+	min-width: min(var(--carousel-min-width, 200px), 100%) !important;
+	max-width: 100% !important;
+}
+
+/* Règles spécifiques pour Group (enfants peuvent être des <div> ou autres) */
+.wp-block-group.nbc-carousel.nbc-carousel-min-width>*,
+.block-editor-block-list__layout .wp-block-group.nbc-carousel.nbc-carousel-min-width>*,
+.editor-styles-wrapper .wp-block-group.nbc-carousel.nbc-carousel-min-width>* {
+	flex: 0 0 auto !important;
+	width: min(var(--carousel-min-width, 200px), 100%) !important;
+	min-width: min(var(--carousel-min-width, 200px), 100%) !important;
+	max-width: 100% !important;
 }
 
 /* ==========================================================================
@@ -491,7 +506,8 @@
    ========================================================================== */
 
 /* Mobile (par défaut) - 1 colonne */
-.wp-block-post-template.is-layout-grid.nbc-carousel .wp-block-post {
+/* Exclure le mode min-width qui a ses propres règles */
+.wp-block-post-template.is-layout-grid.nbc-carousel:not(.nbc-carousel-min-width) .wp-block-post {
 	width: 100% !important;
 	min-width: 100% !important;
 }
@@ -678,7 +694,8 @@
    ========================================================================== */
 
 /* Mobile (par défaut) - 1 colonne */
-.wp-block-group.is-layout-grid.nbc-carousel>* {
+/* Exclure le mode min-width qui a ses propres règles */
+.wp-block-group.is-layout-grid.nbc-carousel:not(.nbc-carousel-min-width)>* {
 	width: 100% !important;
 	min-width: 100% !important;
 }

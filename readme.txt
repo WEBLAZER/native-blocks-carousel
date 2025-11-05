@@ -42,8 +42,22 @@ Transform any WordPress block into a responsive carousel with pure CSS. Zero Jav
 
 = Personnalisation =
 
-* **Colonnes** - Pour les Grids : définissez le nombre de colonnes visibles (1-6)
-* **Largeur minimale** - Pour les Grids : utilisez "Minimum column width" pour un layout fluide
+= Deux modes pour définir la largeur des slides =
+
+**Mode Manual (Nombre de colonnes) :**
+* Définissez un nombre fixe de colonnes visibles (1-16)
+* Idéal pour un contrôle précis du nombre d'éléments visibles
+* Dans les paramètres du bloc Grid/Post Template : "Grid" > "Column count"
+* Exemple : 3 colonnes = chaque slide fait 33% de la largeur du conteneur
+
+**Mode Auto (Largeur fixe) :**
+* Définissez une largeur fixe pour chaque slide (ex: 300px)
+* La largeur définie est respectée exactement sur tous les écrans
+* Comportement intelligent : si la largeur dépasse la fenêtre (mobile), la slide s'adapte automatiquement
+* Dans les paramètres du bloc Grid/Post Template : "Grid" > "Minimum column width"
+* Exemple : width 300px = chaque slide fait exactement 300px (sauf sur écran plus petit)
+
+**Autres options :**
 * **Espacement** - Utilisez "Block spacing" pour ajuster l'espace entre les éléments
 * **Couleurs** - Les boutons héritent automatiquement des couleurs de votre thème
 
@@ -111,9 +125,25 @@ Absolument ! Vous pouvez ajouter autant de carrousels que vous le souhaitez sur 
 
 = Comment régler le nombre de colonnes visibles ? =
 
-Pour les blocs Grid et Post Template :
-- Utilisez l'option "Columns" pour un nombre fixe (1-6 colonnes)
-- Utilisez "Minimum column width" pour un layout fluide qui s'adapte automatiquement
+Le plugin offre deux modes pour contrôler la largeur des slides dans les carousels Grid et Post Template :
+
+**Mode 1 : Manual (Nombre de colonnes fixe)**
+1. Dans les paramètres du bloc, allez dans "Grid" > "Grid item position"
+2. Sélectionnez "Manual"
+3. Définissez le nombre de colonnes dans "Column count" (1-16)
+4. Résultat : Le carousel affichera toujours exactement ce nombre de colonnes visibles
+
+**Mode 2 : Auto (Largeur fixe)**
+1. Dans les paramètres du bloc, allez dans "Grid" > "Grid item position"
+2. Sélectionnez "Auto"
+3. Définissez la largeur dans "Minimum column width" (ex: 300px)
+4. Résultat : Chaque slide fera exactement 300px de large (sauf si l'écran est plus petit, auquel cas elle s'adapte)
+
+**Quel mode choisir ?**
+- **Mode Manual** : Vous voulez toujours 3 cartes visibles en proportion (33% chacune)
+- **Mode Auto** : Vous voulez que chaque carte fasse exactement 300px (largeur fixe)
+
+Le plugin détecte automatiquement le mode choisi et applique les styles appropriés. Aucun réglage supplémentaire nécessaire !
 
 = Le carousel est-il responsive ? =
 
@@ -147,6 +177,23 @@ Le système responsive est automatique, mais vous pouvez le personnaliser via CS
 5. Configuration du nombre de colonnes et espacement
 
 == Changelog ==
+
+= 1.0.2 - 2025-01-XX =
+* ✨ **NOUVEAU** : Support complet du mode "Auto" (Minimum column width) pour Grid et Post Template
+* ✨ Deux modes disponibles : Manual (nombre de colonnes fixe) et Auto (largeur fixe en pixels)
+* 🎯 Détection automatique du mode choisi par l'utilisateur dans les paramètres du bloc
+* 🎨 Application automatique de la largeur fixe aux slides en mode Auto
+* 📱 **Mode Auto intelligent** : La largeur définie est respectée exactement, sauf si elle dépasse la fenêtre (mobile)
+* 📱 Utilisation de min() pour éviter que les slides dépassent sur mobile
+* 💬 Messages d'aide améliorés dans l'éditeur pour expliquer les deux modes
+* 📖 Documentation enrichie avec guide détaillé sur les deux modes
+* 🐛 Correction du comportement des slides en mode "Minimum column width"
+* 🐛 Correction du comportement responsive : pas de responsive forcé en mode Auto
+* 🎨 **NOUVEAU** : Gestion intelligente du padding horizontal
+* 🎨 Le padding horizontal est converti en espacement via pseudo-éléments
+* 🎨 Plus de bandes blanches lors du scroll avec du padding
+* 🎨 Les slides gardent leur largeur correcte même avec du padding
+* 🚀 Script JavaScript frontend pour injecter --carousel-min-width depuis le CSS généré par WordPress
 
 = 1.0.1 - 2025-01-XX =
 * 📱 **NOUVEAU** : Système responsive complet avec adaptation automatique des colonnes

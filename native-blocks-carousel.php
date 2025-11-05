@@ -3,7 +3,7 @@
  * Plugin Name: Native Blocks Carousel
  * Plugin URI: https://github.com/WEBLAZER/native-blocks-carousel
  * Description: Transform any WordPress block into a performant carousel with pure CSS. Zero JavaScript, works with Gallery, Grid, Post Template, and Group blocks.
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: weblazer35
  * Author URI: https://weblazer.fr
  * License: GPL v2 or later
@@ -25,7 +25,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Constantes du plugin
-define('NATIVE_BLOCKS_CAROUSEL_VERSION', '1.0.1');
+define('NATIVE_BLOCKS_CAROUSEL_VERSION', '1.0.2');
 define('NATIVE_BLOCKS_CAROUSEL_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('NATIVE_BLOCKS_CAROUSEL_PLUGIN_PATH', plugin_dir_path(__FILE__));
 
@@ -87,6 +87,17 @@ class NativeBlocksCarousel
             [],
             NATIVE_BLOCKS_CAROUSEL_VERSION
         );
+
+        // Charger le script frontend (uniquement sur le frontend, pas dans l'éditeur)
+        if (!is_admin()) {
+            wp_enqueue_script(
+                'native-blocks-carousel-frontend',
+                NATIVE_BLOCKS_CAROUSEL_PLUGIN_URL . 'assets/js/carousel-frontend.js',
+                [],
+                NATIVE_BLOCKS_CAROUSEL_VERSION,
+                true // Charger dans le footer
+            );
+        }
 
         // Injecter les couleurs des boutons du thème
         $this->inject_theme_button_colors();
@@ -200,20 +211,40 @@ class NativeBlocksCarousel
      */
     public function inject_carousel_variables(string $block_content, array $block): string
     {
-        // Vérifier si le bloc a la classe 'nbc-carousel'
+        // Vérifier si le bloc a la classe 'nbc-carousel' (dans className OU dans le HTML)
         $class_name = $block['attrs']['className'] ?? '';
-        if (strpos($class_name, 'nbc-carousel') === false) {
+        $has_carousel_class = strpos($class_name, 'nbc-carousel') !== false || strpos($block_content, 'nbc-carousel') !== false;
+        
+        if (!$has_carousel_class) {
             return $block_content;
         }
 
         $custom_styles = [];
 
-        // 1. Injecter --carousel-min-width pour les Grids avec minimumColumnWidth
+        // 1. Injecter --carousel-min-width pour les Grids avec minimumColumnWidth (mode Auto)
         if (
             ($block['blockName'] === 'core/group' || $block['blockName'] === 'core/post-template') &&
             strpos($class_name, 'nbc-carousel-min-width') !== false
         ) {
-            $min_width = $block['attrs']['layout']['minimumColumnWidth'] ?? null;
+            // Essayer plusieurs chemins possibles pour trouver minimumColumnWidth
+            $min_width = $block['attrs']['layout']['minimumColumnWidth'] 
+                ?? $block['attrs']['minimumColumnWidth']
+                ?? null;
+            
+            // Vérifier aussi si on est en mode Auto (gridItemPosition === 'auto')
+            // Note: minimumColumnWidth devrait déjà être dans les attributs si défini
+            
+            // Si pas trouvé dans les attributs, essayer d'extraire depuis le grid-template-columns dans le HTML
+            // WordPress génère : grid-template-columns: repeat(auto-fill, minmax(min(XXXpx, 100%), 1fr))
+            if (!$min_width && preg_match('/minmax\(min\(([^,]+),/', $block_content, $matches)) {
+                $min_width = trim($matches[1]);
+            }
+            
+            // Aussi essayer depuis les styles inline si présents
+            if (!$min_width && preg_match('/grid-template-columns:\s*[^;]*minmax\(min\(([^,]+),/', $block_content, $matches)) {
+                $min_width = trim($matches[1]);
+            }
+            
             if ($min_width) {
                 $custom_styles['--carousel-min-width'] = $min_width;
             }
@@ -260,7 +291,7 @@ class NativeBlocksCarousel
             $tag_end = $matches[3];
 
             // Combiner les styles existants avec les nouveaux
-            $new_style = trim($existing_style);
+            $new_style = $existing_style;
             if (!empty($new_style) && !str_ends_with($new_style, ';')) {
                 $new_style .= ';';
             }
