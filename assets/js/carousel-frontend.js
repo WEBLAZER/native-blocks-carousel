@@ -143,12 +143,113 @@
 		});
 	}
 
+	/**
+	 * Convertit une couleur CSS en hexadécimal pour les SVG
+	 */
+	function convertColorToHexForSvg(color) {
+		if (!color) return '#ffffff';
+		
+		if (color.startsWith('#')) {
+			return color;
+		}
+		
+		if (color.startsWith('rgb')) {
+			const matches = color.match(/\d+/g);
+			if (matches && matches.length >= 3) {
+				const r = parseInt(matches[0]);
+				const g = parseInt(matches[1]);
+				const b = parseInt(matches[2]);
+				return '#' + [r, g, b].map(function(x) {
+					const hex = x.toString(16);
+					return hex.length === 1 ? '0' + hex : hex;
+				}).join('');
+			}
+		}
+		
+		// Fallback : créer un élément temporaire pour obtenir la valeur hex
+		const temp = document.createElement('div');
+		temp.style.color = color;
+		temp.style.position = 'absolute';
+		temp.style.visibility = 'hidden';
+		document.body.appendChild(temp);
+		const computedColor = window.getComputedStyle(temp).color;
+		document.body.removeChild(temp);
+		
+		if (computedColor.startsWith('rgb')) {
+			const matches = computedColor.match(/\d+/g);
+			if (matches && matches.length >= 3) {
+				const r = parseInt(matches[0]);
+				const g = parseInt(matches[1]);
+				const b = parseInt(matches[2]);
+				return '#' + [r, g, b].map(function(x) {
+					const hex = x.toString(16);
+					return hex.length === 1 ? '0' + hex : hex;
+				}).join('');
+			}
+		}
+		
+		return '#ffffff';
+	}
+
+	/**
+	 * Génère le SVG d'une flèche avec la couleur spécifiée
+	 */
+	function generateArrowSvg(direction, color) {
+		let pathData;
+		if (direction === 'left') {
+			pathData = 'M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z';
+		} else {
+			pathData = 'M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z';
+		}
+		
+		const svg = '<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 320 512\'><path fill=\'' + color + '\' d=\'' + pathData + '\'/></svg>';
+		return 'data:image/svg+xml,' + encodeURIComponent(svg);
+	}
+
+	/**
+	 * Injecte les SVG des flèches avec la couleur du texte des boutons
+	 * Lit la variable --carousel-button-color injectée par PHP et génère les SVG
+	 */
+	function injectArrowSvgs() {
+		const root = document.documentElement;
+		const rootStyle = window.getComputedStyle(root);
+		
+		// Lire la couleur du texte des boutons depuis la variable CSS
+		const buttonColor = rootStyle.getPropertyValue('--carousel-button-color').trim();
+		
+		// Si la variable n'est pas définie, essayer de la lire depuis un bouton WordPress réel
+		let actualColor = buttonColor;
+		if (!actualColor || actualColor === '') {
+			// Chercher un bouton WordPress sur la page
+			const wpButton = document.querySelector('.wp-element-button, button.wp-element-button');
+			if (wpButton) {
+				const buttonStyle = window.getComputedStyle(wpButton);
+				actualColor = buttonStyle.color;
+			} else {
+				// Fallback vers blanc
+				actualColor = '#ffffff';
+			}
+		}
+		
+		// Générer les SVG avec la couleur trouvée
+		if (actualColor && actualColor !== 'rgba(0, 0, 0, 0)' && actualColor !== '') {
+			const arrowColor = convertColorToHexForSvg(actualColor);
+			const leftArrowSvg = generateArrowSvg('left', arrowColor);
+			const rightArrowSvg = generateArrowSvg('right', arrowColor);
+			
+			// Injecter les variables CSS sur :root
+			root.style.setProperty('--carousel-button-arrow-left', 'url("' + leftArrowSvg + '")');
+			root.style.setProperty('--carousel-button-arrow-right', 'url("' + rightArrowSvg + '")');
+		}
+	}
+
 	// Fonction d'initialisation principale
 	// Le padding est maintenant géré en PHP, mais on utilise JavaScript comme fallback
 	// pour lire le padding calculé directement (plus fiable que d'essayer de l'extraire en PHP)
 	function initCarousel() {
 		injectMinWidthVariables();
 		injectPaddingVariables();
+		injectArrowSvgs();
 	}
 
 	// Exécuter au chargement du DOM
@@ -191,9 +292,12 @@
 				requestAnimationFrame(initCarousel);
 			});
 		} else {
-			// Si seulement le padding doit être mis à jour
+			// Si seulement le padding et les SVG doivent être mis à jour
 			requestAnimationFrame(function () {
-				requestAnimationFrame(injectPaddingVariables);
+				requestAnimationFrame(function () {
+					injectPaddingVariables();
+					injectArrowSvgs();
+				});
 			});
 		}
 	});

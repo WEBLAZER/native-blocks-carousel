@@ -524,4 +524,423 @@
       }, 300);
     });
   }
+
+  /**
+   * Met à jour dynamiquement les couleurs des boutons depuis les styles calculés
+   * Reproduit le comportement de WordPress qui lit directement les styles calculés
+   */
+  function updateButtonColorsFromTheme() {
+    const root = document.documentElement;
+    let buttonBg = '';
+    let buttonColor = '#fff';
+
+    // Méthode principale : Lire depuis un bouton WordPress réel dans l'éditeur
+    // C'est la méthode la plus fiable car elle lit exactement ce que WordPress applique
+    const editorWrapper = document.querySelector('.editor-styles-wrapper');
+    if (editorWrapper) {
+      // Chercher un bouton existant dans l'éditeur
+      let referenceButton = editorWrapper.querySelector('.wp-element-button, button.wp-element-button');
+
+      // Si pas de bouton trouvé, en créer un temporaire dans le contexte de l'éditeur
+      if (!referenceButton) {
+        referenceButton = document.createElement('button');
+        referenceButton.className = 'wp-element-button';
+        referenceButton.style.position = 'absolute';
+        referenceButton.style.visibility = 'hidden';
+        referenceButton.style.pointerEvents = 'none';
+        referenceButton.style.top = '-9999px';
+        referenceButton.style.left = '-9999px';
+        referenceButton.textContent = 'Button'; // Nécessaire pour que les styles s'appliquent
+        editorWrapper.appendChild(referenceButton);
+      }
+
+      // Lire les styles calculés (comme WordPress le fait)
+      const buttonComputedStyle = window.getComputedStyle(referenceButton);
+      const computedBg = buttonComputedStyle.backgroundColor;
+      const computedColor = buttonComputedStyle.color;
+
+      // Utiliser les couleurs calculées si elles sont valides
+      if (computedBg && computedBg !== 'rgba(0, 0, 0, 0)' && computedBg !== 'transparent') {
+        buttonBg = computedBg;
+      }
+
+      if (computedColor && computedColor !== 'rgba(0, 0, 0, 0)') {
+        buttonColor = computedColor;
+      }
+
+      // Nettoyer le bouton temporaire si on l'a créé
+      if (referenceButton.parentNode === editorWrapper && referenceButton.style.position === 'absolute') {
+        editorWrapper.removeChild(referenceButton);
+      }
+    } else {
+      // Fallback : chercher dans tout le document
+      const existingButton = document.querySelector('.wp-element-button, button.wp-element-button');
+      if (existingButton) {
+        const buttonComputedStyle = window.getComputedStyle(existingButton);
+        const computedBg = buttonComputedStyle.backgroundColor;
+        const computedColor = buttonComputedStyle.color;
+
+        if (computedBg && computedBg !== 'rgba(0, 0, 0, 0)' && computedBg !== 'transparent') {
+          buttonBg = computedBg;
+        }
+
+        if (computedColor && computedColor !== 'rgba(0, 0, 0, 0)') {
+          buttonColor = computedColor;
+        }
+      }
+    }
+
+    // Appliquer les couleurs trouvées aux variables CSS du carousel
+    if (buttonBg && buttonBg !== 'rgba(0, 0, 0, 0)' && buttonBg !== 'transparent' && buttonBg !== '') {
+      root.style.setProperty('--carousel-button-bg', buttonBg);
+    }
+
+    if (buttonColor && buttonColor !== 'rgba(0, 0, 0, 0)' && buttonColor !== '') {
+      root.style.setProperty('--carousel-button-color', buttonColor);
+
+      // Générer les SVG des flèches avec la couleur du texte des boutons
+      const arrowColor = convertColorToHexForSvg(buttonColor, root.ownerDocument || document);
+      const leftArrowSvg = generateArrowSvg('left', arrowColor);
+      const rightArrowSvg = generateArrowSvg('right', arrowColor);
+
+      root.style.setProperty('--carousel-button-arrow-left', `url("${leftArrowSvg}")`);
+      root.style.setProperty('--carousel-button-arrow-right', `url("${rightArrowSvg}")`);
+    }
+  }
+
+  // Fonction utilitaire pour convertir une couleur en hexadécimal
+  function convertColorToHexForSvg(color, docContext) {
+    if (!color) return '#ffffff';
+
+    if (color.startsWith('#')) {
+      return color;
+    }
+
+    if (color.startsWith('rgb')) {
+      const matches = color.match(/\d+/g);
+      if (matches && matches.length >= 3) {
+        const r = parseInt(matches[0]);
+        const g = parseInt(matches[1]);
+        const b = parseInt(matches[2]);
+        return '#' + [r, g, b].map(x => {
+          const hex = x.toString(16);
+          return hex.length === 1 ? '0' + hex : hex;
+        }).join('');
+      }
+    }
+
+    if (docContext) {
+      const temp = docContext.createElement('div');
+      temp.style.color = color;
+      docContext.body.appendChild(temp);
+      const computedColor = docContext.defaultView.getComputedStyle(temp).color;
+      docContext.body.removeChild(temp);
+
+      if (computedColor.startsWith('rgb')) {
+        const matches = computedColor.match(/\d+/g);
+        if (matches && matches.length >= 3) {
+          const r = parseInt(matches[0]);
+          const g = parseInt(matches[1]);
+          const b = parseInt(matches[2]);
+          return '#' + [r, g, b].map(x => {
+            const hex = x.toString(16);
+            return hex.length === 1 ? '0' + hex : hex;
+          }).join('');
+        }
+      }
+    }
+
+    return '#ffffff';
+  }
+
+  // Fonction utilitaire pour générer le SVG d'une flèche
+  function generateArrowSvg(direction, color) {
+    let pathData;
+    if (direction === 'left') {
+      pathData = 'M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z';
+    } else {
+      pathData = 'M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z';
+    }
+
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'><path fill='${color}' d='${pathData}'/></svg>`;
+    return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+  }
+
+  /**
+   * Initialise la mise à jour dynamique des couleurs dans l'éditeur de thème (Site Editor)
+   * Observe les changements dans les balises <style> de .editor-styles-wrapper
+   */
+  function initThemeEditorColorSync() {
+    let lastButtonBg = '';
+    let lastButtonColor = '';
+    let referenceButton = null;
+
+    // Fonction pour obtenir l'iframe de l'aperçu dans le Site Editor
+    function getPreviewIframe() {
+      const iframeElement = document.querySelector('.edit-site-visual-editor__editor-canvas, iframe[name="editor-canvas"]');
+      if (iframeElement && iframeElement.contentDocument) {
+        return iframeElement.contentDocument;
+      } else if (iframeElement && iframeElement.contentWindow) {
+        try {
+          return iframeElement.contentWindow.document;
+        } catch (e) {
+          // Erreur CORS
+          return null;
+        }
+      }
+      return null;
+    }
+
+    // Fonction pour créer/maintenir un bouton de référence
+    function getReferenceButton() {
+      // D'abord essayer dans l'iframe (Site Editor)
+      let doc = getPreviewIframe();
+      let editorWrapper = null;
+
+      if (doc) {
+        editorWrapper = doc.querySelector('.editor-styles-wrapper');
+      } else {
+        // Fallback : page principale (Block Editor normal)
+        doc = document;
+        editorWrapper = document.querySelector('.editor-styles-wrapper');
+      }
+
+      if (!editorWrapper) {
+        return null;
+      }
+
+      // Chercher un bouton existant
+      if (!referenceButton || !editorWrapper.contains(referenceButton)) {
+        referenceButton = editorWrapper.querySelector('.wp-element-button, button.wp-element-button');
+
+        // Si pas trouvé, en créer un
+        if (!referenceButton) {
+          referenceButton = doc.createElement('button');
+          referenceButton.className = 'wp-element-button';
+          referenceButton.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;top:-9999px;left:-9999px;';
+          referenceButton.textContent = 'Button';
+          editorWrapper.appendChild(referenceButton);
+        }
+      }
+
+      return { button: referenceButton, doc: doc };
+    }
+
+    // Fonction de mise à jour avec détection de changement
+    function checkAndUpdateColors() {
+      const buttonData = getReferenceButton();
+      if (!buttonData || !buttonData.button) {
+        return;
+      }
+
+      const button = buttonData.button;
+      const doc = buttonData.doc;
+      const root = doc.documentElement;
+
+      // Lire les styles calculés actuels
+      const buttonComputedStyle = doc.defaultView.getComputedStyle(button);
+      const currentBg = buttonComputedStyle.backgroundColor;
+      const currentColor = buttonComputedStyle.color;
+
+      // Vérifier si les couleurs ont changé
+      const bgChanged = currentBg !== lastButtonBg &&
+        currentBg !== 'rgba(0, 0, 0, 0)' &&
+        currentBg !== 'transparent' &&
+        currentBg !== '';
+      const colorChanged = currentColor !== lastButtonColor &&
+        currentColor !== 'rgba(0, 0, 0, 0)' &&
+        currentColor !== '';
+
+      // Mettre à jour si changement détecté
+      if (bgChanged || colorChanged || !lastButtonBg) {
+        lastButtonBg = currentBg;
+        lastButtonColor = currentColor;
+
+        // Appliquer les nouvelles couleurs dans le bon document (iframe ou page principale)
+        if (currentBg && currentBg !== 'rgba(0, 0, 0, 0)' && currentBg !== 'transparent') {
+          root.style.setProperty('--carousel-button-bg', currentBg);
+        }
+
+        if (currentColor && currentColor !== 'rgba(0, 0, 0, 0)') {
+          root.style.setProperty('--carousel-button-color', currentColor);
+
+          // Générer les SVG des flèches avec la couleur du texte des boutons
+          const arrowColor = convertColorToHexForSvg(currentColor, doc);
+          const leftArrowSvg = generateArrowSvg('left', arrowColor);
+          const rightArrowSvg = generateArrowSvg('right', arrowColor);
+
+          root.style.setProperty('--carousel-button-arrow-left', `url("${leftArrowSvg}")`);
+          root.style.setProperty('--carousel-button-arrow-right', `url("${rightArrowSvg}")`);
+        }
+      }
+    }
+
+
+    // Mise à jour initiale après un court délai pour laisser WordPress charger les styles
+    setTimeout(function () {
+      updateButtonColorsFromTheme();
+      checkAndUpdateColors();
+    }, 500);
+
+    // Observer spécifiquement les balises <style> dans .editor-styles-wrapper
+    // WordPress met à jour ces balises quand les styles changent
+    if (window.MutationObserver) {
+      const observer = new MutationObserver(function (mutations) {
+        let shouldUpdate = false;
+
+        mutations.forEach(function (mutation) {
+          // Si une balise <style> a été ajoutée/modifiée
+          if (mutation.type === 'childList') {
+            mutation.addedNodes.forEach(function (node) {
+              if (node.nodeName === 'STYLE' || (node.nodeType === 1 && node.tagName === 'STYLE')) {
+                shouldUpdate = true;
+              }
+            });
+          }
+
+          // Si le contenu d'une balise <style> a changé
+          if (mutation.type === 'characterData' ||
+            (mutation.type === 'attributes' && mutation.target.tagName === 'STYLE')) {
+            shouldUpdate = true;
+          }
+        });
+
+        if (shouldUpdate) {
+          // Attendre un peu pour que WordPress finisse d'appliquer les styles
+          setTimeout(function () {
+            requestAnimationFrame(function () {
+              requestAnimationFrame(checkAndUpdateColors);
+            });
+          }, 50);
+        }
+      });
+
+      // Observer .editor-styles-wrapper dans l'iframe ET dans la page principale
+      function observeEditorWrapper(doc) {
+        const editorWrapper = doc.querySelector('.editor-styles-wrapper');
+        if (editorWrapper) {
+          observer.observe(editorWrapper, {
+            childList: true,
+            subtree: true,
+            characterData: true,
+            attributes: true,
+            attributeFilter: ['style']
+          });
+
+          // Observer aussi toutes les balises <style> existantes
+          const styleTags = editorWrapper.querySelectorAll('style');
+          styleTags.forEach(function (styleTag) {
+            observer.observe(styleTag, {
+              childList: true,
+              subtree: true,
+              characterData: true
+            });
+          });
+        }
+      }
+
+      // Observer dans l'iframe (Site Editor)
+      const iframeDoc = getPreviewIframe();
+      if (iframeDoc) {
+        observeEditorWrapper(iframeDoc);
+      }
+
+      // Observer aussi dans la page principale (Block Editor normal)
+      observeEditorWrapper(document);
+
+      // Observer aussi l'iframe lui-même pour détecter quand il se recharge
+      const iframeElement = document.querySelector('.edit-site-visual-editor__editor-canvas, iframe[name="editor-canvas"]');
+      if (iframeElement) {
+        iframeElement.addEventListener('load', function () {
+          setTimeout(function () {
+            const newIframeDoc = getPreviewIframe();
+            if (newIframeDoc) {
+              observeEditorWrapper(newIframeDoc);
+              checkAndUpdateColors();
+            }
+          }, 500);
+        });
+      }
+    }
+
+    // Polling de secours toutes les 200ms (moins agressif)
+    const pollingInterval = setInterval(function () {
+      requestAnimationFrame(checkAndUpdateColors);
+    }, 200);
+
+    // Nettoyer l'intervalle quand on quitte la page
+    window.addEventListener('beforeunload', function () {
+      clearInterval(pollingInterval);
+    });
+  }
+
+  // Initialiser la synchronisation des couleurs dans l'éditeur de thème
+  // Utiliser plusieurs méthodes pour s'assurer que ça fonctionne
+
+  // Méthode 1 : Via wp.domReady
+  if (wp && wp.domReady) {
+    wp.domReady(initThemeEditorColorSync);
+  } else if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initThemeEditorColorSync);
+  } else {
+    setTimeout(initThemeEditorColorSync, 200);
+  }
+
+  // Méthode 2 : Écouter les changements via wp.data (store Redux)
+  // WordPress utilise Redux pour gérer l'état de l'éditeur
+  if (wp && wp.data && wp.data.subscribe) {
+    let settingsCheckInterval = null;
+
+    // Attendre que le store soit prêt
+    const initDataListener = function () {
+      try {
+        const select = wp.data.select('core/block-editor');
+        if (select && select.getSettings) {
+          let lastStylesString = '';
+
+          // Vérifier périodiquement les settings
+          settingsCheckInterval = setInterval(function () {
+            try {
+              const settings = select.getSettings();
+              if (settings && settings.styles) {
+                // Convertir les styles en string pour comparer
+                const currentStylesString = JSON.stringify(settings.styles.elements?.button || {});
+
+                if (currentStylesString !== lastStylesString) {
+                  lastStylesString = currentStylesString;
+
+                  // Déclencher une mise à jour
+                  requestAnimationFrame(function () {
+                    requestAnimationFrame(function () {
+                      const button = document.querySelector('.editor-styles-wrapper .wp-element-button, .editor-styles-wrapper button.wp-element-button');
+                      if (button) {
+                        const computedStyle = window.getComputedStyle(button);
+                        const bg = computedStyle.backgroundColor;
+                        const color = computedStyle.color;
+
+                        if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
+                          document.documentElement.style.setProperty('--carousel-button-bg', bg);
+                        }
+                        if (color && color !== 'rgba(0, 0, 0, 0)') {
+                          document.documentElement.style.setProperty('--carousel-button-color', color);
+                        }
+                      }
+                    });
+                  });
+                }
+              }
+            } catch (e) {
+              // Ignorer les erreurs
+            }
+          }, 150);
+        }
+      } catch (e) {
+        // Le store n'est pas encore disponible, réessayer plus tard
+        setTimeout(initDataListener, 500);
+      }
+    };
+
+    // Démarrer après un délai pour laisser WordPress initialiser
+    setTimeout(initDataListener, 1000);
+  }
 })(window.wp);

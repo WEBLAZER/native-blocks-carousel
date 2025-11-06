@@ -63,6 +63,9 @@
 	position: relative !important;
 	/* S'assurer que le parent peut contenir les boutons positionnés */
 	overflow: visible;
+	/* S'assurer que le parent contraint la largeur du carousel */
+	max-width: 100%;
+	box-sizing: border-box;
 }
 
 .nbc-carousel,
@@ -71,6 +74,8 @@
 	/* Layout */
 	position: relative !important;
 	width: 100%;
+	max-width: 100%;
+	box-sizing: border-box;
 	display: flex;
 	flex-flow: row nowrap;
 	align-items: stretch;
@@ -131,6 +136,11 @@
 
 .nbc-carousel .wp-block-group[style*="border-radius"] {
 	overflow: hidden;
+}
+
+.nbc-carousel .wp-block-group.has-global-padding {
+  padding-left: initial;
+  padding-right: initial;
 }
 
 /* Arrière-plans */
@@ -432,16 +442,19 @@
 }
 
 /* Boutons fallback - Prendre en compte le padding pour TOUS les carrousels */
+/* Les SVG des flèches sont générés dynamiquement avec la couleur du texte des boutons */
 :has(> .nbc-carousel)::before {
 	left: calc(var(--carousel-padding-left, 0px) + var(--carousel-button-offset, 0px));
 	transform: translate(50%, -50%);
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'%3E%3Cpath fill='white' d='M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z'/%3E%3C/svg%3E");
+	/* Utiliser la variable CSS générée dynamiquement, avec fallback vers le SVG blanc */
+	background-image: var(--carousel-button-arrow-left, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'%3E%3Cpath fill='white' d='M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z'/%3E%3C/svg%3E"));
 }
 
 :has(> .nbc-carousel)::after {
 	right: calc(var(--carousel-padding-right, 0px) + var(--carousel-button-offset, 0px));
 	transform: translate(-50%, -50%);
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'%3E%3Cpath fill='white' d='M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z'/%3E%3C/svg%3E");
+	/* Utiliser la variable CSS générée dynamiquement, avec fallback vers le SVG blanc */
+	background-image: var(--carousel-button-arrow-right, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'%3E%3Cpath fill='white' d='M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z'/%3E%3C/svg%3E"));
 }
 
 /* Sur les navigateurs compatibles, masquer les fallbacks et afficher les vrais boutons */
@@ -505,7 +518,8 @@
 		left: calc(var(--carousel-padding-left, 0px) + var(--carousel-button-offset, 0px));
 		content: '';
 		transform: translate(50%, -50%);
-		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'%3E%3Cpath fill='white' d='M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z'/%3E%3C/svg%3E");
+		/* Utiliser la variable CSS générée dynamiquement, avec fallback vers le SVG blanc */
+		background-image: var(--carousel-button-arrow-left, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'%3E%3Cpath fill='white' d='M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z'/%3E%3C/svg%3E"));
 		background-repeat: no-repeat;
 		background-position: center;
 		background-size: 40% 40%;
@@ -516,7 +530,8 @@
 		left: auto;
 		content: '';
 		transform: translate(-50%, -50%);
-		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'%3E%3Cpath fill='white' d='M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z'/%3E%3C/svg%3E");
+		/* Utiliser la variable CSS générée dynamiquement, avec fallback vers le SVG blanc */
+		background-image: var(--carousel-button-arrow-right, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'%3E%3Cpath fill='white' d='M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z'/%3E%3C/svg%3E"));
 		background-repeat: no-repeat;
 		background-position: center;
 		background-size: 40% 40%;
