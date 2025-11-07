@@ -15,7 +15,7 @@
    ========================================================================== */
 
 :root {
-	--carousel-button-size: 3rem;
+	--carousel-button-size: 2.8rem;
 	--carousel-button-offset: 0px;
 	--carousel-marker-size: 0.66rem;
 	--carousel-marker-gap: 0.5rem;
@@ -139,8 +139,8 @@
 }
 
 .nbc-carousel .wp-block-group.has-global-padding {
-  padding-left: initial;
-  padding-right: initial;
+	padding-left: initial;
+	padding-right: initial;
 }
 
 /* Arrière-plans */
@@ -428,8 +428,6 @@
 	background-color: var(--carousel-button-bg);
 	border: 2px solid var(--carousel-button-bg);
 	opacity: 0.67;
-	/* Rendre le bouton inactif plus visible mais différent de l'actif */
-	filter: grayscale(0) brightness(1);
 
 	/* Effets */
 	box-shadow: var(--carousel-shadow);
@@ -508,7 +506,6 @@
 		opacity: 0.67;
 		cursor: default;
 		/* Rendre le bouton inactif plus visible mais différent de l'actif */
-		filter: grayscale(0) brightness(1);
 	}
 
 	/* Boutons - Prendre en compte le padding pour TOUS les carrousels */
@@ -517,24 +514,24 @@
 	.nbc-carousel::scroll-button(left) {
 		left: calc(var(--carousel-padding-left, 0px) + var(--carousel-button-offset, 0px));
 		content: '';
-		transform: translate(50%, -50%);
+		transform: translate(-50%, -50%);
 		/* Utiliser la variable CSS générée dynamiquement, avec fallback vers le SVG blanc */
 		background-image: var(--carousel-button-arrow-left, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'%3E%3Cpath fill='white' d='M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z'/%3E%3C/svg%3E"));
 		background-repeat: no-repeat;
 		background-position: center;
-		background-size: 40% 40%;
+		background-size: 50% 50%;
 	}
 
 	.nbc-carousel::scroll-button(right) {
 		right: calc(var(--carousel-padding-right, 0px) + var(--carousel-button-offset, 0px));
 		left: auto;
 		content: '';
-		transform: translate(-50%, -50%);
+		transform: translate(50%, -50%);
 		/* Utiliser la variable CSS générée dynamiquement, avec fallback vers le SVG blanc */
 		background-image: var(--carousel-button-arrow-right, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'%3E%3Cpath fill='white' d='M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z'/%3E%3C/svg%3E"));
 		background-repeat: no-repeat;
 		background-position: center;
-		background-size: 40% 40%;
+		background-size: 50% 50%;
 	}
 }
 

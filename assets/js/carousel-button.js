@@ -7,13 +7,66 @@
   const { createHigherOrderComponent } = wp.compose;
   const { Fragment, useEffect, useMemo, createElement } = wp.element;
   const { InspectorControls, BlockListBlock } = wp.blockEditor;
-  const { PanelBody, ToggleControl } = wp.components;
+  const { PanelBody, ToggleControl, ButtonGroup, Button, Tooltip, Dashicon } = wp.components;
   const { __ } = wp.i18n;
 
   /**
    * Blocs supportés pour le carousel
    */
   const SUPPORTED_BLOCKS = ['core/group', 'core/post-template', 'core/gallery'];
+
+  const DEFAULT_ARROW_STYLE = 'chevron';
+
+  const ICON_BASE = {
+    chevron: {
+      viewBox: '0 0 320 512',
+      paths: {
+        left: {
+          d: 'M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z'
+        },
+        right: {
+          d: 'M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z'
+        }
+      }
+    },
+    arrow: {
+      viewBox: '0 0 640 640',
+      paths: {
+        right: {
+          d: 'M566.6 342.6C579.1 330.1 579.1 309.8 566.6 297.3L406.6 137.3C394.1 124.8 373.8 124.8 361.3 137.3C348.8 149.8 348.8 170.1 361.3 182.6L466.7 288L96 288C78.3 288 64 302.3 64 320C64 337.7 78.3 352 96 352L466.7 352L361.3 457.4C348.8 469.9 348.8 490.2 361.3 502.7C373.8 515.2 394.1 515.2 406.6 502.7L566.6 342.7z'
+        },
+        left: {
+          d: 'M566.6 342.6C579.1 330.1 579.1 309.8 566.6 297.3L406.6 137.3C394.1 124.8 373.8 124.8 361.3 137.3C348.8 149.8 348.8 170.1 361.3 182.6L466.7 288L96 288C78.3 288 64 302.3 64 320C64 337.7 78.3 352 96 352L466.7 352L361.3 457.4C348.8 469.9 348.8 490.2 361.3 502.7C373.8 515.2 394.1 515.2 406.6 502.7L566.6 342.7z',
+          transform: 'scale(-1 1) translate(-640 0)'
+        }
+      }
+    }
+  };
+
+  const ICON_ALIASES = {
+    classic: 'chevron',
+    'solid-full': 'arrow',
+    arrowfull: 'arrow',
+  };
+
+  const ARROW_ICONS = {
+    ...ICON_BASE,
+    classic: ICON_BASE.chevron,
+    'solid-full': ICON_BASE.arrow,
+  };
+
+  const normalizeStyleKey = (styleKey) => {
+    if (!styleKey) {
+      return DEFAULT_ARROW_STYLE;
+    }
+    if (ICON_BASE[styleKey]) {
+      return styleKey;
+    }
+    if (ICON_ALIASES[styleKey]) {
+      return ICON_ALIASES[styleKey];
+    }
+    return DEFAULT_ARROW_STYLE;
+  };
 
   /**
    * Ajoute l'attribut 'carouselEnabled' aux blocs supportés
@@ -31,6 +84,10 @@
           type: 'boolean',
           default: false,
         },
+        carouselArrowStyle: {
+          type: 'string',
+          default: DEFAULT_ARROW_STYLE,
+        },
       },
     };
   }
@@ -40,14 +97,48 @@
    */
   const withCarouselControl = createHigherOrderComponent((BlockEdit) => {
     return (props) => {
-      const { attributes, setAttributes, name } = props;
+      const { attributes, setAttributes, name, clientId } = props;
 
       // Ne s'applique qu'aux blocs supportés
       if (!SUPPORTED_BLOCKS.includes(name)) {
         return createElement(BlockEdit, props);
       }
 
-      const { carouselEnabled } = attributes;
+      const { carouselEnabled, carouselArrowStyle = DEFAULT_ARROW_STYLE } = attributes;
+      const normalizedArrowStyle = wp.element.useMemo(
+        () => normalizeStyleKey(carouselArrowStyle),
+        [carouselArrowStyle]
+      );
+
+      useEffect(() => {
+        if (carouselArrowStyle !== normalizedArrowStyle) {
+          setAttributes({ carouselArrowStyle: normalizedArrowStyle });
+        }
+      }, [carouselArrowStyle, normalizedArrowStyle, setAttributes]);
+
+      const arrowStyleOptions = [
+        {
+          value: 'chevron',
+          label: __('Chevron', 'native-blocks-carousel'),
+        },
+        {
+          value: 'arrow',
+          label: __('Flèche', 'native-blocks-carousel'),
+        },
+      ];
+
+      const buildIconSvg = (styleKey) => {
+        const normalizedKey = normalizeStyleKey(styleKey);
+        const icon = ARROW_ICONS[normalizedKey] || ARROW_ICONS[DEFAULT_ARROW_STYLE];
+        const pathConfig = icon.paths.right || icon.paths[Object.keys(icon.paths)[0]];
+        const attributes = [`fill='currentColor'`, `d='${pathConfig.d}'`];
+
+        if (pathConfig.transform) {
+          attributes.push(`transform='${pathConfig.transform}'`);
+        }
+
+        return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${icon.viewBox}' aria-hidden='true'><path ${attributes.join(' ')} /></svg>`;
+      };
 
       // Mémoriser la sérialisation du layout pour éviter les re-renders inutiles
       const layoutKey = useMemo(
@@ -62,6 +153,15 @@
       const toggleCarousel = (enabled) => {
         setAttributes({ carouselEnabled: enabled });
 
+        if (enabled) {
+          const normalizedStyle = normalizeStyleKey(attributes.carouselArrowStyle);
+          if (normalizedStyle !== attributes.carouselArrowStyle) {
+            setAttributes({
+              carouselArrowStyle: normalizedStyle,
+            });
+          }
+        }
+
         // Gérer la classe CSS
         const currentClasses = attributes.className || '';
         const classArray = currentClasses.split(' ').filter(Boolean);
@@ -73,7 +173,8 @@
             cls !== 'nbc-carousel-min-width' &&
             // Retirer aussi les anciennes classes pour migration
             !cls.startsWith('carousel-cols-') &&
-            cls !== 'carousel-min-width'
+            cls !== 'carousel-min-width' &&
+            !cls.startsWith('nbc-carousel-icon-')
         );
 
         if (enabled) {
@@ -230,6 +331,133 @@
         layoutKey, // Pour les grids
       ]);
 
+      useEffect(() => {
+        const currentClasses = attributes.className || '';
+        const classArray = currentClasses.split(' ').filter(Boolean);
+        const withoutIconClasses = classArray.filter((cls) => !cls.startsWith('nbc-carousel-icon-'));
+        const normalizedStyle = normalizedArrowStyle;
+        const desiredClass = `nbc-carousel-icon-${normalizedStyle}`;
+
+        let nextClasses = withoutIconClasses;
+
+        if (carouselEnabled) {
+          if (!withoutIconClasses.includes(desiredClass)) {
+            nextClasses = [...withoutIconClasses, desiredClass];
+          }
+        }
+
+        const nextClassName = nextClasses.join(' ').trim();
+        const currentClassName = classArray.join(' ').trim();
+
+        if (nextClassName !== currentClassName) {
+          setAttributes({
+            className: nextClassName,
+          });
+        }
+
+        if (typeof window !== 'undefined') {
+          const doc = document;
+          if (doc && typeof requestAnimationFrame === 'function') {
+            const runUpdate = () => {
+              const blockWrapper = doc.querySelector(`[data-block="${clientId}"]`);
+              let targetCarousel = null;
+
+              if (blockWrapper) {
+                if (blockWrapper.classList && blockWrapper.classList.contains('nbc-carousel')) {
+                  targetCarousel = blockWrapper;
+                } else {
+                  targetCarousel = blockWrapper.querySelector('.nbc-carousel');
+                }
+              }
+
+              if (!targetCarousel) {
+                return;
+              }
+
+              const config = {
+                styleKey: normalizedStyle,
+                elements: [targetCarousel],
+              };
+
+              applyArrowIconsToCarousels(null, doc, config);
+
+              setTimeout(() => {
+                applyArrowIconsToCarousels(null, doc, config);
+              }, 50);
+            };
+
+            requestAnimationFrame(() => {
+              requestAnimationFrame(runUpdate);
+            });
+          }
+        }
+      }, [carouselEnabled, carouselArrowStyle, clientId, attributes.className]);
+
+      const ensureArrowStyleControlsCss = () => {
+        if (typeof document === 'undefined') {
+          return;
+        }
+
+        const styleId = 'nbc-arrow-style-control-styles';
+        if (document.getElementById(styleId)) {
+          return;
+        }
+
+        const style = document.createElement('style');
+        style.id = styleId;
+        style.type = 'text/css';
+        style.textContent = `
+          .nbc-arrow-style-panel .nbc-arrow-style-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+          }
+          .nbc-arrow-style-group .components-button {
+            margin: 0 !important;
+          }
+          .nbc-arrow-style-group .components-button + .components-button {
+            margin-left: 0 !important;
+          }
+          .nbc-arrow-style-button.components-button {
+            width: 48px;
+            height: 48px;
+            padding: 0;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            background: #f8f9fa;
+            color: #1e1e1e;
+            transition: box-shadow .2s ease, transform .2s ease;
+          }
+          .nbc-arrow-style-button.components-button.is-primary {
+            background: var(--wp-admin-theme-color, #3858e9);
+            border-color: var(--wp-admin-theme-color, #3858e9);
+            color: #fff;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+          }
+          .nbc-arrow-style-button.components-button.is-secondary:hover {
+            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+            transform: translateY(-1px);
+          }
+          .nbc-arrow-style-button.components-button.is-primary:hover {
+            filter: brightness(1.05);
+            transform: translateY(-1px);
+          }
+          .nbc-arrow-style-button__icon svg {
+            width: 20px;
+            height: 20px;
+            display: block;
+          }
+        `;
+
+        document.head.appendChild(style);
+      };
+
+      ensureArrowStyleControlsCss();
+
       return createElement(
         Fragment,
         null,
@@ -277,6 +505,52 @@
                   'native-blocks-carousel'
                 ),
             })
+            ,
+            carouselEnabled
+              ? createElement(
+                PanelBody,
+                {
+                  title: __('Style de flèches', 'native-blocks-carousel'),
+                  initialOpen: true,
+                  className: 'nbc-arrow-style-panel',
+                },
+                createElement(
+                  ButtonGroup,
+                  {
+                    className: 'nbc-arrow-style-group',
+                  },
+                  arrowStyleOptions.map((option) =>
+                    createElement(
+                      Tooltip,
+                      { key: option.value, text: option.label },
+                      createElement(
+                        Button,
+                        {
+                          className: 'nbc-arrow-style-button',
+                          variant: normalizedArrowStyle === option.value ? 'primary' : 'secondary',
+                          onClick: () => {
+                            const nextValue = normalizeStyleKey(option.value || DEFAULT_ARROW_STYLE);
+                            setAttributes({
+                              carouselArrowStyle: nextValue,
+                            });
+                          },
+                          'aria-pressed': normalizedArrowStyle === option.value,
+                        },
+                        createElement(
+                          'span',
+                          {
+                            className: 'nbc-arrow-style-button__icon',
+                            dangerouslySetInnerHTML: { __html: buildIconSvg(option.value) },
+                            role: 'img',
+                            'aria-hidden': true,
+                          }
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+              : null
           )
         )
       );
@@ -297,6 +571,18 @@
       }
 
       const customStyles = {};
+
+      // Corriger le gap en utilisant la valeur calculée en direct
+      if (typeof window !== 'undefined' && window.getComputedStyle) {
+        const node = props?.clientId ? document.querySelector(`[data-block="${props.clientId}"]`) : null;
+        const carouselNode = node && node.classList.contains('nbc-carousel') ? node : node?.querySelector?.('.nbc-carousel');
+        if (carouselNode) {
+          const computedGap = window.getComputedStyle(carouselNode).gap || window.getComputedStyle(carouselNode).columnGap;
+          if (computedGap && computedGap !== 'normal') {
+            customStyles['--wp--style--block-gap'] = computedGap;
+          }
+        }
+      }
 
       // 1. Injecter --carousel-min-width pour les Grids avec minimumColumnWidth
       if (
@@ -322,7 +608,7 @@
       }
 
       // Injecter le gap (même si c'est "0" pour None)
-      if (blockGap !== undefined && blockGap !== null && blockGap !== '') {
+      if (blockGap !== undefined && blockGap !== null && blockGap !== '' && !customStyles['--wp--style--block-gap']) {
         // Convertir "0" en "0px" pour les calculs CSS
         customStyles['--wp--style--block-gap'] = (blockGap === '0' || blockGap === 0) ? '0px' : blockGap;
       }
@@ -408,6 +694,7 @@
             ...props.wrapperProps?.style,
             ...customStyles,
           },
+          'data-nbc-carousel-arrow-style': attributes.carouselArrowStyle || DEFAULT_ARROW_STYLE,
         },
       };
 
@@ -482,7 +769,10 @@
         clearTimeout(timeout);
         timeout = setTimeout(function () {
           requestAnimationFrame(function () {
-            requestAnimationFrame(copyPaddingVariablesToParent);
+            requestAnimationFrame(function () {
+              copyPaddingVariablesToParent();
+              applyArrowIconsToCarousels(null, document);
+            });
           });
         }, 50);
       });
@@ -519,7 +809,10 @@
       clearTimeout(debounceTimeout);
       debounceTimeout = setTimeout(function () {
         requestAnimationFrame(function () {
-          requestAnimationFrame(copyPaddingVariablesToParent);
+          requestAnimationFrame(function () {
+            copyPaddingVariablesToParent();
+            applyArrowIconsToCarousels(null, document);
+          });
         });
       }, 300);
     });
@@ -595,17 +888,21 @@
       root.style.setProperty('--carousel-button-bg', buttonBg);
     }
 
+    const docContext = root.ownerDocument || document;
+
     if (buttonColor && buttonColor !== 'rgba(0, 0, 0, 0)' && buttonColor !== '') {
       root.style.setProperty('--carousel-button-color', buttonColor);
 
       // Générer les SVG des flèches avec la couleur du texte des boutons
-      const arrowColor = convertColorToHexForSvg(buttonColor, root.ownerDocument || document);
-      const leftArrowSvg = generateArrowSvg('left', arrowColor);
-      const rightArrowSvg = generateArrowSvg('right', arrowColor);
+      const arrowColor = convertColorToHexForSvg(buttonColor, docContext);
+      const defaultLeftArrow = generateArrowSvg('left', arrowColor, DEFAULT_ARROW_STYLE);
+      const defaultRightArrow = generateArrowSvg('right', arrowColor, DEFAULT_ARROW_STYLE);
 
-      root.style.setProperty('--carousel-button-arrow-left', `url("${leftArrowSvg}")`);
-      root.style.setProperty('--carousel-button-arrow-right', `url("${rightArrowSvg}")`);
+      root.style.setProperty('--carousel-button-arrow-left', `url("${defaultLeftArrow}")`);
+      root.style.setProperty('--carousel-button-arrow-right', `url("${defaultRightArrow}")`);
     }
+
+    applyArrowIconsToCarousels(buttonColor, docContext);
   }
 
   // Fonction utilitaire pour convertir une couleur en hexadécimal
@@ -653,16 +950,154 @@
     return '#ffffff';
   }
 
-  // Fonction utilitaire pour générer le SVG d'une flèche
-  function generateArrowSvg(direction, color) {
-    let pathData;
-    if (direction === 'left') {
-      pathData = 'M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z';
-    } else {
-      pathData = 'M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z';
+  function resolveCarouselArrowStyleFromElement(element) {
+    if (!element || !element.classList) {
+      return DEFAULT_ARROW_STYLE;
     }
 
-    const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'><path fill='${color}' d='${pathData}'/></svg>`;
+    if (element.dataset && element.dataset.nbcCarouselArrowStyle && ARROW_ICONS[element.dataset.nbcCarouselArrowStyle]) {
+      return element.dataset.nbcCarouselArrowStyle;
+    }
+
+    const parentWithData = element.closest('[data-nbc-carousel-arrow-style]');
+    if (parentWithData && parentWithData.dataset && ARROW_ICONS[parentWithData.dataset.nbcCarouselArrowStyle]) {
+      return parentWithData.dataset.nbcCarouselArrowStyle;
+    }
+
+    const iconClass = Array.from(element.classList).find((cls) => cls.startsWith('nbc-carousel-icon-'));
+
+    if (iconClass) {
+      const styleKey = iconClass.replace('nbc-carousel-icon-', '');
+      if (ARROW_ICONS[styleKey]) {
+        return styleKey;
+      }
+    }
+
+    return DEFAULT_ARROW_STYLE;
+  }
+
+  function resolveArrowColor(color, docContext) {
+    const doc = docContext || document;
+    if (!doc) {
+      return '#ffffff';
+    }
+
+    const root = doc.documentElement || doc;
+    let baseColor = color;
+
+    if (!baseColor || baseColor === 'rgba(0, 0, 0, 0)' || baseColor === 'transparent') {
+      baseColor = (root.style && root.style.getPropertyValue('--carousel-button-color')) || '';
+
+      if (!baseColor && doc.defaultView && doc.defaultView.getComputedStyle) {
+        baseColor = doc.defaultView.getComputedStyle(root).getPropertyValue('--carousel-button-color');
+      }
+    }
+
+    return convertColorToHexForSvg(baseColor || '#ffffff', doc);
+  }
+
+  function applyArrowIconsToCarousels(color, docContext, overrideConfig) {
+    const baseDoc = docContext || document;
+
+    if (!baseDoc) {
+      return;
+    }
+
+    let carousels = [];
+
+    if (overrideConfig && Array.isArray(overrideConfig.elements) && overrideConfig.elements.length) {
+      carousels = overrideConfig.elements.filter(Boolean);
+    } else {
+      const docsToSearch = new Set();
+
+      if (baseDoc && typeof baseDoc.querySelectorAll === 'function') {
+        docsToSearch.add(baseDoc);
+      }
+
+      // Lorsque le script s'exécute dans le back-office, les blocs sont rendus dans une iframe
+      if (baseDoc === document) {
+        const iframeSelectors = [
+          '.editor-canvas iframe',
+          'iframe[name="editor-canvas"]',
+          '.edit-site-visual-editor__editor-canvas',
+        ];
+
+        iframeSelectors.forEach((selector) => {
+          const iframe = document.querySelector(selector);
+          if (iframe && iframe.contentDocument) {
+            docsToSearch.add(iframe.contentDocument);
+          }
+        });
+      }
+
+      docsToSearch.forEach((searchDoc) => {
+        try {
+          const found = Array.from(searchDoc.querySelectorAll('.nbc-carousel'));
+          if (found.length) {
+            found.forEach((node) => {
+              if (node) {
+                carousels.push(node);
+              }
+            });
+          }
+        } catch (e) {
+          // Ignorer les contextes non accessibles (CORS, etc.)
+        }
+      });
+    }
+
+    if (!carousels.length) {
+      return;
+    }
+
+    // Supprimer les doublons éventuels
+    carousels = Array.from(new Set(carousels));
+
+    const arrowColorCache = new WeakMap();
+
+    carousels.forEach((carousel) => {
+      const carouselDoc = carousel?.ownerDocument || baseDoc;
+      let arrowColor = arrowColorCache.get(carouselDoc);
+      if (!arrowColor) {
+        arrowColor = resolveArrowColor(color, carouselDoc);
+        arrowColorCache.set(carouselDoc, arrowColor);
+      }
+      const styleKey = overrideConfig && overrideConfig.styleKey && ARROW_ICONS[overrideConfig.styleKey]
+        ? overrideConfig.styleKey
+        : resolveCarouselArrowStyleFromElement(carousel);
+      const leftArrowSvg = generateArrowSvg('left', arrowColor, styleKey);
+      const rightArrowSvg = generateArrowSvg('right', arrowColor, styleKey);
+
+      if (carousel.dataset) {
+        carousel.dataset.nbcCarouselArrowStyle = styleKey;
+      }
+
+      carousel.style.setProperty('--carousel-button-arrow-left', `url("${leftArrowSvg}")`);
+      carousel.style.setProperty('--carousel-button-arrow-right', `url("${rightArrowSvg}")`);
+
+      const parent = carousel.parentElement;
+      if (parent) {
+        if (parent.dataset) {
+          parent.dataset.nbcCarouselArrowStyle = styleKey;
+        }
+        parent.style.setProperty('--carousel-button-arrow-left', `url("${leftArrowSvg}")`);
+        parent.style.setProperty('--carousel-button-arrow-right', `url("${rightArrowSvg}")`);
+      }
+    });
+  }
+
+  // Fonction utilitaire pour générer le SVG d'une flèche
+  function generateArrowSvg(direction, color, iconKey) {
+    const icon = ARROW_ICONS[iconKey] || ARROW_ICONS[DEFAULT_ARROW_STYLE];
+    const directionKey = direction === 'left' ? 'left' : 'right';
+    const pathConfig = icon.paths[directionKey] || icon.paths.right;
+    const attributes = [`fill='${color}'`, `d='${pathConfig.d}'`];
+
+    if (pathConfig.transform) {
+      attributes.push(`transform='${pathConfig.transform}'`);
+    }
+
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${icon.viewBox}'><path ${attributes.join(' ')} /></svg>`;
     return `data:image/svg+xml,${encodeURIComponent(svg)}`;
   }
 
@@ -766,12 +1201,14 @@
 
           // Générer les SVG des flèches avec la couleur du texte des boutons
           const arrowColor = convertColorToHexForSvg(currentColor, doc);
-          const leftArrowSvg = generateArrowSvg('left', arrowColor);
-          const rightArrowSvg = generateArrowSvg('right', arrowColor);
+          const leftArrowSvg = generateArrowSvg('left', arrowColor, DEFAULT_ARROW_STYLE);
+          const rightArrowSvg = generateArrowSvg('right', arrowColor, DEFAULT_ARROW_STYLE);
 
           root.style.setProperty('--carousel-button-arrow-left', `url("${leftArrowSvg}")`);
           root.style.setProperty('--carousel-button-arrow-right', `url("${rightArrowSvg}")`);
         }
+
+        applyArrowIconsToCarousels(currentColor, doc);
       }
     }
 
@@ -795,12 +1232,15 @@
               if (node.nodeName === 'STYLE' || (node.nodeType === 1 && node.tagName === 'STYLE')) {
                 shouldUpdate = true;
               }
+              if (node.nodeType === 1 && node.classList && node.classList.contains('nbc-carousel')) {
+                shouldUpdate = true;
+              }
             });
           }
 
           // Si le contenu d'une balise <style> a changé
           if (mutation.type === 'characterData' ||
-            (mutation.type === 'attributes' && mutation.target.tagName === 'STYLE')) {
+            (mutation.type === 'attributes' && (mutation.target.tagName === 'STYLE' || mutation.attributeName === 'class'))) {
             shouldUpdate = true;
           }
         });
@@ -824,7 +1264,7 @@
             subtree: true,
             characterData: true,
             attributes: true,
-            attributeFilter: ['style']
+            attributeFilter: ['style', 'class']
           });
 
           // Observer aussi toutes les balises <style> existantes
@@ -923,6 +1363,8 @@
                         }
                         if (color && color !== 'rgba(0, 0, 0, 0)') {
                           document.documentElement.style.setProperty('--carousel-button-color', color);
+
+                          applyArrowIconsToCarousels(color, document);
                         }
                       }
                     });
@@ -942,5 +1384,16 @@
 
     // Démarrer après un délai pour laisser WordPress initialiser
     setTimeout(initDataListener, 1000);
+  }
+
+  if (typeof window !== 'undefined') {
+    window.nbcCarousel = window.nbcCarousel || {};
+    window.nbcCarousel.applyArrowIconsToCarousels = (color, context, overrideConfig) => {
+      const normalizedConfig = overrideConfig ? {
+        ...overrideConfig,
+        styleKey: normalizeStyleKey(overrideConfig.styleKey),
+      } : overrideConfig;
+      applyArrowIconsToCarousels(color, context || document, normalizedConfig);
+    };
   }
 })(window.wp);
