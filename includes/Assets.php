@@ -96,12 +96,15 @@ class Assets implements ServiceInterface
     {
         $this->registerScripts();
 
-        \wp_enqueue_style(
-            'native-blocks-carousel-editor',
-            $this->pluginUrl . 'assets/css/carousel-editor.css',
-            ['native-blocks-carousel'],
-            $this->version
-        );
+        \wp_enqueue_style('native-blocks-carousel');
+
+        $editorStylesPath = NATIVE_BLOCKS_CAROUSEL_PLUGIN_PATH . 'assets/css/carousel-editor.css';
+        if (\file_exists($editorStylesPath)) {
+            $editorStyles = \file_get_contents($editorStylesPath);
+            if ($editorStyles) {
+                \wp_add_inline_style('native-blocks-carousel', $editorStyles);
+            }
+        }
 
         \wp_enqueue_script('native-blocks-carousel-shared');
 

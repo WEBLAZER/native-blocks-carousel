@@ -7,7 +7,7 @@
   const { createHigherOrderComponent } = wp.compose;
   const { Fragment, useEffect, useMemo, createElement } = wp.element;
   const { InspectorControls, BlockListBlock } = wp.blockEditor;
-  const { PanelBody, ToggleControl, ButtonGroup, Button, Tooltip, Dashicon } = wp.components;
+  const { PanelBody, ToggleControl, Tooltip, __experimentalToggleGroupControl: ToggleGroupControl, __experimentalToggleGroupControlOption: ToggleGroupControlOption } = wp.components;
   const { __ } = wp.i18n;
 
   /**
@@ -439,17 +439,13 @@
         style.type = 'text/css';
         style.textContent = `
           .nbc-arrow-style-panel .nbc-arrow-style-group {
-            display: flex;
-            flex-wrap: wrap;
             gap: 8px;
           }
-          .nbc-arrow-style-group .components-button {
-            margin: 0 !important;
+          .nbc-arrow-style-group.components-toggle-group-control {
+            display: flex;
+            flex-wrap: wrap;
           }
-          .nbc-arrow-style-group .components-button + .components-button {
-            margin-left: 0 !important;
-          }
-          .nbc-arrow-style-button.components-button {
+          .nbc-arrow-style-group .components-toggle-group-control__option {
             width: 48px;
             height: 48px;
             padding: 0;
@@ -463,21 +459,18 @@
             color: #1e1e1e;
             transition: box-shadow .2s ease, transform .2s ease;
           }
-          .nbc-arrow-style-button.components-button.is-primary {
+          .nbc-arrow-style-group .components-toggle-group-control__option:hover {
+            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+            transform: translateY(-1px);
+          }
+          .nbc-arrow-style-group .components-toggle-group-control__option.is-selected {
             background: var(--wp-admin-theme-color, #3858e9);
             border-color: var(--wp-admin-theme-color, #3858e9);
             color: #fff;
             box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+            transform: none;
           }
-          .nbc-arrow-style-button.components-button.is-secondary:hover {
-            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
-            transform: translateY(-1px);
-          }
-          .nbc-arrow-style-button.components-button.is-primary:hover {
-            filter: brightness(1.05);
-            transform: translateY(-1px);
-          }
-          .nbc-arrow-style-button__icon svg {
+          .nbc-arrow-style-icon svg {
             width: 20px;
             height: 20px;
             display: block;
@@ -505,6 +498,7 @@
             createElement(ToggleControl, {
               label: __('Activer le carousel', 'native-blocks-carousel'),
               checked: carouselEnabled,
+              __nextHasNoMarginBottom: true,
               onChange: toggleCarousel,
               help: carouselEnabled
                 ? name === 'core/gallery'
@@ -546,36 +540,35 @@
                   className: 'nbc-arrow-style-panel',
                 },
                 createElement(
-                  ButtonGroup,
+                  ToggleGroupControl,
                   {
                     className: 'nbc-arrow-style-group',
+                    value: normalizedArrowStyle,
+                    isBlock: false,
+                    __next40pxDefaultSize: true,
+                    __nextHasNoMarginBottom: true,
+                    onChange: (nextValue) => {
+                      const normalizedValue = normalizeStyleKey(nextValue || DEFAULT_ARROW_STYLE);
+                      setAttributes({ carouselArrowStyle: normalizedValue });
+                    },
                   },
                   arrowStyleOptions.map((option) =>
                     createElement(
-                      Tooltip,
-                      { key: option.value, text: option.label },
+                      ToggleGroupControlOption,
+                      {
+                        key: option.value,
+                        value: option.value,
+                        label: option.label,
+                        className: 'nbc-arrow-style-option',
+                      },
                       createElement(
-                        Button,
+                        'span',
                         {
-                          className: 'nbc-arrow-style-button',
-                          variant: normalizedArrowStyle === option.value ? 'primary' : 'secondary',
-                          onClick: () => {
-                            const nextValue = normalizeStyleKey(option.value || DEFAULT_ARROW_STYLE);
-                            setAttributes({
-                              carouselArrowStyle: nextValue,
-                            });
-                          },
-                          'aria-pressed': normalizedArrowStyle === option.value,
-                        },
-                        createElement(
-                          'span',
-                          {
-                            className: 'nbc-arrow-style-button__icon',
-                            dangerouslySetInnerHTML: { __html: buildIconSvg(option.value) },
-                            role: 'img',
-                            'aria-hidden': true,
-                          }
-                        )
+                          className: 'nbc-arrow-style-icon',
+                          dangerouslySetInnerHTML: { __html: buildIconSvg(option.value) },
+                          role: 'img',
+                          'aria-hidden': true,
+                        }
                       )
                     )
                   )
