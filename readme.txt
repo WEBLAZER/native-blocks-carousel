@@ -36,11 +36,11 @@ Unlike many all-in-one carousel slider blocks that require you to add a dedicate
 = Quick comparison =
 
 - **Activation**: Any Block Carousel Slider – toggle an existing Gutenberg block. Classic carousel slider blocks – add a dedicated slider block and rebuild every slide.
-- **WordPress loop**: Any Block Carousel Slider – fonctionne avec Query Loop, Post Template, CPT et produits WooCommerce sans duplication. Les carrousels concurrents – imposent un bloc par diapositive ou du code personnalisé.
-- **Frontend JavaScript**: Any Block Carousel Slider – zéro JavaScript, carousel slider 100 % CSS. Les carrousels concurrents – chargent Swiper/Slick et des scripts additionnels.
-- **Performance**: Any Block Carousel Slider – DOM léger, aucun asset externe. Les carrousels concurrents – multiplient les fichiers, reflow et téléchargements.
-- **Content maintenance**: Any Block Carousel Slider – un seul bloc Gutenberg à mettre à jour. Les carrousels concurrents – dupliquent le contenu dans des slides dédiées.
-- **Security & upkeep**: Any Block Carousel Slider – aucune bibliothèque tierce à surveiller. Les carrousels concurrents – dépendent de librairies JS externes comme Swiper/Slick.
+- **WordPress loop**: Any Block Carousel Slider – works with Query Loop, Post Template, CPTs, and WooCommerce products without duplication. Competitor carousels – require one block per slide or custom code.
+- **Frontend JavaScript**: Any Block Carousel Slider – zero JavaScript, 100% CSS carousel slider. Competitor carousels – load Swiper/Slick and additional scripts.
+- **Performance**: Any Block Carousel Slider – lightweight DOM, no external assets. Competitor carousels – multiply files, reflow, and downloads.
+- **Content maintenance**: Any Block Carousel Slider – single Gutenberg block to update. Competitor carousels – duplicate content in dedicated slides.
+- **Security & upkeep**: Any Block Carousel Slider – no third-party libraries to monitor. Competitor carousels – depend on external JS libraries like Swiper/Slick.
 
 = Key features =
 
