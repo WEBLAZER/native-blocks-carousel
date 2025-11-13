@@ -4,7 +4,7 @@ Donate link: https://weblazer.github.io/
 Tags: carousel, slider, block, gutenberg, query-loop
 Requires at least: 6.0
 Tested up to: 6.8
-Stable tag: 1.0.3.1
+Stable tag: 1.0.3.2
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -16,6 +16,10 @@ Gutenberg carousel slider block: transform any WordPress block into a responsive
 **Any Block Carousel Slider** is a Gutenberg carousel slider block plugin that instantly converts any native WordPress block (Gallery, Group, Grid, Query Loop, Post Template, WooCommerce Products, etc.) into a responsive carousel slider without adding a dedicated block or loading a JavaScript library. Simply enable the "Carousel" toggle in the Gutenberg editor: your content stays 100% native, your DOM stays lightweight, and your Lighthouse performance scores remain intact.
 
 Unlike many all-in-one carousel slider blocks that require you to add a dedicated "Carousel" block and rebuild every slide, **Any Block Carousel Slider** hooks straight into the Gutenberg blocks you already use. The result: a WordPress loop, image gallery, or product grid can become a carousel slider in one click, without content duplication or extra maintenance.
+
+= Try it now =
+
+Test **Any Block Carousel Slider** instantly in your browser with [WordPress Playground](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/WEBLAZER/any-block-carousel-slider/main/.wordpress-org/playground-blueprint.json) – no installation required! The demo includes pre-configured examples of Query Loop, Gallery, and Group blocks transformed into smooth, responsive carousels. Simply open the demo page to see the plugin in action.
 
 = Why Any Block Carousel Slider instead of a dedicated carousel slider block? =
 
@@ -153,6 +157,10 @@ Visual arrows remain visible (disabled state) and users navigate via touch scrol
 5. Custom CSS variables to adapt the carousel slider design.
 
 == Changelog ==
+
+= 1.0.3.2 - 2025-11-13 =
+* 🎮 Added WordPress Playground demo with pre-configured carousel examples.
+* 🔗 Updated "Try it now" section with interactive demo link.
 
 = 1.0.3.1 - 2025-11-13 =
 * 📝 Updated readme.txt to refresh WordPress.org cache.
