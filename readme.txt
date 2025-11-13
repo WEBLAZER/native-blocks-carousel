@@ -4,7 +4,7 @@ Donate link: https://weblazer.github.io/
 Tags: carousel, slider, block, gutenberg, query-loop
 Requires at least: 6.0
 Tested up to: 6.8
-Stable tag: 1.0.3.2
+Stable tag: 1.0.3.3
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -19,7 +19,7 @@ Unlike many all-in-one carousel slider blocks that require you to add a dedicate
 
 = Try it now =
 
-Test **Any Block Carousel Slider** instantly in your browser with [WordPress Playground](https://playground.wordpress.net/?blueprint-url=https%3A%2F%2Fraw.githubusercontent.com%2FWEBLAZER%2Fany-block-carousel-slider%2Fmain%2F.wordpress-org%2Fplayground-blueprint.json) – no installation required! The demo includes pre-configured examples of Query Loop, Gallery, and Group blocks transformed into smooth, responsive carousels. Simply open the demo page to see the plugin in action.
+Test **Any Block Carousel Slider** instantly in your browser with [WordPress Playground](https://playground.wordpress.net/?plugin=native-blocks-carousel) – no installation required! Simply activate the plugin and start transforming your blocks into carousels.
 
 = Why Any Block Carousel Slider instead of a dedicated carousel slider block? =
 
@@ -157,6 +157,10 @@ Visual arrows remain visible (disabled state) and users navigate via touch scrol
 5. Custom CSS variables to adapt the carousel slider design.
 
 == Changelog ==
+
+= 1.0.3.3 - 2025-11-13 =
+* 🔗 Simplified WordPress Playground link in "Try it now" section.
+* 📝 Updated readme.txt to refresh WordPress.org cache.
 
 = 1.0.3.2 - 2025-11-13 =
 * 🎮 Added WordPress Playground demo with pre-configured carousel examples.
