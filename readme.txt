@@ -20,8 +20,8 @@ Unlike many all-in-one carousel slider blocks that require you to add a dedicate
 = Try it now =
 
 Test **Any Block Carousel Slider** dans WordPress Playground :
- 
-[https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/WEBLAZER/any-block-carousel-slider/main/.wordpress-org/playground-blueprint-v2.json](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/WEBLAZER/any-block-carousel-slider/main/.wordpress-org/playground-blueprint-v2.json)
+
+[https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/WEBLAZER/any-block-carousel-slider/main/.wordpress-org/playground-blueprint-v3.json](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/WEBLAZER/any-block-carousel-slider/main/.wordpress-org/playground-blueprint-v3.json)
 
 = Why Any Block Carousel Slider instead of a dedicated carousel slider block? =
 
