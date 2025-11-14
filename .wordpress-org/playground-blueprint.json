@@ -8,14 +8,14 @@
 	"steps": [
 		{
 			"step": "installPlugin",
-			"pluginZipFile": {
+			"pluginData": {
 				"resource": "url",
 				"url": "https://raw.githubusercontent.com/WEBLAZER/any-block-carousel-slider/main/.wordpress-org/any-block-carousel-slider-playground.zip"
 			}
 		},
 		{
 			"step": "activatePlugin",
-			"pluginName": "any-block-carousel-slider/any-block-carousel-slider.php"
+			"pluginPath": "any-block-carousel-slider/any-block-carousel-slider.php"
 		},
 		{
 			"step": "runWpCli",
