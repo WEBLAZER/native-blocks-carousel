@@ -21,6 +21,10 @@
 			"pluginPath": "any-block-carousel-slider/any-block-carousel-slider.php"
 		},
 		{
+			"step": "activateTheme",
+			"themeFolderName": "twentytwentyfive"
+		},
+		{
 			"step": "wp-cli",
 			"command": [
 				"wp",
@@ -35,7 +39,7 @@
 			"command": [
 				"wp",
 				"eval",
-				"require_once ABSPATH . 'wp-admin/includes/image.php';\nrequire_once ABSPATH . 'wp-admin/includes/file.php';\nrequire_once ABSPATH . 'wp-admin/includes/media.php';\n\n$images = [\n    'https://picsum.photos/seed/abcs1/1600/900',\n    'https://picsum.photos/seed/abcs2/1600/900',\n    'https://picsum.photos/seed/abcs3/1600/900',\n    'https://picsum.photos/seed/abcs4/1600/900',\n    'https://picsum.photos/seed/abcs5/1600/900',\n    'https://picsum.photos/seed/abcs6/1600/900'\n];\n\nforeach ( $images as $index => $image_url ) {\n    $number  = str_pad( strval( $index + 1 ), 2, '0', STR_PAD_LEFT );\n    $post_id = wp_insert_post( [\n        'post_title'   => 'Carousel Demo Post ' . $number,\n        'post_content' => 'Activez le mode carousel sur ce bloc Query Loop pour tester le plugin.',\n        'post_status'  => 'publish',\n        'post_type'    => 'post'\n    ] );\n\n    if ( is_wp_error( $post_id ) ) {\n        continue;\n    }\n\n    $attachment_id = media_sideload_image( $image_url, $post_id, 'Image de démonstration #' . $number, 'id' );\n    if ( ! is_wp_error( $attachment_id ) ) {\n        set_post_thumbnail( $post_id, $attachment_id );\n    }\n}\n"
+				"require_once ABSPATH . 'wp-admin/includes/image.php';\nrequire_once ABSPATH . 'wp-admin/includes/file.php';\nrequire_once ABSPATH . 'wp-admin/includes/media.php';\n\n$images = [\n    'https://picsum.photos/seed/abcs1/1600/900',\n    'https://picsum.photos/seed/abcs2/1600/900',\n    'https://picsum.photos/seed/abcs3/1600/900',\n    'https://picsum.photos/seed/abcs4/1600/900',\n    'https://picsum.photos/seed/abcs5/1600/900',\n    'https://picsum.photos/seed/abcs6/1600/900'\n];\n\nforeach ( $images as $index => $image_url ) {\n    $number  = str_pad( strval( $index + 1 ), 2, '0', STR_PAD_LEFT );\n    $post_id = wp_insert_post( [\n        'post_title'   => 'Carousel Demo Post ' . $number,\n        'post_content' => 'Activez le mode carousel sur ce bloc Query Loop pour tester le plugin.',\n        'post_status'  => 'publish',\n        'post_type'    => 'post'\n    ] );\n\n    if ( is_wp_error( $post_id ) ) {\n        continue;\n    }\n\n    $attachment_id = media_sideload_image( $image_url, $post_id, 'Image de démonstration #' . $number, 'id' );\n    if ( ! is_wp_error( $attachment_id ) ) {\n        set_post_thumbnail( $post_id, $attachment_id );\n    }\n}\n\n$page_content = '<!-- wp:group -->\\n<div class=\"wp-block-group\"><!-- wp:heading -->\\n<h2 class=\"wp-block-heading\">Articles en carousel</h2>\\n<!-- /wp:heading -->\\n<!-- wp:paragraph -->\\n<p>Sélectionnez un bloc Query Loop et activez la bascule \"Carousel\" (panneau Mise en page) pour voir l\'effet Any Block Carousel Slider.</p>\\n<!-- /wp:paragraph -->\\n<!-- wp:query {\"query\":{\"perPage\":6,\"postType\":\"post\",\"order\":\"desc\"},\"layout\":{\"type\":\"default\"}} -->\\n<div class=\"wp-block-query\"><!-- wp:post-template {\"layout\":{\"type\":\"grid\",\"columnCount\":3}} -->\\n<!-- wp:group {\"className\":\"abcs abcs-cols-3 abcs-icon-chevron\"} -->\\n<div class=\"wp-block-group abcs abcs-cols-3 abcs-icon-chevron\"><!-- wp:post-featured-image {\"isLink\":true,\"aspectRatio\":\"3/2\"} /--><!-- wp:post-title {\"isLink\":true} /--><!-- wp:post-excerpt /--></div>\\n<!-- /wp:group -->\\n<!-- /wp:post-template --></div>\\n<!-- /wp:query --></div>\\n<!-- /wp:group -->';\n\n$page_id = wp_insert_post( [\n    'post_title'   => 'Démonstration Carousel',\n    'post_content' => $page_content,\n    'post_status'  => 'publish',\n    'post_type'    => 'page'\n] );\n\nif ( ! is_wp_error( $page_id ) ) {\n    update_option( 'show_on_front', 'page' );\n    update_option( 'page_on_front', $page_id );\n}\n"
 			]
 		},
 		{
