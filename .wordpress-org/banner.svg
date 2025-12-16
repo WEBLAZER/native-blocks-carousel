@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 24.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 1544 500" style="enable-background:new 0 0 1544 500;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#0073AA;}
+	.st1{fill:#1E1E1E;}
+	.st2{fill:#FFFFFF;}
+	.st3{font-family:'Outfit-SemiBold';}
+	.st4{font-size:72px;}
+	.st5{font-family:'Outfit-Light';}
+	.st6{font-size:32px;}
+	.st7{font-family:'Outfit-Bold';}
+	.st8{font-size:18px;}
+	
+	/* Animation : la slide (grand rectangle blanc) glisse de droite à gauche en boucle continue */
+	@keyframes slideMove {
+		/* Pause initiale - Slide 1 visible */
+		0%, 25% { transform: translateX(0); }
+		/* Glisse vers la gauche - Slide 2 apparaît */
+		25%, 50% { transform: translateX(-242px); }
+		/* Pause - Slide 2 visible */
+		50%, 75% { transform: translateX(-242px); }
+		/* À 99.99%, reste à -242px (slide 2 visible, slide 1 dupliquée à la position de slide 1 originale) */
+		99.99% { transform: translateX(-242px); }
+		/* Retour instantané à 0 (invisible car slide 1 dupliquée = slide 1 originale visuellement) */
+		100% { transform: translateX(0); }
+	}
+	
+	.slide-container {
+		animation: slideMove 4s linear infinite;
+	}
+</style>
+<rect class="st0" width="1544" height="500"/>
+<path class="st1" d="M683.3,360H570c-11,0-20-9-20-20l0,0c0-11,9-20,20-20h113.3c11,0,20,9,20,20l0,0C703.3,351,694.4,360,683.3,360
+	z"/>
+<path class="st1" d="M837.4,360h-89.2c-11,0-20-9-20-20l0,0c0-11,9-20,20-20h89.2c11,0,20,9,20,20l0,0
+	C857.4,351,848.5,360,837.4,360z"/>
+<path class="st1" d="M1112.3,360h-211c-11,0-20-9-20-20l0,0c0-11,9-20,20-20h211c11,0,20,9,20,20l0,0
+	C1132.3,351,1123.3,360,1112.3,360z"/>
+<text transform="matrix(1 0 0 1 550 220)" class="st2 st3 st4">Any Block Carousel Slider</text>
+<text transform="matrix(1 0 0 1 550 280)" class="st2 st5 st6">Transform any block into a responsive carousel</text>
+<text transform="matrix(1 0 0 1 581.9834 347)" class="st2 st7 st8">PURE CSS</text>
+<text transform="matrix(1 0 0 1 755.0427 347)" class="st2 st7 st8">ZERO JS</text>
+<text transform="matrix(1 0 0 1 909.9844 347)" class="st2 st7 st8">MAX PERFORMANCE</text>
+
+<!-- Carrousel animé (icône intégrée à sa taille originale 256x256) -->
+<g transform="translate(144, 122)">
+	<!-- Masque pour cacher les slides qui sortent du conteneur (avec border-radius) -->
+	<defs>
+		<clipPath id="bannerCarouselMask">
+			<rect x="0" y="0" width="256" height="256" rx="24" ry="24"/>
+		</clipPath>
+	</defs>
+	
+	<!-- Slides animées (grands rectangles blancs qui glissent de droite à gauche) -->
+	<g clip-path="url(#bannerCarouselMask)">
+		<g class="slide-container">
+			<!-- Slide 1 (grand rectangle blanc vide) -->
+			<path class="st2" d="M202.7,32H53.3C41.6,32,32,41.6,32,53.3v117.3c0,11.7,9.6,21.3,21.3,21.3h149.3c11.7,0,21.3-9.6,21.3-21.3V53.3
+				C224,41.6,214.4,32,202.7,32z M49.1,53.3c0-2.5,1.5-5.3,4.3-5.3h149.3c3.2,0,5.3,2.1,5.3,5.3v117.3c0,3.2-2.1,5.3-5.3,5.3H53.3
+				c-3.2,0-5.3-2.1-5.3-5.3L49.1,53.3z"/>
+			
+			<!-- Slide 2 (positionnée à droite de la slide 1 avec gap de 50px) -->
+			<path class="st2" d="M444.7,32H295.3C283.6,32,274,41.6,274,53.3v117.3c0,11.7,9.6,21.3,21.3,21.3h149.3c11.7,0,21.3-9.6,21.3-21.3V53.3
+				C466,41.6,456.4,32,444.7,32z M291.1,53.3c0-2.5,1.5-5.3,4.3-5.3h149.3c3.2,0,5.3,2.1,5.3,5.3v117.3c0,3.2-2.1,5.3-5.3,5.3H295.3
+				c-3.2,0-5.3-2.1-5.3-5.3L291.1,53.3z"/>
+			
+			<!-- Slide 1 (dupliquée pour la boucle continue) -->
+			<g transform="translate(242, 0)">
+				<path class="st2" d="M202.7,32H53.3C41.6,32,32,41.6,32,53.3v117.3c0,11.7,9.6,21.3,21.3,21.3h149.3c11.7,0,21.3-9.6,21.3-21.3V53.3
+					C224,41.6,214.4,32,202.7,32z M49.1,53.3c0-2.5,1.5-5.3,4.3-5.3h149.3c3.2,0,5.3,2.1,5.3,5.3v117.3c0,3.2-2.1,5.3-5.3,5.3H53.3
+					c-3.2,0-5.3-2.1-5.3-5.3L49.1,53.3z"/>
+			</g>
+		</g>
+	</g>
+	
+	<!-- Points de pagination - STATIQUES (pas d'animation) -->
+	<circle class="st2" cx="96" cy="216" r="8"/>
+	<circle class="st2" cx="128" cy="216" r="8"/>
+	<circle class="st2" cx="160" cy="216" r="8"/>
+	
+	<!-- Flèche droite - STATIQUE (pas d'animation) -->
+	<circle class="st2" cx="216" cy="112" r="29.3"/>
+	<path class="st0" d="M227.2,110.1c1,1,1,2.6,0,3.6l-12.8,12.8c-1,1-2.6,1-3.6,0s-1-2.6,0-3.6l11-11l-11-11c-1-1-1-2.6,0-3.6
+		s2.6-1,3.6,0L227.2,110.1L227.2,110.1z"/>
+	
+	<!-- Flèche gauche - STATIQUE (pas d'animation) -->
+	<circle class="st2" cx="40" cy="112" r="29.3"/>
+	<path class="st0" d="M30.5,110.8c-1,1-1,2.6,0,3.6l12.8,12.8c1,1,2.6,1,3.6,0s1-2.6,0-3.6l-11-11l11-11c1-1,1-2.6,0-3.6
+		s-2.6-1-3.6,0L30.5,110.8L30.5,110.8z"/>
+</g>
+</svg>

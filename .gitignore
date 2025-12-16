@@ -31,4 +31,3 @@ composer.lock
 # Environment
 .env
 .env.local
-

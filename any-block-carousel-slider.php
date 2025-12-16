@@ -28,7 +28,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('ANY_BLOCK_CAROUSEL_SLIDER_VERSION', '1.0.3.5');
+define('ANY_BLOCK_CAROUSEL_SLIDER_VERSION', '1.0.3.6');
 define('ANY_BLOCK_CAROUSEL_SLIDER_PLUGIN_FILE', __FILE__);
 define('ANY_BLOCK_CAROUSEL_SLIDER_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('ANY_BLOCK_CAROUSEL_SLIDER_PLUGIN_PATH', plugin_dir_path(__FILE__));
