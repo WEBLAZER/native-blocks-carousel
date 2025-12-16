@@ -20,7 +20,7 @@
 	--carousel-marker-size: 0.66rem;
 	--carousel-marker-gap: 0.5rem;
 	--carousel-marker-bottom-offset: -2rem;
-	--carousel-z-index: 999999;
+	--carousel-z-index: 5;
 	--carousel-transition-duration: 0.3s;
 	--carousel-transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
