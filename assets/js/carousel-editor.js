@@ -7,7 +7,7 @@
   const { createHigherOrderComponent } = wp.compose;
   const { Fragment, useEffect, useMemo, createElement, RawHTML } = wp.element;
   const { InspectorControls, BlockListBlock } = wp.blockEditor;
-  const { PanelBody, ToggleControl, Tooltip, __experimentalToggleGroupControl: ToggleGroupControl, __experimentalToggleGroupControlOption: ToggleGroupControlOption, __experimentalToggleGroupControlOptionIcon: ToggleGroupControlOptionIcon } = wp.components;
+  const { PanelBody, ToggleControl, RangeControl, Tooltip, __experimentalToggleGroupControl: ToggleGroupControl, __experimentalToggleGroupControlOption: ToggleGroupControlOption, __experimentalToggleGroupControlOptionIcon: ToggleGroupControlOptionIcon } = wp.components;
   const { __ } = wp.i18n;
 
   /**
@@ -197,6 +197,18 @@
           type: 'boolean',
           default: true,
         },
+        carouselLoop: {
+          type: 'boolean',
+          default: false,
+        },
+        carouselAutoplay: {
+          type: 'boolean',
+          default: false,
+        },
+        carouselAutoplayDelay: {
+          type: 'number',
+          default: 3000,
+        },
       },
     };
   }
@@ -218,6 +230,9 @@
         carouselArrowStyle = DEFAULT_ARROW_STYLE,
         carouselShowArrows = true,
         carouselShowMarkers = true,
+        carouselLoop = false,
+        carouselAutoplay = false,
+        carouselAutoplayDelay = 3000,
       } = attributes;
       const normalizedArrowStyle = wp.element.useMemo(
         () => normalizeStyleKey(carouselArrowStyle),
@@ -737,6 +752,61 @@
                   ),
               })
               : null,
+            carouselEnabled
+              ? createElement(ToggleControl, {
+                label: __('Enable loop', 'native-blocks-carousel'),
+                checked: carouselLoop,
+                __nextHasNoMarginBottom: true,
+                onChange: (value) => {
+                  setAttributes({ carouselLoop: value });
+                },
+                help: carouselLoop
+                  ? __(
+                    'The carousel will loop infinitely, returning to the first slide after the last.',
+                    'native-blocks-carousel'
+                  )
+                  : __(
+                    'Loop is disabled. The carousel stops at the end.',
+                    'native-blocks-carousel'
+                  ),
+              })
+              : null,
+            carouselEnabled
+              ? createElement(ToggleControl, {
+                label: __('Enable autoplay', 'native-blocks-carousel'),
+                checked: carouselAutoplay,
+                __nextHasNoMarginBottom: true,
+                onChange: (value) => {
+                  setAttributes({ carouselAutoplay: value });
+                },
+                help: carouselAutoplay
+                  ? __(
+                    'The carousel will automatically scroll through slides.',
+                    'native-blocks-carousel'
+                  )
+                  : __(
+                    'Autoplay is disabled. Users must navigate manually.',
+                    'native-blocks-carousel'
+                  ),
+              })
+              : null,
+            carouselEnabled && carouselAutoplay
+              ? createElement(RangeControl, {
+                label: __('Autoplay delay (ms)', 'native-blocks-carousel'),
+                value: carouselAutoplayDelay,
+                onChange: (value) => {
+                  setAttributes({ carouselAutoplayDelay: value || 3000 });
+                },
+                min: 1000,
+                max: 10000,
+                step: 100,
+                __nextHasNoMarginBottom: true,
+                help: __(
+                  'Time in milliseconds between each slide transition.',
+                  'native-blocks-carousel'
+                ),
+              })
+              : null,
             carouselEnabled && carouselShowArrows
               ? createElement(
                 PanelBody,
@@ -916,6 +986,9 @@
             ...customStyles,
           },
           'data-abcs-arrow-style': attributes.carouselArrowStyle || DEFAULT_ARROW_STYLE,
+          'data-abcs-loop': attributes.carouselLoop ? 'true' : 'false',
+          'data-abcs-autoplay': attributes.carouselAutoplay ? 'true' : 'false',
+          'data-abcs-autoplay-delay': attributes.carouselAutoplayDelay || 3000,
         },
       };
 
@@ -1040,13 +1113,81 @@
   }
 
   /**
+   * Injects CSS variables into a <style> tag instead of inline style attribute.
+   * This is a better practice than using element.style.setProperty() on documentElement.
+   *
+   * @param {Object} variables - Object with CSS variable names as keys and values as values
+   * @param {Document|HTMLElement} docContext - Document context (for iframe support)
+   */
+  function injectCssVariablesInStyleTag(variables, docContext) {
+    const doc = docContext && docContext.ownerDocument ? docContext.ownerDocument : (docContext || document);
+    const head = doc.head || doc.getElementsByTagName('head')[0];
+
+    if (!head) return;
+
+    // Find or create the style tag for carousel variables
+    let styleTag = doc.getElementById('carousel-dynamic-variables');
+
+    if (!styleTag) {
+      styleTag = doc.createElement('style');
+      styleTag.id = 'carousel-dynamic-variables';
+      styleTag.type = 'text/css';
+      head.appendChild(styleTag);
+    }
+
+    // Build CSS with all variables
+    let css = ':root {';
+    for (const [key, value] of Object.entries(variables)) {
+      if (value !== null && value !== undefined && value !== '') {
+        css += `\n  ${key}: ${value};`;
+      }
+    }
+    css += '\n}';
+
+    styleTag.textContent = css;
+  }
+
+  /**
+   * Checks if a color value matches WordPress core default button colors.
+   * This helps avoid applying core defaults when theme has no custom button styles.
+   *
+   * @param {string} color - Color value to check (can be rgb, rgba, hex, etc.)
+   * @returns {boolean} True if the color matches core defaults
+   */
+  function isWordPressCoreDefaultColor(color) {
+    if (!color) return false;
+
+    // WordPress core default button colors
+    // Background: rgb(50, 55, 60) = #32373c
+    // Text: rgb(255, 255, 255) = #fff
+    const coreDefaults = [
+      'rgb(50, 55, 60)',
+      'rgba(50, 55, 60, 1)',
+      '#32373c',
+      'rgb(255, 255, 255)',
+      'rgba(255, 255, 255, 1)',
+      '#ffffff',
+      '#fff'
+    ];
+
+    // Normalize the color for comparison
+    const normalizedColor = color.toLowerCase().trim();
+
+    return coreDefaults.some(defaultColor => {
+      const normalizedDefault = defaultColor.toLowerCase().trim();
+      return normalizedColor === normalizedDefault || normalizedColor.includes(normalizedDefault);
+    });
+  }
+
+  /**
    * Dynamically updates button colors based on computed styles.
    * Mirrors WordPress behaviour that reads computed styles directly.
+   * Only applies colors if they come from theme customizations, not WordPress core defaults.
    */
   function updateButtonColorsFromTheme() {
     const root = document.documentElement;
     let buttonBg = '';
-    let buttonColor = '#fff';
+    let buttonColor = '';
 
     // Main method: read from a real WordPress button inside the editor
     // This is the most reliable approach because it matches what WordPress applies
@@ -1073,12 +1214,12 @@
       const computedBg = buttonComputedStyle.backgroundColor;
       const computedColor = buttonComputedStyle.color;
 
-      // Use computed colors when they are valid
-      if (computedBg && computedBg !== 'rgba(0, 0, 0, 0)' && computedBg !== 'transparent') {
+      // Use computed colors when they are valid AND not WordPress core defaults
+      if (computedBg && computedBg !== 'rgba(0, 0, 0, 0)' && computedBg !== 'transparent' && !isWordPressCoreDefaultColor(computedBg)) {
         buttonBg = computedBg;
       }
 
-      if (computedColor && computedColor !== 'rgba(0, 0, 0, 0)') {
+      if (computedColor && computedColor !== 'rgba(0, 0, 0, 0)' && !isWordPressCoreDefaultColor(computedColor)) {
         buttonColor = computedColor;
       }
 
@@ -1094,33 +1235,41 @@
         const computedBg = buttonComputedStyle.backgroundColor;
         const computedColor = buttonComputedStyle.color;
 
-        if (computedBg && computedBg !== 'rgba(0, 0, 0, 0)' && computedBg !== 'transparent') {
+        // Use computed colors when they are valid AND not WordPress core defaults
+        if (computedBg && computedBg !== 'rgba(0, 0, 0, 0)' && computedBg !== 'transparent' && !isWordPressCoreDefaultColor(computedBg)) {
           buttonBg = computedBg;
         }
 
-        if (computedColor && computedColor !== 'rgba(0, 0, 0, 0)') {
+        if (computedColor && computedColor !== 'rgba(0, 0, 0, 0)' && !isWordPressCoreDefaultColor(computedColor)) {
           buttonColor = computedColor;
         }
       }
     }
 
     // Apply the retrieved colors to the carousel CSS variables
+    // Use style tag instead of inline style attribute (better practice)
+    const docContext = root.ownerDocument || document;
+    const variables = {};
+
     if (buttonBg && buttonBg !== 'rgba(0, 0, 0, 0)' && buttonBg !== 'transparent' && buttonBg !== '') {
-      root.style.setProperty('--carousel-button-bg', buttonBg);
+      variables['--carousel-button-bg'] = buttonBg;
     }
 
-    const docContext = root.ownerDocument || document;
-
     if (buttonColor && buttonColor !== 'rgba(0, 0, 0, 0)' && buttonColor !== '') {
-      root.style.setProperty('--carousel-button-color', buttonColor);
+      variables['--carousel-button-color'] = buttonColor;
 
       // Generate arrow SVGs using the button text color
       const arrowColor = convertColorToHexForSvg(buttonColor, docContext);
       const defaultLeftArrow = generateArrowSvg('left', arrowColor, DEFAULT_ARROW_STYLE);
       const defaultRightArrow = generateArrowSvg('right', arrowColor, DEFAULT_ARROW_STYLE);
 
-      root.style.setProperty('--carousel-button-arrow-left', `url("${defaultLeftArrow}")`);
-      root.style.setProperty('--carousel-button-arrow-right', `url("${defaultRightArrow}")`);
+      variables['--carousel-button-arrow-left'] = `url("${defaultLeftArrow}")`;
+      variables['--carousel-button-arrow-right'] = `url("${defaultRightArrow}")`;
+    }
+
+    // Inject all variables at once in a style tag
+    if (Object.keys(variables).length > 0) {
+      injectCssVariablesInStyleTag(variables, docContext);
     }
 
     applyArrowIconsToCarousels(buttonColor, docContext);
@@ -1408,13 +1557,16 @@
       const currentColor = buttonComputedStyle.color;
 
       // Check whether the colors changed
+      // Also check that colors are not WordPress core defaults
       const bgChanged = currentBg !== lastButtonBg &&
         currentBg !== 'rgba(0, 0, 0, 0)' &&
         currentBg !== 'transparent' &&
-        currentBg !== '';
+        currentBg !== '' &&
+        !isWordPressCoreDefaultColor(currentBg);
       const colorChanged = currentColor !== lastButtonColor &&
         currentColor !== 'rgba(0, 0, 0, 0)' &&
-        currentColor !== '';
+        currentColor !== '' &&
+        !isWordPressCoreDefaultColor(currentColor);
 
       // Update if a change is detected
       if (bgChanged || colorChanged || !lastButtonBg) {
@@ -1422,20 +1574,28 @@
         lastButtonColor = currentColor;
 
         // Apply colors inside the appropriate document (iframe or main page)
-        if (currentBg && currentBg !== 'rgba(0, 0, 0, 0)' && currentBg !== 'transparent') {
-          root.style.setProperty('--carousel-button-bg', currentBg);
+        // Use style tag instead of inline style attribute (better practice)
+        const variables = {};
+
+        if (currentBg && currentBg !== 'rgba(0, 0, 0, 0)' && currentBg !== 'transparent' && !isWordPressCoreDefaultColor(currentBg)) {
+          variables['--carousel-button-bg'] = currentBg;
         }
 
-        if (currentColor && currentColor !== 'rgba(0, 0, 0, 0)') {
-          root.style.setProperty('--carousel-button-color', currentColor);
+        if (currentColor && currentColor !== 'rgba(0, 0, 0, 0)' && !isWordPressCoreDefaultColor(currentColor)) {
+          variables['--carousel-button-color'] = currentColor;
 
           // Generate arrow SVGs using the button text color
           const arrowColor = convertColorToHexForSvg(currentColor, doc);
           const leftArrowSvg = generateArrowSvg('left', arrowColor, DEFAULT_ARROW_STYLE);
           const rightArrowSvg = generateArrowSvg('right', arrowColor, DEFAULT_ARROW_STYLE);
 
-          root.style.setProperty('--carousel-button-arrow-left', `url("${leftArrowSvg}")`);
-          root.style.setProperty('--carousel-button-arrow-right', `url("${rightArrowSvg}")`);
+          variables['--carousel-button-arrow-left'] = `url("${leftArrowSvg}")`;
+          variables['--carousel-button-arrow-right'] = `url("${rightArrowSvg}")`;
+        }
+
+        // Inject all variables at once in a style tag
+        if (Object.keys(variables).length > 0) {
+          injectCssVariablesInStyleTag(variables, doc);
         }
 
         applyArrowIconsToCarousels(currentColor, doc);
@@ -1588,13 +1748,30 @@
                         const bg = computedStyle.backgroundColor;
                         const color = computedStyle.color;
 
-                        if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
-                          document.documentElement.style.setProperty('--carousel-button-bg', bg);
+                        // Only apply colors if they are not WordPress core defaults
+                        // Use style tag instead of inline style attribute (better practice)
+                        const variables = {};
+
+                        if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent' && !isWordPressCoreDefaultColor(bg)) {
+                          variables['--carousel-button-bg'] = bg;
                         }
-                        if (color && color !== 'rgba(0, 0, 0, 0)') {
-                          document.documentElement.style.setProperty('--carousel-button-color', color);
+                        if (color && color !== 'rgba(0, 0, 0, 0)' && !isWordPressCoreDefaultColor(color)) {
+                          variables['--carousel-button-color'] = color;
+
+                          // Generate arrow SVGs using the button text color
+                          const arrowColor = convertColorToHexForSvg(color, document);
+                          const leftArrowSvg = generateArrowSvg('left', arrowColor, DEFAULT_ARROW_STYLE);
+                          const rightArrowSvg = generateArrowSvg('right', arrowColor, DEFAULT_ARROW_STYLE);
+
+                          variables['--carousel-button-arrow-left'] = `url("${leftArrowSvg}")`;
+                          variables['--carousel-button-arrow-right'] = `url("${rightArrowSvg}")`;
 
                           applyArrowIconsToCarousels(color, document);
+                        }
+
+                        // Inject all variables at once in a style tag
+                        if (Object.keys(variables).length > 0) {
+                          injectCssVariablesInStyleTag(variables, document);
                         }
                       }
                     });

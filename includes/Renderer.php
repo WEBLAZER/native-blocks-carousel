@@ -50,17 +50,41 @@ class Renderer implements ServiceInterface
         $this->maybeAddBlockGapVariable($custom_styles, $block);
         $this->maybeAddPaddingVariables($custom_styles, $block, $block_content);
 
-        if (empty($custom_styles)) {
+        // Get loop and autoplay attributes
+        $loop = $block['attrs']['carouselLoop'] ?? false;
+        $autoplay = $block['attrs']['carouselAutoplay'] ?? false;
+        $autoplay_delay = $block['attrs']['carouselAutoplayDelay'] ?? 3000;
+
+        $has_styles = !empty($custom_styles);
+        $has_loop_attrs = $loop;
+        $has_autoplay_attrs = $autoplay;
+
+        // If no styles and no loop/autoplay attributes, return early
+        if (!$has_styles && !$has_loop_attrs && !$has_autoplay_attrs) {
             return $block_content;
         }
 
-        $styles_string = $this->buildStylesString($custom_styles);
+        $styles_string = $has_styles ? $this->buildStylesString($custom_styles) : '';
+
         if (\class_exists('\\WP_HTML_Tag_Processor')) {
             $processor = new \WP_HTML_Tag_Processor($block_content);
 
             if ($processor->next_tag(['class_name' => 'abcs'])) {
-                $existing_style = $processor->get_attribute('style');
-                $processor->set_attribute('style', $this->mergeStyleAttribute($existing_style, $styles_string));
+                if ($has_styles) {
+                    $existing_style = $processor->get_attribute('style');
+                    $processor->set_attribute('style', $this->mergeStyleAttribute($existing_style, $styles_string));
+                }
+
+                // Add loop data attribute
+                if ($has_loop_attrs) {
+                    $processor->set_attribute('data-abcs-loop', $loop ? 'true' : 'false');
+                }
+
+                // Add autoplay data attributes
+                if ($has_autoplay_attrs) {
+                    $processor->set_attribute('data-abcs-autoplay', $autoplay ? 'true' : 'false');
+                    $processor->set_attribute('data-abcs-autoplay-delay', (string) $autoplay_delay);
+                }
 
                 $modified_content = $processor->get_updated_html();
 
@@ -70,16 +94,42 @@ class Renderer implements ServiceInterface
             }
         }
 
+        // Fallback to regex if WP_HTML_Tag_Processor is not available
         $pattern = '/(<(?:div|ul|figure)\s+[^>]*class="[^"]*\babcs\b[^"]*"[^>]*?)(?:\s+style="([^"]*)")?(\s*>)/i';
 
-        $replacement = function (array $matches) use ($styles_string) {
+        $replacement = function (array $matches) use ($styles_string, $loop, $autoplay, $autoplay_delay, $has_styles, $has_loop_attrs, $has_autoplay_attrs) {
             $tag_start = $matches[1];
             $existing_style = $matches[2] ?? '';
             $tag_end = $matches[3];
 
-            $new_style = $this->mergeStyleAttribute($existing_style, $styles_string);
+            $result = $tag_start;
 
-            return $tag_start . ' style="' . $new_style . '"' . $tag_end;
+            // Add style attribute if needed
+            if ($has_styles) {
+                $existing_style_trimmed = '' !== $existing_style ? \trim($existing_style) : '';
+                if ('' !== $existing_style_trimmed && ';' !== \substr($existing_style_trimmed, -1)) {
+                    $existing_style_trimmed .= ';';
+                }
+                $new_style = $existing_style_trimmed . $styles_string;
+                $result .= ' style="' . \esc_attr($new_style) . '"';
+            } elseif ($existing_style) {
+                $result .= ' style="' . \esc_attr($existing_style) . '"';
+            }
+
+            // Add loop data attribute
+            if ($has_loop_attrs) {
+                $result .= ' data-abcs-loop="' . \esc_attr($loop ? 'true' : 'false') . '"';
+            }
+
+            // Add autoplay data attributes
+            if ($has_autoplay_attrs) {
+                $result .= ' data-abcs-autoplay="' . \esc_attr($autoplay ? 'true' : 'false') . '"';
+                $result .= ' data-abcs-autoplay-delay="' . \esc_attr((string) $autoplay_delay) . '"';
+            }
+
+            $result .= $tag_end;
+
+            return $result;
         };
 
         $modified_content = \preg_replace_callback($pattern, $replacement, $block_content, 1);

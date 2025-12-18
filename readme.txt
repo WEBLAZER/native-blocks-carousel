@@ -4,7 +4,7 @@ Tags: carousel, slider, block, gutenberg, woocommerce
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.3.6
+Stable tag: 1.0.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -44,6 +44,8 @@ Unlike many all-in-one carousel slider blocks that require you to add a dedicate
 = Key features =
 
 * **100% CSS** – Smooth carousel slider with `scroll-snap`, `::scroll-button`, and `::scroll-marker`. No script to bundle.
+* **Loop functionality** – Enable infinite scrolling with seamless reset to start/end when reaching boundaries.
+* **Autoplay support** – Automatic slide progression with configurable delay and pause on hover/interaction.
 * **Smart responsive** – Automatically handles visible columns, spacing, and control sizes according to WordPress breakpoints (1280, 1024, 782, 600, 480, 375).
 * **Two width modes** – Manual mode (fixed column count) and Auto mode (fixed width like 320px) with automatic detection.
 * **Gutenberg block spacing detection** – Respects `gap` and `padding` values defined in the block editor, including presets.
@@ -60,6 +62,8 @@ Unlike many all-in-one carousel slider blocks that require you to add a dedicate
 
 = Advanced customization =
 
+* **Loop mode** – Enable infinite scrolling: when reaching the end, the carousel seamlessly resets to the beginning (and vice versa). Navigation buttons remain active at all times.
+* **Autoplay** – Automatic slide progression with configurable delay (default: 3000ms). Autoplay pauses on hover and user interaction, and stops at the end when loop is disabled.
 * **Manual mode (fixed columns)** – Ideal for article carousel sliders: 1 to 6 columns depending on screen sizes.
 * **Auto mode (fixed width)** – Perfect for card-based sliders (posts, testimonials, product highlights) with pixel-perfect widths like 280px, 320px, or 360px.
 * **Padding and gaps** – Automatic management via CSS vars `--carousel-padding-*`, `--wp--style--block-gap`.
@@ -178,6 +182,15 @@ Visual arrows remain visible (disabled state) and users navigate via touch scrol
 * 🔗 Simplified WordPress Playground link in "Try it now" section.
 * 📝 Updated readme.txt to refresh WordPress.org cache.
 
+= 1.0.4 - 2025-01-XX =
+* ✨ Added Loop functionality: infinite carousel scrolling with seamless reset to start/end.
+* ✨ Added Autoplay functionality: automatic slide progression with configurable delay.
+* 🎯 Loop keeps navigation buttons visible even at carousel boundaries.
+* ⏱️ Autoplay respects configured delay before resetting when loop is enabled.
+* 🎨 Improved scroll detection to ignore scroll-snap micro-adjustments.
+* 🐛 Fixed premature reset triggers when scrolling towards carousel end.
+* 🛠️ Enhanced boundary detection for better loop and autoplay behavior.
+
 = 1.0.3.2 - 2025-11-13 =
 * 🎮 Added WordPress Playground demo with pre-configured carousel examples.
 * 🔗 Updated "Try it now" section with interactive demo link.
@@ -219,6 +232,9 @@ Visual arrows remain visible (disabled state) and users navigate via touch scrol
 * 🔄 Multi-carousel compatibility on the same page.
 
 == Upgrade Notice ==
+
+= 1.0.4 =
+Recommended update: adds Loop and Autoplay features for enhanced carousel functionality. Loop enables infinite scrolling, and Autoplay provides automatic slide progression with configurable timing.
 
 = 1.0.3 =
 Recommended update: fixes dynamic arrow style updates in the editor and improves compatibility with Site Editor iframes.

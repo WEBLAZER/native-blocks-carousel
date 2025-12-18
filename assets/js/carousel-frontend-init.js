@@ -3,7 +3,7 @@
  * Injects missing CSS variables for the minimumColumnWidth mode.
  *
  * @package AnyBlockCarouselSlider
- * @version 1.0.2
+ * @version 1.0.4
  * @author weblazer35
  */
 
@@ -440,20 +440,53 @@
 
 			carousel.style.setProperty('--carousel-button-arrow-left', 'url("' + leftArrowSvg + '")');
 			carousel.style.setProperty('--carousel-button-arrow-right', 'url("' + rightArrowSvg + '")');
-		if (carousel.dataset) {
-			carousel.dataset.abcsCarouselArrowStyle = styleKey;
-			carousel.dataset.abcsArrowStyle = styleKey;
-		}
+			if (carousel.dataset) {
+				carousel.dataset.abcsCarouselArrowStyle = styleKey;
+				carousel.dataset.abcsArrowStyle = styleKey;
+			}
 
 			if (parent) {
-			if (parent.dataset) {
-				parent.dataset.abcsCarouselArrowStyle = styleKey;
-				parent.dataset.abcsArrowStyle = styleKey;
-			}
+				if (parent.dataset) {
+					parent.dataset.abcsCarouselArrowStyle = styleKey;
+					parent.dataset.abcsArrowStyle = styleKey;
+				}
 				parent.style.setProperty('--carousel-button-arrow-left', 'url("' + leftArrowSvg + '")');
 				parent.style.setProperty('--carousel-button-arrow-right', 'url("' + rightArrowSvg + '")');
 			}
 		});
+	}
+
+	/**
+	 * Injects CSS variables into a <style> tag instead of inline style attribute.
+	 * This is a better practice than using element.style.setProperty() on documentElement.
+	 *
+	 * @param {Object} variables - Object with CSS variable names as keys and values as values
+	 */
+	function injectCssVariablesInStyleTag(variables) {
+		const head = document.head || document.getElementsByTagName('head')[0];
+
+		if (!head) return;
+
+		// Find or create the style tag for carousel variables
+		let styleTag = document.getElementById('carousel-dynamic-variables');
+
+		if (!styleTag) {
+			styleTag = document.createElement('style');
+			styleTag.id = 'carousel-dynamic-variables';
+			styleTag.type = 'text/css';
+			head.appendChild(styleTag);
+		}
+
+		// Build CSS with all variables
+		let css = ':root {';
+		for (const [key, value] of Object.entries(variables)) {
+			if (value !== null && value !== undefined && value !== '') {
+				css += '\n  ' + key + ': ' + value + ';';
+			}
+		}
+		css += '\n}';
+
+		styleTag.textContent = css;
 	}
 
 	/**
@@ -487,12 +520,473 @@
 			const defaultLeftArrow = generateArrowSvg('left', arrowColor, DEFAULT_ARROW_STYLE);
 			const defaultRightArrow = generateArrowSvg('right', arrowColor, DEFAULT_ARROW_STYLE);
 
-			// Inject CSS variables on :root
-			root.style.setProperty('--carousel-button-arrow-left', 'url("' + defaultLeftArrow + '")');
-			root.style.setProperty('--carousel-button-arrow-right', 'url("' + defaultRightArrow + '")');
+			// Inject CSS variables in a style tag instead of inline style attribute
+			const variables = {
+				'--carousel-button-arrow-left': 'url("' + defaultLeftArrow + '")',
+				'--carousel-button-arrow-right': 'url("' + defaultRightArrow + '")'
+			};
+			injectCssVariablesInStyleTag(variables);
 		}
 
 		// Do not force the style on each carousel here; they are normalised later
+	}
+
+	/**
+	 * Initializes autoplay for carousels with autoplay enabled.
+	 * Handles automatic scrolling, pause on hover/interaction, and stop at end.
+	 */
+	// Store intervals and state outside function to persist across calls
+	const autoplayIntervals = new WeakMap();
+	const autoplayPaused = new WeakMap();
+	const interactionTimeout = new WeakMap();
+	const autoplayInitialized = new WeakSet();
+	const loopResetSetup = new WeakSet();
+	const isAutoScrollingMap = new WeakMap(); // Track autoplay scrolling state
+
+	/**
+	 * Setup loop functionality: keep buttons visible and handle reset when clicking Next at the end
+	 * Simple approach: listen for clicks and check if we're at the end, then reset
+	 */
+	function setupLoopReset(carousel) {
+		// Skip if already setup
+		if (loopResetSetup.has(carousel)) {
+			return;
+		}
+
+		const isLoopEnabled = carousel.getAttribute('data-abcs-loop') === 'true';
+		if (!isLoopEnabled) {
+			return;
+		}
+
+		// Skip if carousel has no children
+		if (!carousel.firstElementChild) {
+			return;
+		}
+
+		let isResetting = false; // Flag to prevent multiple resets
+
+		// Get autoplay delay for this carousel (if autoplay is enabled)
+		const autoplayDelay = parseInt(carousel.getAttribute('data-abcs-autoplay-delay'), 10) || 3000;
+
+		// Function to check if we're at the end
+		function isAtEnd() {
+			const threshold = 5;
+			return carousel.scrollLeft + carousel.offsetWidth >= carousel.scrollWidth - threshold;
+		}
+
+		// Function to check if we're at the start
+		function isAtStart() {
+			const threshold = 5;
+			return carousel.scrollLeft <= threshold;
+		}
+
+		// Function to reset to start
+		function resetToStart() {
+			if (isResetting) {
+				return;
+			}
+			isResetting = true;
+			carousel.style.scrollBehavior = 'auto';
+			carousel.scrollTo({
+				left: 0,
+				behavior: 'auto'
+			});
+			carousel.style.scrollBehavior = '';
+			setTimeout(function () {
+				isResetting = false;
+			}, 100);
+		}
+
+		// Function to reset to end
+		function resetToEnd() {
+			if (isResetting) {
+				return;
+			}
+			isResetting = true;
+			carousel.style.scrollBehavior = 'auto';
+			carousel.scrollTo({
+				left: carousel.scrollWidth,
+				behavior: 'auto'
+			});
+			carousel.style.scrollBehavior = '';
+			setTimeout(function () {
+				isResetting = false;
+			}, 100);
+		}
+
+		// Track if we were already at boundaries BEFORE any interaction
+		// This distinguishes "arriving at the end" from "already at the end"
+		let wasAtEndBeforeInteraction = false;
+		let wasAtStartBeforeInteraction = false;
+		let clickTimeout = null;
+		let scrollTimeout = null;
+		let previousScrollLeft = carousel.scrollLeft;
+
+		// Update boundary flags on scroll (to track when we reach boundaries)
+		function updateBoundaryFlags() {
+			// Only update if we're not resetting
+			if (!isResetting) {
+				wasAtEndBeforeInteraction = isAtEnd();
+				wasAtStartBeforeInteraction = isAtStart();
+			}
+		}
+
+		// Listen for clicks on the carousel (this will catch clicks on scroll buttons)
+		function handleClick(e) {
+			if (isResetting) {
+				return;
+			}
+
+			// Clear any pending click timeout
+			if (clickTimeout) {
+				clearTimeout(clickTimeout);
+			}
+
+			// Store state BEFORE the click - this is crucial!
+			// We use the flag that was set BEFORE this click, not the current state
+			const wasAtEndBeforeClick = wasAtEndBeforeInteraction;
+			const wasAtStartBeforeClick = wasAtStartBeforeInteraction;
+
+			// Only reset if we were ALREADY at the end BEFORE the click
+			// This allows the first click to show the last slide, and the second click to reset
+			if (wasAtEndBeforeClick) {
+				clickTimeout = setTimeout(function () {
+					if (isResetting) {
+						return;
+					}
+					// If still at end after click, the button couldn't scroll - reset to start
+					if (isAtEnd()) {
+						resetToStart();
+					}
+				}, 400); // Longer delay to let scroll-button try to scroll
+			}
+			// Only reset if we were ALREADY at the start BEFORE the click
+			else if (wasAtStartBeforeClick) {
+				clickTimeout = setTimeout(function () {
+					if (isResetting) {
+						return;
+					}
+					// If still at start after click, the button couldn't scroll - reset to end
+					if (isAtStart()) {
+						resetToEnd();
+					}
+				}, 400);
+			}
+
+			// After the click, update flags for next time (but don't reset now)
+			// This ensures that if we just arrived at the end, the next click will trigger reset
+			setTimeout(function () {
+				updateBoundaryFlags();
+			}, 500); // Wait for scroll to complete before updating flags
+		}
+
+		// Handle scroll events - only reset if we were ALREADY at the end before scrolling
+		function handleScroll() {
+			if (isResetting) {
+				previousScrollLeft = carousel.scrollLeft;
+				return;
+			}
+
+			const currentScrollLeft = carousel.scrollLeft;
+			const isScrollingForward = currentScrollLeft > previousScrollLeft;
+			const isScrollingBackward = currentScrollLeft < previousScrollLeft;
+			const scrollDelta = Math.abs(currentScrollLeft - previousScrollLeft);
+
+			// Update boundary flags as we scroll
+			updateBoundaryFlags();
+
+			previousScrollLeft = currentScrollLeft;
+
+			// Clear any pending scroll timeout
+			if (scrollTimeout) {
+				clearTimeout(scrollTimeout);
+			}
+
+			// Check if this is autoplay scrolling
+			const isAutoplayActive = isAutoScrollingMap.get(carousel);
+
+			// Ignore tiny scrolls (scroll-snap adjustments) - they're less than 10px
+			// BUT allow autoplay scrolls even if tiny (autoplay is programmatic, not scroll-snap)
+			const isSignificantScroll = scrollDelta > 10 || isAutoplayActive;
+
+			// Only reset if we were ALREADY at the end BEFORE this scroll AND still at end
+			// AND it's a significant scroll (not just scroll-snap micro-adjustments)
+			// OR if it's autoplay (which can have small scrolls)
+			// This prevents reset when scrolling normally towards the end or from scroll-snap
+			if (wasAtEndBeforeInteraction && isAtEnd() && isScrollingForward && isSignificantScroll) {
+				scrollTimeout = setTimeout(function () {
+					if (isAtEnd() && !isResetting && wasAtEndBeforeInteraction) {
+						// We were already at the end and tried to scroll forward - reset to start
+						// If autoplay is active, add delay before reset equal to autoplay delay
+						if (isAutoplayActive) {
+							setTimeout(function () {
+								if (!isResetting) {
+									resetToStart();
+								}
+							}, autoplayDelay);
+						} else {
+							resetToStart();
+						}
+					}
+				}, 200);
+			}
+			// Only reset if we were ALREADY at the start BEFORE this scroll AND still at start
+			else if (wasAtStartBeforeInteraction && isAtStart() && isScrollingBackward && isSignificantScroll) {
+				scrollTimeout = setTimeout(function () {
+					if (isAtStart() && !isResetting && wasAtStartBeforeInteraction) {
+						// We were already at the start and tried to scroll backward - reset to end
+						resetToEnd();
+					}
+				}, 200);
+			}
+		}
+
+		// Initialize boundary flags
+		updateBoundaryFlags();
+
+		// Listen for clicks and scroll events
+		carousel.addEventListener('click', handleClick);
+		carousel.addEventListener('scroll', handleScroll, { passive: true });
+
+		// Store handler references for cleanup
+		carousel._abcsLoopClickHandler = handleClick;
+		carousel._abcsLoopScrollHandler = handleScroll;
+
+		// Store cleanup function
+		carousel._abcsLoopCleanup = function () {
+			if (carousel._abcsLoopClickHandler) {
+				carousel.removeEventListener('click', carousel._abcsLoopClickHandler);
+			}
+			if (carousel._abcsLoopScrollHandler) {
+				carousel.removeEventListener('scroll', carousel._abcsLoopScrollHandler);
+			}
+			if (clickTimeout) {
+				clearTimeout(clickTimeout);
+			}
+			if (scrollTimeout) {
+				clearTimeout(scrollTimeout);
+			}
+			loopResetSetup.delete(carousel);
+		};
+
+		loopResetSetup.add(carousel);
+	}
+
+	function initAutoplay() {
+		const carousels = document.querySelectorAll('.abcs[data-abcs-autoplay="true"]');
+
+		carousels.forEach(function (carousel) {
+			// Skip if already initialized
+			if (autoplayInitialized.has(carousel)) {
+				return;
+			}
+
+			// Skip if carousel has no children
+			if (!carousel.firstElementChild) {
+				return;
+			}
+
+			const autoplayDelay = parseInt(carousel.getAttribute('data-abcs-autoplay-delay'), 10) || 3000;
+			const isLoopEnabled = carousel.getAttribute('data-abcs-loop') === 'true';
+
+			// Setup loop reset if loop is enabled
+			if (isLoopEnabled) {
+				setupLoopReset(carousel);
+			}
+			let intervalId = null;
+			let isPaused = false;
+			let isHoverPaused = false;
+			let interactionTimeoutId = null;
+			let isAutoScrolling = false; // Flag to track if scroll is from autoplay
+			const RESUME_DELAY = 2000; // Resume autoplay after 2 seconds of no interaction
+
+			// Calculate slide width including gap
+			function getSlideWidth() {
+				const firstChild = carousel.firstElementChild;
+				if (!firstChild) {
+					return 0;
+				}
+				const computedStyle = window.getComputedStyle(carousel);
+				const gap = computedStyle.getPropertyValue('gap') || computedStyle.getPropertyValue('--wp--style--block-gap') || '1rem';
+				// Convert gap to pixels if it has a unit
+				let gapValue = 0;
+				if (gap && gap !== 'normal') {
+					// Try to parse as number (for px values)
+					const gapNum = parseFloat(gap);
+					if (!isNaN(gapNum)) {
+						// If gap contains 'rem' or 'em', convert to pixels
+						if (gap.includes('rem')) {
+							const rootFontSize = parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16;
+							gapValue = gapNum * rootFontSize;
+						} else if (gap.includes('em')) {
+							const parentFontSize = parseFloat(computedStyle.fontSize) || 16;
+							gapValue = gapNum * parentFontSize;
+						} else {
+							// Assume px or unitless
+							gapValue = gapNum;
+						}
+					}
+				}
+				return firstChild.offsetWidth + gapValue;
+			}
+
+			// Check if carousel is at the end
+			function isAtEnd() {
+				// If loop is enabled, never consider it at the end
+				if (isLoopEnabled) {
+					return false;
+				}
+				const threshold = 5; // Small threshold for rounding errors
+				return carousel.scrollLeft + carousel.offsetWidth >= carousel.scrollWidth - threshold;
+			}
+
+
+			// Scroll to next slide
+			function scrollToNext() {
+				const slideWidth = getSlideWidth();
+				if (slideWidth === 0) {
+					return;
+				}
+
+				const currentScroll = carousel.scrollLeft;
+				const nextScroll = currentScroll + slideWidth;
+
+				// If loop is disabled, check if we're at the end
+				if (!isLoopEnabled) {
+					const threshold = 5;
+					const isAtEndNow = currentScroll + carousel.offsetWidth >= carousel.scrollWidth - threshold;
+					if (isAtEndNow) {
+						// Stop autoplay if at the end and loop is disabled
+						if (intervalId) {
+							clearInterval(intervalId);
+							intervalId = null;
+							autoplayIntervals.delete(carousel);
+						}
+						return;
+					}
+				}
+
+				// With loop enabled, the reset handler will detect the end and jump to start
+				// We just scroll normally - the handler manages the reset
+				isAutoScrolling = true;
+				isAutoScrollingMap.set(carousel, true);
+				carousel.scrollTo({
+					left: nextScroll,
+					behavior: 'smooth'
+				});
+
+				// Keep the flag active longer to allow handler to detect end during smooth scroll
+				setTimeout(function () {
+					isAutoScrolling = false;
+					isAutoScrollingMap.set(carousel, false);
+				}, 700); // Slightly longer to ensure smooth scroll completes
+			}
+
+			// Start autoplay
+			function startAutoplay() {
+				// If loop is disabled, check if we're at the end
+				if (intervalId || (!isLoopEnabled && isAtEnd())) {
+					return;
+				}
+
+				// Start autoplay (loop reset is already set up if needed)
+				intervalId = setInterval(function () {
+					if (!isPaused) {
+						scrollToNext();
+					}
+				}, autoplayDelay);
+				autoplayIntervals.set(carousel, intervalId);
+			}
+
+			// Pause autoplay
+			function pauseAutoplay() {
+				isPaused = true;
+				autoplayPaused.set(carousel, true);
+			}
+
+			// Resume autoplay
+			function resumeAutoplay() {
+				// If loop is disabled and we're at the end, don't resume
+				if (!isLoopEnabled && isAtEnd()) {
+					return;
+				}
+				isPaused = false;
+				autoplayPaused.delete(carousel);
+			}
+
+			// Handle interaction - pause and resume after delay
+			function handleInteraction() {
+				// Ignore scroll events from autoplay
+				if (isAutoScrolling || isAutoScrollingMap.get(carousel)) {
+					return;
+				}
+
+				pauseAutoplay();
+
+				// Clear existing timeout
+				if (interactionTimeoutId) {
+					clearTimeout(interactionTimeoutId);
+				}
+
+				// Resume after delay (only if not hover paused)
+				interactionTimeoutId = setTimeout(function () {
+					if (!isHoverPaused) {
+						resumeAutoplay();
+					}
+					interactionTimeoutId = null;
+				}, RESUME_DELAY);
+
+				interactionTimeout.set(carousel, interactionTimeoutId);
+			}
+
+			// Event listeners for pause on hover
+			const handleMouseEnter = function () {
+				isHoverPaused = true;
+				pauseAutoplay();
+			};
+			const handleMouseLeave = function () {
+				isHoverPaused = false;
+				// Resume if loop is enabled or if not at the end
+				if (isLoopEnabled || !isAtEnd()) {
+					resumeAutoplay();
+				}
+			};
+			carousel.addEventListener('mouseenter', handleMouseEnter);
+			carousel.addEventListener('mouseleave', handleMouseLeave);
+
+			// Event listeners for pause on interaction
+			carousel.addEventListener('scroll', handleInteraction, { passive: true });
+			carousel.addEventListener('touchstart', handleInteraction, { passive: true });
+			carousel.addEventListener('mousedown', handleInteraction);
+
+			// Pause when clicking on scroll buttons (handled via parent click events)
+			// Note: ::scroll-button are pseudo-elements, so we listen on the carousel itself
+
+			// Start autoplay
+			startAutoplay();
+
+			// Mark as initialized
+			autoplayInitialized.add(carousel);
+
+			// Cleanup function (stored for potential future use)
+			carousel._abcsAutoplayCleanup = function () {
+				if (intervalId) {
+					clearInterval(intervalId);
+					intervalId = null;
+					autoplayIntervals.delete(carousel);
+				}
+				if (interactionTimeoutId) {
+					clearTimeout(interactionTimeoutId);
+					interactionTimeoutId = null;
+					interactionTimeout.delete(carousel);
+				}
+				carousel.removeEventListener('mouseenter', handleMouseEnter);
+				carousel.removeEventListener('mouseleave', handleMouseLeave);
+				carousel.removeEventListener('scroll', handleInteraction);
+				carousel.removeEventListener('touchstart', handleInteraction);
+				carousel.removeEventListener('mousedown', handleInteraction);
+			};
+		});
 	}
 
 	// Main initialisation function
@@ -503,6 +997,16 @@
 		injectPaddingVariables();
 		injectArrowSvgs();
 		applyArrowIconsToCarousels(null, document);
+
+		// Setup loop reset for all carousels with loop enabled
+		const loopCarousels = document.querySelectorAll('.abcs[data-abcs-loop="true"]');
+		loopCarousels.forEach(function (carousel) {
+			if (carousel.firstElementChild) {
+				setupLoopReset(carousel);
+			}
+		});
+
+		initAutoplay();
 	}
 
 	// Run on DOM ready
@@ -553,10 +1057,83 @@
 					injectPaddingVariables();
 					injectArrowSvgs();
 					applyArrowIconsToCarousels(null, document);
+					initAutoplay();
 				});
 			});
 		}
 	});
+
+	// Handle dynamically added carousels with MutationObserver
+	function setupAutoplayObserver() {
+		// Only set up observer if MutationObserver is available
+		if (typeof MutationObserver === 'undefined') {
+			return;
+		}
+
+		const observer = new MutationObserver(function (mutations) {
+			let shouldInitAutoplay = false;
+			let shouldInitLoop = false;
+			mutations.forEach(function (mutation) {
+				mutation.addedNodes.forEach(function (node) {
+					if (node.nodeType === 1) { // Element node
+						// Check if the added node is a carousel
+						if (node.classList && node.classList.contains('abcs')) {
+							if (node.getAttribute('data-abcs-autoplay') === 'true') {
+								shouldInitAutoplay = true;
+							}
+							if (node.getAttribute('data-abcs-loop') === 'true') {
+								shouldInitLoop = true;
+							}
+						}
+						// Check for carousels within the added node
+						if (node.querySelectorAll) {
+							const autoplayCarousels = node.querySelectorAll('.abcs[data-abcs-autoplay="true"]');
+							if (autoplayCarousels.length > 0) {
+								shouldInitAutoplay = true;
+							}
+							const loopCarousels = node.querySelectorAll('.abcs[data-abcs-loop="true"]');
+							if (loopCarousels.length > 0) {
+								shouldInitLoop = true;
+							}
+						}
+					}
+				});
+			});
+
+			if (shouldInitAutoplay) {
+				// Use requestAnimationFrame to ensure DOM is ready
+				requestAnimationFrame(function () {
+					initAutoplay();
+				});
+			}
+			if (shouldInitLoop) {
+				// Setup loop reset for new carousels
+				requestAnimationFrame(function () {
+					const loopCarousels = document.querySelectorAll('.abcs[data-abcs-loop="true"]');
+					loopCarousels.forEach(function (carousel) {
+						if (carousel.firstElementChild && !loopResetSetup.has(carousel)) {
+							setupLoopReset(carousel);
+						}
+					});
+				});
+			}
+		});
+
+		// Start observing the document body for added nodes
+		observer.observe(document.body, {
+			childList: true,
+			subtree: true
+		});
+	}
+
+	// Set up observer after initial load
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', function () {
+			setupAutoplayObserver();
+		});
+	} else {
+		setupAutoplayObserver();
+	}
 
 	if (typeof window !== 'undefined') {
 		window.abcsCarousel = window.abcsCarousel || {};
@@ -567,6 +1144,7 @@
 			} : overrideConfig;
 			applyArrowIconsToCarousels(color, context || document, normalizedConfig);
 		};
+		window.abcsCarousel.initAutoplay = initAutoplay;
 	}
 
 })();
