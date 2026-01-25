@@ -4,7 +4,7 @@ Tags: carousel, slider, block, gutenberg, woocommerce
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.4.1
+Stable tag: 1.0.4.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -170,6 +170,9 @@ Visual arrows remain visible (disabled state) and users navigate via touch scrol
 5. Custom CSS variables to adapt the carousel slider design.
 
 == Changelog ==
+
+= 1.0.4.2 - 2025-01-25 =
+* 🐛 Fixed block editor bug where layout container fixed positon was removed.
 
 = 1.0.3.5 - 2025-11-14 =
 * ♻️ Align plugin text domain with official WordPress.org slug.
