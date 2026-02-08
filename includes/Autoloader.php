@@ -9,6 +9,10 @@ declare(strict_types=1);
 
 namespace Weblazer\AnyBlockCarouselSlider;
 
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 /**
  * Minimal PSR-4 autoloader for the plugin namespace.
  */

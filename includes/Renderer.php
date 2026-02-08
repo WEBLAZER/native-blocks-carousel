@@ -9,6 +9,10 @@ declare(strict_types=1);
 
 namespace Weblazer\AnyBlockCarouselSlider;
 
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 use Weblazer\AnyBlockCarouselSlider\Contracts\ServiceInterface;
 
 /**
@@ -278,7 +282,8 @@ class Renderer implements ServiceInterface
         $styles_string = '';
 
         foreach ($custom_styles as $property => $value) {
-            if (\in_array($property, ['--carousel-padding-left', '--carousel-padding-right', '--carousel-scroll-padding-left', '--carousel-scroll-padding-right'], true)
+            if (
+                \in_array($property, ['--carousel-padding-left', '--carousel-padding-right', '--carousel-scroll-padding-left', '--carousel-scroll-padding-right'], true)
                 && ('0' === $value || 0 === $value)
             ) {
                 $value = '0px';

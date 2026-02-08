@@ -9,6 +9,10 @@ declare(strict_types=1);
 
 namespace Weblazer\AnyBlockCarouselSlider;
 
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 /**
  * Retrieves and injects button colors from the active theme.
  */
@@ -29,11 +33,11 @@ class ThemeStyles
         $merged_data = \WP_Theme_JSON_Resolver::get_merged_data();
         $styles = $merged_data->get_stylesheet();
         $merged_settings = $merged_data->get_data();
-        
+
         // Get theme data separately (to check if theme has custom styles)
         $theme_data = \WP_Theme_JSON_Resolver::get_theme_data();
         $theme_settings = $theme_data->get_data();
-        
+
         // Get user data separately (to check if user has custom styles)
         $user_data = \WP_Theme_JSON_Resolver::get_user_data();
         $user_settings = $user_data->get_data();
@@ -72,7 +76,7 @@ class ThemeStyles
             (isset($theme_settings['styles']['elements']['button']) && !empty($theme_settings['styles']['elements']['button']))
             || (isset($user_settings['styles']['elements']['button']) && !empty($user_settings['styles']['elements']['button']))
         );
-        
+
         // This regex searches for .wp-element-button class and extracts background-color value
         // Pattern: .wp-element-button { ... background-color: VALUE; ... }
         // Only extract if theme or user has defined button styles (to avoid core defaults)
@@ -98,7 +102,7 @@ class ThemeStyles
         // If user has explicitly set colors in site-editor, we should respect them
         // even if they match core defaults (user might want to use core defaults intentionally)
         $colors_from_user = !empty($user_settings['styles']['elements']['button'] ?? []);
-        
+
         if (!$colors_from_user) {
             // Only filter core defaults if colors don't come from user styles
             // This prevents using core defaults that might be stored in theme styles
@@ -151,7 +155,7 @@ class ThemeStyles
         // Example: var(--wp--preset--color--primary) → --wp--preset--color--primary
         if (\preg_match('/var\(([^)]+)\)/', $value, $var_match)) {
             $var_name = \trim($var_match[1]);
-            
+
             // Search for the variable definition in the compiled stylesheet
             // Pattern: --variable-name: VALUE;
             // preg_quote() escapes special regex characters in the variable name

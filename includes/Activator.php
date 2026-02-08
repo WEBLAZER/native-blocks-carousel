@@ -9,6 +9,10 @@ declare(strict_types=1);
 
 namespace Weblazer\AnyBlockCarouselSlider;
 
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 /**
  * Checks compatibility during plugin activation.
  */

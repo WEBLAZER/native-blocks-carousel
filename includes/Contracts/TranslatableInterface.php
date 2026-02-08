@@ -9,6 +9,10 @@ declare(strict_types=1);
 
 namespace Weblazer\AnyBlockCarouselSlider\Contracts;
 
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 interface TranslationServiceInterface extends ServiceInterface
 {
     /**

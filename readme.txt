@@ -2,9 +2,9 @@
 Contributors: weblazer
 Tags: carousel, slider, block, gutenberg, woocommerce
 Requires at least: 6.0
-Tested up to: 6.9.1
+Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.4.2
+Stable tag: 1.0.4.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -182,8 +182,13 @@ Visual arrows remain visible (disabled state) and users navigate via touch scrol
 * 🔗 Simplified WordPress Playground link in "Try it now" section.
 * 📝 Updated readme.txt to refresh WordPress.org cache.
 
+= 1.0.4.3 - 2026-02-08 =
+* 🛡️ Security: Added direct access protection to all PHP files.
+* 📝 Documentation: Corrected WordPress version compatibility format.
+* 🏷️ Maintenance release.
+
 = 1.0.4.2 - 2026-02-08 =
-* 🛠️ Compatibility with WordPress 6.9.1.
+* 🛠️ Compatibility with WordPress 6.9.
 * 🏷️ Maintenance release.
 
 = 1.0.4.1 - 2025-01-XX =

@@ -9,6 +9,10 @@ declare(strict_types=1);
 
 namespace Weblazer\AnyBlockCarouselSlider;
 
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 use Weblazer\AnyBlockCarouselSlider\Contracts\ServiceInterface;
 use Weblazer\AnyBlockCarouselSlider\Translations;
 
