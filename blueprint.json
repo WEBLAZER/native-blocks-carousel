@@ -1,6 +1,6 @@
 {
 	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
-	"description": "Final Stable Demo - Any Block Carousel Slider",
+	"description": "Any Block Carousel - FakerPress Edition",
 	"steps": [
 		{
 			"step": "login",
@@ -22,6 +22,13 @@
 			}
 		},
 		{
+			"step": "installPlugin",
+			"pluginData": {
+				"resource": "wordpress.org/plugins",
+				"slug": "fakerpress"
+			}
+		},
+		{
 			"step": "activatePlugin",
 			"pluginPath": "native-blocks-carousel/any-block-carousel-slider.php"
 		},
@@ -38,7 +45,7 @@
 		},
 		{
 			"step": "runPHP",
-			"code": "<?php \nrequire_once 'wp-load.php';\nupdate_option('permalink_structure', '/%postname%/');\n\$home = get_page_by_path('sample-page');\nif (\$home) {\n\tupdate_option('show_on_front', 'page');\n\tupdate_option('page_on_front', \$home->ID);\n}"
+			"code": "<?php \nrequire_once 'wp-load.php';\n\n// 1. Setup Permalinks\nupdate_option('permalink_structure', '/%postname%/');\n\n// 2. Set Front Page\n$home = get_page_by_path('sample-page');\nif ($home) {\n\tupdate_option('show_on_front', 'page');\n\tupdate_option('page_on_front', $home->ID);\n}\n\n// 3. Generate Content with FakerPress (if available)\nif ( class_exists( 'FakerPress\\Module\\Post' ) ) {\n    \$module = new FakerPress\\Module\\Post();\n    \$module->generate( array(\n        'qty' => array( 8, 12 ),\n        'post_type' => 'post',\n        'post_status' => 'publish',\n        'post_author' => array( 1 ),\n        'faker_images' => array( 'attachment_id' => true ),\n        'faker_image_provider' => 'picsum',\n        'faker_image_size' => '1024x682',\n    ) );\n}\n\n// 4. Cleanup : Deactivate FakerPress to keep the demo focused\ndeactivate_plugins( 'fakerpress/fakerpress.php' );\n"
 		}
 	],
 	"landingPage": "/"
