@@ -1,0 +1,881 @@
+/**
+ * Any Block Carousel Slider - Styles CSS
+ *
+ * Transform any WordPress block into a carousel with the .abcs class
+ * Compatible with post loops and all WordPress blocks
+ * Compatible with Block Editor and frontend
+ *
+ * @package AnyBlockCarouselSlider
+ * @version 1.0.4.1
+ * @author weblazer35
+ */
+
+/* ==========================================================================
+   VARIABLES CSS
+   ========================================================================== */
+
+:root {
+	--carousel-button-size: 2.8rem;
+	--carousel-button-offset: 0px;
+	--carousel-marker-size: 0.66rem;
+	--carousel-marker-gap: 0.5rem;
+	--carousel-marker-bottom-offset: -2rem;
+	--carousel-z-index: 5;
+	--carousel-transition-duration: 0.3s;
+	--carousel-transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
+
+	/* Colors - automatically detected from theme styles by PHP */
+	/* Values below act as fallbacks if no theme styles are found */
+	--carousel-button-bg: var(--wp--style--elements--button--color--background, #007cba);
+	--carousel-button-color: var(--wp--style--elements--button--color--text, #fff);
+	--carousel-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+	/* Carousel padding - automatically set by PHP/JavaScript */
+	--carousel-padding-left: 0px;
+	--carousel-padding-right: 0px;
+	--carousel-padding-top: 0px;
+	--carousel-padding-bottom: 0px;
+}
+
+/* ==========================================================================
+   CAROUSEL PRINCIPAL
+   ========================================================================== */
+
+/* Force every parent containing a carousel to use position: relative */
+/* Required so ::scroll-button and ::scroll-marker are positioned correctly */
+:has(.abcs) {
+	position: relative !important;
+}
+
+.abcs {
+	position: relative !important;
+}
+
+/* Ensure the direct parent is also positioned relative */
+*:has(> .abcs) {
+	position: relative !important;
+	overflow: visible;
+	max-width: 100%;
+	box-sizing: border-box;
+}
+
+/* Main carousel styles - grouped selectors for editor compatibility */
+.abcs,
+.block-editor-block-list__layout .abcs,
+.editor-styles-wrapper .abcs {
+	position: relative !important;
+	width: 100%;
+	max-width: 100%;
+	box-sizing: border-box;
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: stretch;
+	justify-content: flex-start;
+	gap: var(--wp--style--block-gap, 1rem);
+	padding: 1rem 0px;
+
+	overflow-x: scroll;
+	overflow-y: visible;
+	scroll-snap-type: x mandatory;
+	scroll-behavior: smooth;
+	-webkit-overflow-scrolling: touch;
+
+	scroll-padding-left: var(--carousel-scroll-padding-left, 0);
+	scroll-padding-right: var(--carousel-scroll-padding-right, 0);
+
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+	-webkit-scrollbar: none;
+
+	scroll-marker-group: after;
+
+	isolation: isolate;
+	contain: layout !important;
+	transform: translateZ(0);
+}
+
+/* ==========================================================================
+   CAROUSEL ITEMS
+   ========================================================================== */
+
+.abcs>*,
+.block-editor-block-list__layout .abcs>*,
+.editor-styles-wrapper .abcs>* {
+	position: relative;
+	flex: 0 0 auto;
+	width: 100%;
+	height: auto;
+	scroll-snap-align: start;
+	/* scroll-snap-stop: always; */
+	margin: 0px !important;
+	padding: 0px;
+}
+
+.abcs .wp-block-group[style*="border-radius"] {
+	overflow: hidden;
+}
+
+.abcs .wp-block-group.has-global-padding {
+	padding-left: initial;
+	padding-right: initial;
+}
+
+.abcs .has-background,
+.block-editor-block-list__layout .abcs .has-background,
+.editor-styles-wrapper .abcs .has-background {
+	height: 100%;
+}
+
+/* ==========================================================================
+   GALERIES EN MODE CAROUSEL
+   ========================================================================== */
+
+.wp-block-gallery.abcs,
+.block-editor-block-list__layout .wp-block-gallery.abcs,
+.editor-styles-wrapper .wp-block-gallery.abcs {
+	flex-wrap: nowrap !important;
+	columns: auto !important;
+}
+
+.wp-block-gallery.abcs>.wp-block-image,
+.block-editor-block-list__layout .wp-block-gallery.abcs>.wp-block-image,
+.editor-styles-wrapper .wp-block-gallery.abcs>.wp-block-image {
+	flex: 0 0 auto;
+	width: calc(16.666% - var(--wp--style--block-gap, 1rem) * 5 / 6);
+	min-width: calc(16.666% - var(--wp--style--block-gap, 1rem) * 5 / 6);
+	max-width: 100%;
+	scroll-snap-align: start;
+}
+
+.wp-block-gallery.abcs>.wp-block-image img,
+.block-editor-block-list__layout .wp-block-gallery.abcs>.wp-block-image img,
+.editor-styles-wrapper .wp-block-gallery.abcs>.wp-block-image img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+/* ==========================================================================
+   GRILLES (GRID LAYOUT) EN MODE CAROUSEL
+   ========================================================================== */
+
+.is-layout-grid.abcs,
+.block-editor-block-list__layout .is-layout-grid.abcs,
+.editor-styles-wrapper .is-layout-grid.abcs {
+	display: flex !important;
+	grid-template-columns: none !important;
+	flex-wrap: nowrap !important;
+}
+
+.is-layout-grid.abcs>*,
+.block-editor-block-list__layout .is-layout-grid.abcs>*,
+.editor-styles-wrapper .is-layout-grid.abcs>* {
+	flex: 0 0 auto;
+	width: var(--carousel-grid-item-width, calc(33.333% - var(--wp--style--block-gap, 1rem) * 2 / 3));
+	min-width: var(--carousel-grid-item-width, calc(33.333% - var(--wp--style--block-gap, 1rem) * 2 / 3));
+	max-width: 100%;
+}
+
+/* Grid Item Position - Respecter grid-column span */
+.is-layout-grid.abcs>*[style*="grid-column-end:span 2"],
+.is-layout-grid.abcs>*[style*="grid-column:span 2"] {
+	width: calc(var(--carousel-grid-item-width, 33.333%) * 2 + var(--wp--style--block-gap, 1rem)) !important;
+}
+
+.is-layout-grid.abcs>*[style*="grid-column-end:span 3"],
+.is-layout-grid.abcs>*[style*="grid-column:span 3"] {
+	width: calc(var(--carousel-grid-item-width, 33.333%) * 3 + var(--wp--style--block-gap, 1rem) * 2) !important;
+}
+
+.is-layout-grid.abcs>*[style*="grid-column-end:span 4"],
+.is-layout-grid.abcs>*[style*="grid-column:span 4"] {
+	width: calc(var(--carousel-grid-item-width, 33.333%) * 4 + var(--wp--style--block-gap, 1rem) * 3) !important;
+}
+
+/* Helper classes to define the number of visible columns in the carousel grid */
+/* Simplified: use a generic rule with --carousel-grid-item-width variable */
+.is-layout-grid.abcs[class*="abcs-cols-"]>* {
+	width: var(--carousel-grid-item-width);
+	min-width: var(--carousel-grid-item-width);
+}
+
+/* Define --carousel-grid-item-width for each column count */
+.is-layout-grid.abcs.abcs-cols-1>* {
+	--carousel-grid-item-width: 100%;
+}
+
+.is-layout-grid.abcs.abcs-cols-2>* {
+	--carousel-grid-item-width: calc(50% - var(--wp--style--block-gap, 1rem) / 2);
+}
+
+.is-layout-grid.abcs.abcs-cols-3>* {
+	--carousel-grid-item-width: calc(33.333% - var(--wp--style--block-gap, 1rem) * 2 / 3);
+}
+
+.is-layout-grid.abcs.abcs-cols-4>* {
+	--carousel-grid-item-width: calc(25% - var(--wp--style--block-gap, 1rem) * 3 / 4);
+}
+
+.is-layout-grid.abcs.abcs-cols-5>* {
+	--carousel-grid-item-width: calc(20% - var(--wp--style--block-gap, 1rem) * 4 / 5);
+}
+
+.is-layout-grid.abcs.abcs-cols-6>* {
+	--carousel-grid-item-width: calc(16.666% - var(--wp--style--block-gap, 1rem) * 5 / 6);
+}
+
+.is-layout-grid.abcs.abcs-cols-7>* {
+	--carousel-grid-item-width: calc(14.285% - var(--wp--style--block-gap, 1rem) * 6 / 7);
+}
+
+.is-layout-grid.abcs.abcs-cols-8>* {
+	--carousel-grid-item-width: calc(12.5% - var(--wp--style--block-gap, 1rem) * 7 / 8);
+}
+
+.is-layout-grid.abcs.abcs-cols-9>* {
+	--carousel-grid-item-width: calc(11.111% - var(--wp--style--block-gap, 1rem) * 8 / 9);
+}
+
+.is-layout-grid.abcs.abcs-cols-10>* {
+	--carousel-grid-item-width: calc(10% - var(--wp--style--block-gap, 1rem) * 9 / 10);
+}
+
+.is-layout-grid.abcs.abcs-cols-11>* {
+	--carousel-grid-item-width: calc(9.090% - var(--wp--style--block-gap, 1rem) * 10 / 11);
+}
+
+.is-layout-grid.abcs.abcs-cols-12>* {
+	--carousel-grid-item-width: calc(8.333% - var(--wp--style--block-gap, 1rem) * 11 / 12);
+}
+
+.is-layout-grid.abcs.abcs-cols-13>* {
+	--carousel-grid-item-width: calc(7.692% - var(--wp--style--block-gap, 1rem) * 12 / 13);
+}
+
+.is-layout-grid.abcs.abcs-cols-14>* {
+	--carousel-grid-item-width: calc(7.142% - var(--wp--style--block-gap, 1rem) * 13 / 14);
+}
+
+.is-layout-grid.abcs.abcs-cols-15>* {
+	--carousel-grid-item-width: calc(6.666% - var(--wp--style--block-gap, 1rem) * 14 / 15);
+}
+
+.is-layout-grid.abcs.abcs-cols-16>* {
+	--carousel-grid-item-width: calc(6.25% - var(--wp--style--block-gap, 1rem) * 15 / 16);
+}
+
+/* abcs-min-width: use the minimum width defined in the grid */
+.is-layout-grid.abcs.abcs-min-width>*,
+.block-editor-block-list__layout .is-layout-grid.abcs.abcs-min-width>*,
+.editor-styles-wrapper .is-layout-grid.abcs.abcs-min-width>*,
+.wp-block-post-template.abcs.abcs-min-width .wp-block-post,
+.block-editor-block-list__layout .wp-block-post-template.abcs.abcs-min-width .wp-block-post,
+.editor-styles-wrapper .wp-block-post-template.abcs.abcs-min-width .wp-block-post,
+.wp-block-group.abcs.abcs-min-width>*,
+.block-editor-block-list__layout .wp-block-group.abcs.abcs-min-width>*,
+.editor-styles-wrapper .wp-block-group.abcs.abcs-min-width>* {
+	flex: 0 0 auto !important;
+	width: min(var(--carousel-min-width, 200px), 100%) !important;
+	min-width: min(var(--carousel-min-width, 200px), 100%) !important;
+	max-width: 100% !important;
+}
+
+/* ==========================================================================
+   SCROLL SNAP POUR MODE AUTO (Grid item position: Auto)
+   ========================================================================== */
+
+.abcs.abcs-min-width>*,
+.block-editor-block-list__layout .abcs.abcs-min-width>*,
+.editor-styles-wrapper .abcs.abcs-min-width>*,
+.wp-block-post-template.abcs:not(.is-layout-grid) .wp-block-post,
+.block-editor-block-list__layout .wp-block-post-template.abcs:not(.is-layout-grid) .wp-block-post,
+.editor-styles-wrapper .wp-block-post-template.abcs:not(.is-layout-grid) .wp-block-post,
+.wp-block-post-template.abcs.abcs-min-width .wp-block-post,
+.block-editor-block-list__layout .wp-block-post-template.abcs.abcs-min-width .wp-block-post,
+.editor-styles-wrapper .wp-block-post-template.abcs.abcs-min-width .wp-block-post,
+.wp-block-group.abcs.abcs-min-width>*,
+.block-editor-block-list__layout .wp-block-group.abcs.abcs-min-width>*,
+.editor-styles-wrapper .wp-block-group.abcs.abcs-min-width>*,
+.wp-block-gallery.abcs.abcs-min-width>.wp-block-image,
+.block-editor-block-list__layout .wp-block-gallery.abcs.abcs-min-width>.wp-block-image,
+.editor-styles-wrapper .wp-block-gallery.abcs.abcs-min-width>.wp-block-image {
+	scroll-snap-align: start !important;
+}
+
+/* ==========================================================================
+   BOUTONS DE NAVIGATION (CSS natif futur)
+   ========================================================================== */
+
+/* Fallback : indicateur de pagination pour navigateurs non compatibles */
+:has(> .abcs)::after {
+	content: '';
+	position: absolute;
+	z-index: calc(var(--carousel-z-index, 999999) - 1);
+	left: var(--carousel-padding-left, 0px);
+	bottom: calc(var(--carousel-marker-bottom-offset, -2rem) + var(--carousel-padding-bottom, 1rem));
+	transform: translate(0, 100%);
+	display: block;
+	width: var(--carousel-marker-size, 0.66rem);
+	height: var(--carousel-marker-size, 0.66rem);
+	pointer-events: none;
+	color: var(--carousel-button-bg, #007cba);
+	opacity: 0.55;
+	border-radius: 999px;
+	background-color: currentColor;
+	box-shadow:
+		calc(var(--carousel-marker-size, 0.66rem) + var(--carousel-marker-gap, 0.5rem)) 0 0 currentColor,
+		calc(2 * (var(--carousel-marker-size, 0.66rem) + var(--carousel-marker-gap, 0.5rem))) 0 0 currentColor;
+	filter: drop-shadow(var(--carousel-shadow, 0 2px 8px rgba(0, 0, 0, 0.1)));
+	transition: opacity var(--carousel-transition-duration, 0.3s) var(--carousel-transition-easing, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+:has(> .abcs)::hover::after {
+	opacity: 0.75;
+}
+
+:has(> .abcs.abcs-hide-arrows)::after,
+:has(> .abcs.abcs-hide-markers)::after {
+	display: none !important;
+	content: none !important;
+}
+
+/* Sur les navigateurs compatibles, masquer les fallbacks et afficher les vrais boutons */
+@supports selector(::scroll-button(*)) {
+	:has(> .abcs)::after {
+		display: none;
+	}
+
+	.abcs::scroll-button(*) {
+		position: absolute;
+		z-index: var(--carousel-z-index);
+		top: 50%;
+		width: var(--carousel-button-size);
+		height: var(--carousel-button-size);
+		line-height: 1em;
+		border-radius: 100rem;
+		background-color: var(--carousel-button-bg);
+		border: 2px solid var(--carousel-button-bg);
+		color: var(--carousel-button-color);
+		opacity: 1;
+		visibility: visible;
+		cursor: pointer;
+		text-align: center;
+		display: inline-block;
+		box-shadow: var(--carousel-shadow);
+		transition: all var(--carousel-transition-duration) var(--carousel-transition-easing);
+		font-size: 0px;
+		overflow: hidden;
+		left: auto;
+		right: auto;
+	}
+
+	.abcs::scroll-button(*):hover {
+		box-shadow: var(--carousel-shadow), 0 6px 20px rgba(0, 0, 0, 0.2);
+		background-color: var(--carousel-button-bg);
+		filter: brightness(1.1);
+	}
+
+	.abcs::scroll-button(*):disabled {
+		opacity: 0;
+		visibility: hidden;
+		pointer-events: none;
+		cursor: default;
+	}
+
+	/* Keep scroll buttons enabled when loop is active */
+	.abcs[data-abcs-loop="true"]::scroll-button(*):disabled {
+		opacity: 1;
+		visibility: visible;
+		pointer-events: auto;
+		cursor: pointer;
+	}
+
+	.abcs::scroll-button(left) {
+		left: calc(var(--carousel-padding-left, 0px) + var(--carousel-button-offset, 0px));
+		content: '';
+		transform: translate(-50%, -50%);
+		background-image: var(--carousel-button-arrow-left, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'%3E%3Cpath fill='white' d='M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z'/%3E%3C/svg%3E"));
+		background-repeat: no-repeat;
+		background-position: center;
+		background-size: 50% 50%;
+	}
+
+	.abcs::scroll-button(right) {
+		right: calc(var(--carousel-padding-right, 0px) + var(--carousel-button-offset, 0px));
+		left: auto;
+		content: '';
+		transform: translate(50%, -50%);
+		background-image: var(--carousel-button-arrow-right, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'%3E%3Cpath fill='white' d='M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z'/%3E%3C/svg%3E"));
+		background-repeat: no-repeat;
+		background-position: center;
+		background-size: 50% 50%;
+	}
+
+	.abcs.abcs-hide-arrows::scroll-button(*) {
+		display: none !important;
+		opacity: 0 !important;
+		visibility: hidden !important;
+		pointer-events: none !important;
+	}
+
+	.abcs.abcs-hide-markers::scroll-marker-group {
+		display: none !important;
+		opacity: 0 !important;
+		visibility: hidden !important;
+		pointer-events: none !important;
+	}
+}
+
+/* ==========================================================================
+   MARQUEURS DE SCROLL (CSS natif futur)
+   ========================================================================== */
+
+@supports selector(::scroll-marker-group) {
+	:has(> .abcs)::after {
+		display: none;
+	}
+
+	.abcs::scroll-marker-group {
+		position: absolute;
+		z-index: var(--carousel-z-index);
+		bottom: calc(var(--carousel-marker-bottom-offset) + var(--carousel-padding-bottom, 1rem));
+		left: var(--carousel-padding-left, 0);
+		display: flex;
+		justify-content: center;
+		gap: var(--carousel-marker-gap);
+		transform: translate(0, 100%);
+		transition: opacity var(--carousel-transition-duration) var(--carousel-transition-easing);
+	}
+}
+
+@supports selector(::scroll-marker) {
+	.abcs>*::scroll-marker {
+		position: relative;
+		content: '';
+		width: var(--carousel-marker-size);
+		height: var(--carousel-marker-size);
+		background: var(--carousel-button-bg);
+		border-radius: 50%;
+		opacity: 0.5;
+		box-shadow: var(--carousel-shadow);
+		transition: opacity var(--carousel-transition-duration) var(--carousel-transition-easing);
+		cursor: pointer;
+	}
+
+	.abcs.abcs-hide-markers>*::scroll-marker {
+		opacity: 0 !important;
+		cursor: default !important;
+		pointer-events: none !important;
+	}
+
+
+	.abcs>*::scroll-marker:hover {
+		opacity: 0.75;
+	}
+
+	.abcs>*::scroll-marker:target-current {
+		opacity: 1;
+		cursor: default;
+	}
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN - ALIGNMENT WITH WORDPRESS
+   ========================================================================== */
+
+/* Rules derived from analysing WordPress CSS:
+   - Primary breakpoint: 600px (mobile/tablet)
+   - Secondary breakpoint: 782px (tablet/desktop)
+   - Behaviour matches native WordPress blocks
+*/
+
+/* ==========================================================================
+   POST TEMPLATE, GALLERY, GROUP - RESPONSIVE COLUMNS
+   ========================================================================== */
+
+/* Mobile (default) - 1 column for Post Template and Group */
+.wp-block-post-template.is-layout-grid.abcs:not(.abcs-min-width) .wp-block-post,
+.wp-block-group.is-layout-grid.abcs:not(.abcs-min-width)>* {
+	width: 100% !important;
+	min-width: 100% !important;
+}
+
+/* Mobile (default) - 2 columns for Gallery */
+.wp-block-gallery.abcs .wp-block-image {
+	width: calc(50% - var(--wp--style--block-gap, 1rem) / 2) !important;
+	min-width: calc(50% - var(--wp--style--block-gap, 1rem) / 2) !important;
+}
+
+/* From 600px onwards - behaviour determined by column count */
+/* Generic rule for all block types with column classes */
+@media (min-width: 600px) {
+
+	/* Post Template columns */
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-2 .wp-block-post {
+		--carousel-grid-item-width: calc(50% - var(--wp--style--block-gap, 1.25em) / 2);
+	}
+
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-3 .wp-block-post {
+		--carousel-grid-item-width: calc(33.33333% - var(--wp--style--block-gap, 1.25em) * 2 / 3);
+	}
+
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-4 .wp-block-post {
+		--carousel-grid-item-width: calc(25% - var(--wp--style--block-gap, 1.25em) * 3 / 4);
+	}
+
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-5 .wp-block-post {
+		--carousel-grid-item-width: calc(20% - var(--wp--style--block-gap, 1.25em) * 4 / 5);
+	}
+
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-6 .wp-block-post {
+		--carousel-grid-item-width: calc(16.66667% - var(--wp--style--block-gap, 1.25em) * 5 / 6);
+	}
+
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-7 .wp-block-post {
+		--carousel-grid-item-width: calc(14.285% - var(--wp--style--block-gap, 1.25em) * 6 / 7);
+	}
+
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-8 .wp-block-post {
+		--carousel-grid-item-width: calc(12.5% - var(--wp--style--block-gap, 1.25em) * 7 / 8);
+	}
+
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-9 .wp-block-post {
+		--carousel-grid-item-width: calc(11.111% - var(--wp--style--block-gap, 1.25em) * 8 / 9);
+	}
+
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-10 .wp-block-post {
+		--carousel-grid-item-width: calc(10% - var(--wp--style--block-gap, 1.25em) * 9 / 10);
+	}
+
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-11 .wp-block-post {
+		--carousel-grid-item-width: calc(9.090% - var(--wp--style--block-gap, 1.25em) * 10 / 11);
+	}
+
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-12 .wp-block-post {
+		--carousel-grid-item-width: calc(8.333% - var(--wp--style--block-gap, 1.25em) * 11 / 12);
+	}
+
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-13 .wp-block-post {
+		--carousel-grid-item-width: calc(7.692% - var(--wp--style--block-gap, 1.25em) * 12 / 13);
+	}
+
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-14 .wp-block-post {
+		--carousel-grid-item-width: calc(7.142% - var(--wp--style--block-gap, 1.25em) * 13 / 14);
+	}
+
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-15 .wp-block-post {
+		--carousel-grid-item-width: calc(6.666% - var(--wp--style--block-gap, 1.25em) * 14 / 15);
+	}
+
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-16 .wp-block-post {
+		--carousel-grid-item-width: calc(6.25% - var(--wp--style--block-gap, 1.25em) * 15 / 16);
+	}
+
+	/* Apply width and min-width using the variable */
+	.wp-block-post-template.is-layout-grid.abcs[class*="abcs-cols-"] .wp-block-post {
+		width: var(--carousel-grid-item-width) !important;
+		min-width: var(--carousel-grid-item-width) !important;
+	}
+
+	/* Gallery columns */
+	.wp-block-gallery.abcs.abcs-cols-1 .wp-block-image {
+		--carousel-grid-item-width: 100%;
+	}
+
+	.wp-block-gallery.abcs.abcs-cols-2 .wp-block-image {
+		--carousel-grid-item-width: calc(50% - var(--wp--style--block-gap, 1rem) / 2);
+	}
+
+	.wp-block-gallery.abcs.abcs-cols-3 .wp-block-image {
+		--carousel-grid-item-width: calc(33.33333% - var(--wp--style--block-gap, 1rem) * 2 / 3);
+	}
+
+	.wp-block-gallery.abcs.abcs-cols-4 .wp-block-image {
+		--carousel-grid-item-width: calc(25% - var(--wp--style--block-gap, 1rem) * 3 / 4);
+	}
+
+	.wp-block-gallery.abcs.abcs-cols-5 .wp-block-image {
+		--carousel-grid-item-width: calc(20% - var(--wp--style--block-gap, 1rem) * 4 / 5);
+	}
+
+	.wp-block-gallery.abcs.abcs-cols-6 .wp-block-image {
+		--carousel-grid-item-width: calc(16.66667% - var(--wp--style--block-gap, 1rem) * 5 / 6);
+	}
+
+	.wp-block-gallery.abcs.abcs-cols-7 .wp-block-image {
+		--carousel-grid-item-width: calc(14.285% - var(--wp--style--block-gap, 1rem) * 6 / 7);
+	}
+
+	.wp-block-gallery.abcs.abcs-cols-8 .wp-block-image {
+		--carousel-grid-item-width: calc(12.5% - var(--wp--style--block-gap, 1rem) * 7 / 8);
+	}
+
+	.wp-block-gallery.abcs[class*="abcs-cols-"] .wp-block-image {
+		width: var(--carousel-grid-item-width) !important;
+		min-width: var(--carousel-grid-item-width) !important;
+	}
+
+	/* Group columns */
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-2>* {
+		--carousel-grid-item-width: calc(50% - var(--wp--style--block-gap, 1rem) / 2);
+	}
+
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-3>* {
+		--carousel-grid-item-width: calc(33.33333% - var(--wp--style--block-gap, 1rem) * 2 / 3);
+	}
+
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-4>* {
+		--carousel-grid-item-width: calc(25% - var(--wp--style--block-gap, 1rem) * 3 / 4);
+	}
+
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-5>* {
+		--carousel-grid-item-width: calc(20% - var(--wp--style--block-gap, 1rem) * 4 / 5);
+	}
+
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-6>* {
+		--carousel-grid-item-width: calc(16.66667% - var(--wp--style--block-gap, 1rem) * 5 / 6);
+	}
+
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-7>* {
+		--carousel-grid-item-width: calc(14.285% - var(--wp--style--block-gap, 1rem) * 6 / 7);
+	}
+
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-8>* {
+		--carousel-grid-item-width: calc(12.5% - var(--wp--style--block-gap, 1rem) * 7 / 8);
+	}
+
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-9>* {
+		--carousel-grid-item-width: calc(11.111% - var(--wp--style--block-gap, 1rem) * 8 / 9);
+	}
+
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-10>* {
+		--carousel-grid-item-width: calc(10% - var(--wp--style--block-gap, 1rem) * 9 / 10);
+	}
+
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-11>* {
+		--carousel-grid-item-width: calc(9.090% - var(--wp--style--block-gap, 1rem) * 10 / 11);
+	}
+
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-12>* {
+		--carousel-grid-item-width: calc(8.333% - var(--wp--style--block-gap, 1rem) * 11 / 12);
+	}
+
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-13>* {
+		--carousel-grid-item-width: calc(7.692% - var(--wp--style--block-gap, 1rem) * 12 / 13);
+	}
+
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-14>* {
+		--carousel-grid-item-width: calc(7.142% - var(--wp--style--block-gap, 1rem) * 13 / 14);
+	}
+
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-15>* {
+		--carousel-grid-item-width: calc(6.666% - var(--wp--style--block-gap, 1rem) * 14 / 15);
+	}
+
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-16>* {
+		--carousel-grid-item-width: calc(6.25% - var(--wp--style--block-gap, 1rem) * 15 / 16);
+	}
+
+	.wp-block-group.is-layout-grid.abcs[class*="abcs-cols-"]>* {
+		width: var(--carousel-grid-item-width) !important;
+		min-width: var(--carousel-grid-item-width) !important;
+	}
+}
+
+/* Tablet behavior: force 2 columns for Post Template and Group (3+ columns) */
+@media (min-width: 600px) and (max-width: 1200px) {
+
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-3 .wp-block-post,
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-4 .wp-block-post,
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-5 .wp-block-post,
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-6 .wp-block-post,
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-7 .wp-block-post,
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-8 .wp-block-post,
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-9 .wp-block-post,
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-10 .wp-block-post,
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-11 .wp-block-post,
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-12 .wp-block-post,
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-13 .wp-block-post,
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-14 .wp-block-post,
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-15 .wp-block-post,
+	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-16 .wp-block-post {
+		width: calc(50% - var(--wp--style--block-gap, 1.25em) / 2) !important;
+		min-width: calc(50% - var(--wp--style--block-gap, 1.25em) / 2) !important;
+	}
+
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-3>*,
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-4>*,
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-5>*,
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-6>*,
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-7>*,
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-8>*,
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-9>*,
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-10>*,
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-11>*,
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-12>*,
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-13>*,
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-14>*,
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-15>*,
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-16>* {
+		width: calc(50% - var(--wp--style--block-gap, 1rem) / 2) !important;
+		min-width: calc(50% - var(--wp--style--block-gap, 1rem) / 2) !important;
+	}
+}
+
+/* ==========================================================================
+   OPTIMISATIONS RESPONSIVE
+   ========================================================================== */
+
+@media (max-width: 782px) {
+	:root {
+		--carousel-button-size: 2.75rem;
+		--carousel-button-offset: 0.5rem;
+		--carousel-marker-size: 0.5rem;
+	}
+}
+
+@media (max-width: 600px) {
+	:root {
+		--carousel-button-size: 2.5rem;
+		--carousel-button-offset: 0.5rem;
+		--carousel-marker-size: 0.45rem;
+		--carousel-marker-gap: 0.4rem;
+	}
+
+	.abcs {
+		gap: var(--wp--style--block-gap, 0.5rem);
+		padding: 0.75rem 0px;
+	}
+
+	.abcs.abcs-min-width>*,
+	.block-editor-block-list__layout .abcs.abcs-min-width>*,
+	.editor-styles-wrapper .abcs.abcs-min-width>*,
+	.wp-block-post-template.abcs.abcs-min-width .wp-block-post,
+	.block-editor-block-list__layout .wp-block-post-template.abcs.abcs-min-width .wp-block-post,
+	.editor-styles-wrapper .wp-block-post-template.abcs.abcs-min-width .wp-block-post,
+	.wp-block-group.abcs.abcs-min-width>*,
+	.block-editor-block-list__layout .wp-block-group.abcs.abcs-min-width>*,
+	.editor-styles-wrapper .wp-block-group.abcs.abcs-min-width>*,
+	.wp-block-gallery.abcs.abcs-min-width>.wp-block-image,
+	.block-editor-block-list__layout .wp-block-gallery.abcs.abcs-min-width>.wp-block-image,
+	.editor-styles-wrapper .wp-block-gallery.abcs.abcs-min-width>.wp-block-image {
+		width: 100% !important;
+		min-width: 100% !important;
+		max-width: 100% !important;
+	}
+}
+
+@media (max-width: 480px) {
+	:root {
+		--carousel-button-size: 2rem;
+		--carousel-button-offset: 0.25rem;
+		--carousel-marker-size: 0.4rem;
+		--carousel-marker-gap: 0.35rem;
+		--carousel-marker-bottom-offset: -1.5rem;
+	}
+
+	.abcs {
+		gap: var(--wp--style--block-gap, 0.25rem);
+		padding: 1rem 0px;
+	}
+}
+
+@media (max-width: 375px) {
+	:root {
+		--carousel-button-size: 1.75rem;
+		--carousel-marker-size: 0.35rem;
+	}
+}
+
+/* ==========================================================================
+   GUTENBERG EDITOR STYLES
+   ========================================================================== */
+
+.cfg-abcs-toggle-control {
+	margin-bottom: 1rem;
+}
+
+.cfg-abcs-toggle-control .components-base-control__label {
+	font-weight: 600;
+	color: #1e1e1e;
+}
+
+.cfg-abcs-toggle-control .components-base-control__help {
+	font-size: 12px;
+	color: #757575;
+	margin-top: 4px;
+}
+
+.cfg-abcs-toggle-control .components-toggle-control__label[for*="carousel"] {
+	color: #007cba;
+	font-weight: 600;
+}
+
+.cfg-abcs-panel .components-panel__body-title {
+	font-weight: 600;
+}
+
+.cfg-abcs-panel-first {
+	order: -1000 !important;
+}
+
+.block-editor-block-inspector .cfg-abcs-panel-first {
+	order: -1000 !important;
+	margin-bottom: 16px;
+}
+
+.block-editor-block-list__layout .abcs>*:not(:first-child),
+.editor-styles-wrapper .abcs>*:not(:first-child) {
+	pointer-events: none;
+}
+
+/* ==========================================================================
+   PERFORMANCE ET OPTIMISATIONS
+   ========================================================================== */
+
+.abcs,
+.block-editor-block-list__layout .abcs,
+.editor-styles-wrapper .abcs {
+	will-change: scroll-position;
+	contain: layout style;
+}
+
+.abcs>*,
+.block-editor-block-list__layout .abcs>*,
+.editor-styles-wrapper .abcs>* {
+	will-change: transform;
+}
+
+/* ==========================================================================
+   ACCESSIBILITY
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+	.abcs,
+	.block-editor-block-list__layout .abcs,
+	.editor-styles-wrapper .abcs {
+		scroll-behavior: auto;
+	}
+
+	.abcs::scroll-button(*),
+	*:has(>.abcs)::after {
+		transition: none;
+	}
+
+	.abcs>*::scroll-marker {
+		transition: none;
+	}
+}
+
+@media (prefers-contrast: high) {
+
+	.abcs::scroll-button(*),
+	*:has(>.abcs)::after {
+		border-width: 3px;
+	}
+
+	.abcs>*::scroll-marker {
+		border: 2px solid currentColor;
+	}
+}

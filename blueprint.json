@@ -1,0 +1,51 @@
+{
+	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+	"description": "Demo for Any Block Carousel Slider",
+	"steps": [
+		{
+			"step": "login",
+			"username": "admin",
+			"password": "password"
+		},
+		{
+			"step": "installPlugin",
+			"pluginZipFile": {
+				"resource": "url",
+				"url": "https://github.com/WEBLAZER/native-blocks-carousel/archive/refs/heads/main.zip"
+			},
+			"options": {
+				"activate": true
+			}
+		},
+		{
+			"step": "installTheme",
+			"themeZipFile": {
+				"resource": "url",
+				"url": "https://raw.githubusercontent.com/WEBLAZER/native-blocks-carousel/main/assets/theme.zip"
+			}
+		},
+		{
+			"step": "activateTheme",
+			"themeFolderName": "native-blocks-carousel"
+		},
+		{
+			"step": "importWxr",
+			"file": {
+				"resource": "url",
+				"url": "https://raw.githubusercontent.com/WEBLAZER/native-blocks-carousel/main/assets/demo-content.xml"
+			}
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php \nrequire_once ABSPATH . 'wp-admin/includes/post.php';\n$home = get_page_by_path('sample-page');\nif ($home) {\n\tupdate_option('show_on_front', 'page');\n\tupdate_option('page_on_front', $home->ID);\n}\nupdate_option('permalink_structure', '/%postname%/');"
+		},
+		{
+			"step": "setSiteOptions",
+			"options": {
+				"blogname": "Any Block Carousel Slider",
+				"blogdescription": "Pure CSS Carousel for WordPress"
+			}
+		}
+	],
+	"landingPage": "/sample-page/"
+}

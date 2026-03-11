@@ -1,0 +1,171 @@
+/*
+ * Gutenberg editor styles for Any Block Carousel Slider
+ * @package AnyBlockCarouselSlider
+ */
+
+.cfg-abcs-toggle-control {
+	margin-bottom: 1rem;
+}
+
+.cfg-abcs-toggle-control .components-base-control__label {
+	font-weight: 600;
+	color: #1e1e1e;
+}
+
+.cfg-abcs-toggle-control .components-base-control__help {
+	font-size: 12px;
+	color: #757575;
+	margin-top: 4px;
+}
+
+.cfg-abcs-toggle-control .components-toggle-control__label[for*="carousel"] {
+	color: #007cba;
+	font-weight: 600;
+}
+
+.cfg-abcs-panel .components-panel__body-title {
+	font-weight: 600;
+}
+
+.abcs-arrow-style-panel .components-base-control__field,
+.abcs-arrow-style-panel .components-toggle-group-control {
+	display: grid;
+	justify-content: center;
+}
+
+.abcs-arrow-style-panel .components-toggle-group-control {
+	width: 100%;
+}
+
+.abcs-arrow-style-panel .abcs-arrow-style-group {
+	gap: 8px;
+}
+
+.abcs-arrow-style-group.components-toggle-group-control {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.abcs-arrow-style-group .components-toggle-group-control__option {
+	--abcs-arrow-option-size: 44px;
+	width: var(--abcs-arrow-option-size);
+	height: var(--abcs-arrow-option-size);
+	min-width: var(--abcs-arrow-option-size);
+	min-height: var(--abcs-arrow-option-size);
+	flex: 0 0 var(--abcs-arrow-option-size);
+	padding: 0;
+	border-radius: 10px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+	border: 1px solid rgba(0, 0, 0, 0.08);
+	background: #f8f9fa;
+	color: #1e1e1e;
+	transition: box-shadow .2s ease, transform .2s ease, color .2s ease;
+	box-sizing: border-box;
+}
+
+.abcs-arrow-style-group .components-toggle-group-control__option>span {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+	line-height: 0;
+}
+
+.abcs-arrow-style-group .components-toggle-group-control__option:hover {
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+	transform: translateY(-1px);
+}
+
+.abcs-arrow-style-group .components-toggle-group-control__option.is-selected {
+	background: var(--wp-admin-theme-color, #3858e9);
+	border-color: var(--wp-admin-theme-color, #3858e9);
+	color: #fff;
+	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+	transform: none;
+}
+
+.abcs-arrow-style-group .components-toggle-group-control__option.is-selected .abcs-arrow-style-icon__button {
+	background: rgba(255, 255, 255, 0.2);
+	border-color: rgba(255, 255, 255, 0.7);
+	box-shadow: none;
+	color: #fff;
+}
+
+.abcs-arrow-style-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+}
+
+.abcs-arrow-style-icon svg {
+	width: 20px;
+	height: 20px;
+	display: block;
+}
+
+
+.cfg-abcs-panel-first {
+	order: -1000 !important;
+}
+
+.block-editor-block-inspector .cfg-abcs-panel-first {
+	order: -1000 !important;
+	margin-bottom: 16px;
+}
+
+.block-editor-block-list__layout .abcs>*:not(:first-child),
+.editor-styles-wrapper .abcs>*:not(:first-child) {
+	pointer-events: none;
+}
+
+@media (prefers-color-scheme: dark) {
+	.cfg-abcs-toggle-control .components-base-control__label {
+		color: #fff;
+	}
+
+	.cfg-abcs-toggle-control .components-base-control__help {
+		color: #ccc;
+	}
+}
+
+:has(> .abcs.abcs-hide-arrows)::after {
+	display: none !important;
+	content: none !important;
+}
+
+:has(> .abcs.abcs-hide-markers)::after {
+	display: none !important;
+	content: none !important;
+}
+
+@supports selector(::scroll-button(*)) {
+	.abcs.abcs-hide-arrows::scroll-button(*) {
+		display: none !important;
+		opacity: 0 !important;
+		visibility: hidden !important;
+		pointer-events: none !important;
+	}
+}
+
+@supports selector(::scroll-marker-group) {
+	.abcs.abcs-hide-markers::scroll-marker-group {
+		display: none !important;
+		opacity: 0 !important;
+		visibility: hidden !important;
+		pointer-events: none !important;
+	}
+}
+
+@supports selector(::scroll-marker) {
+	.abcs.abcs-hide-markers>*::scroll-marker {
+		opacity: 0 !important;
+		cursor: default !important;
+		pointer-events: none !important;
+	}
+}
