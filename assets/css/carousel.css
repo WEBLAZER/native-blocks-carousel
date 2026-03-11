@@ -43,9 +43,6 @@
 
 /* Force every parent containing a carousel to use position: relative */
 /* Required so ::scroll-button and ::scroll-marker are positioned correctly */
-:has(.abcs) {
-	position: relative !important;
-}
 
 .abcs {
 	position: relative !important;
