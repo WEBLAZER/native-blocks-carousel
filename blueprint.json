@@ -15,10 +15,6 @@
 			}
 		},
 		{
-			"step": "activatePlugin",
-			"pluginName": "native-blocks-carousel"
-		},
-		{
 			"step": "installTheme",
 			"themeZipFile": {
 				"resource": "url",
@@ -26,8 +22,8 @@
 			}
 		},
 		{
-			"step": "activateTheme",
-			"themeFolderName": "native-blocks-carousel"
+			"step": "runPHP",
+			"code": "<?php \nrequire_once ABSPATH . 'wp-admin/includes/plugin.php';\nrequire_once ABSPATH . 'wp-admin/includes/post.php';\n\n// Activate Plugin\nactivate_plugin('native-blocks-carousel/any-block-carousel-slider.php');\n\n// Activate Theme\nswitch_theme('native-blocks-carousel');\n\n// Import content should happen after this or via importWxr step\n"
 		},
 		{
 			"step": "importWxr",
