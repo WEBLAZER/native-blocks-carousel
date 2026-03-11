@@ -1,0 +1,45 @@
+{
+"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+"description": "Official Demo - Any Block Carousel Slider",
+"steps": [
+{
+"step": "login",
+"username": "admin",
+"password": "password"
+},
+{
+"step": "installPlugin",
+"pluginData": {
+"resource": "url",
+"url": "https://raw.githubusercontent.com/WEBLAZER/native-blocks-carousel/main/assets/plugin.zip"
+}
+},
+{
+"step": "installTheme",
+"themeData": {
+"resource": "url",
+"url": "https://raw.githubusercontent.com/WEBLAZER/native-blocks-carousel/main/assets/theme.zip"
+}
+},
+{
+"step": "activatePlugin",
+"pluginPath": "native-blocks-carousel/any-block-carousel-slider.php"
+},
+{
+"step": "activateTheme",
+"themeFolderName": "native-blocks-carousel"
+},
+{
+"step": "importWxr",
+"file": {
+"resource": "url",
+"url": "https://raw.githubusercontent.com/WEBLAZER/native-blocks-carousel/main/assets/demo-content.xml"
+}
+},
+{
+"step": "runPHP",
+"code": "<?php require_once 'wp-load.php'; update_option('permalink_structure', '/%postname%/'); $home = get_page_by_title('Home'); if ($home) { update_option('show_on_front', 'page'); update_option('page_on_front', $home->ID); }"
+}
+],
+"landingPage": "/sample-page/"
+}
