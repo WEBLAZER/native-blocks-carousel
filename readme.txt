@@ -311,3 +311,4 @@ The plugin uses the `render_block` hook to dynamically inject CSS variables base
 == Credits ==
 
 Developed with ❤️ by [Arthur Ballan (WEBLAZER)](https://weblazer.github.io/)
+ 
