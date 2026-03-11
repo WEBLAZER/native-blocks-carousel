@@ -11,14 +11,14 @@
 			"step": "installPlugin",
 			"pluginData": {
 				"resource": "url",
-				"url": "https://raw.githubusercontent.com/WEBLAZER/native-blocks-carousel/main/assets/plugin.zip"
+				"url": "https://cdn.jsdelivr.net/gh/WEBLAZER/native-blocks-carousel@main/assets/plugin.zip"
 			}
 		},
 		{
 			"step": "installTheme",
 			"themeData": {
 				"resource": "url",
-				"url": "https://raw.githubusercontent.com/WEBLAZER/native-blocks-carousel/main/assets/theme.zip"
+				"url": "https://cdn.jsdelivr.net/gh/WEBLAZER/native-blocks-carousel@main/assets/theme.zip"
 			}
 		},
 		{
@@ -33,7 +33,7 @@
 			"step": "importWxr",
 			"file": {
 				"resource": "url",
-				"url": "https://raw.githubusercontent.com/WEBLAZER/native-blocks-carousel/main/assets/demo-home.xml"
+				"url": "https://cdn.jsdelivr.net/gh/WEBLAZER/native-blocks-carousel@main/assets/demo-home.xml"
 			}
 		},
 		{
