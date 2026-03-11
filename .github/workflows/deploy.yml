@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: WordPress.org Deploy
-        uses: 10up/action-wordpress-dot-org-deploy@stable
+        uses: 10up/action-wordpress-dot-org-deploy@v2.2.1
         env:
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
