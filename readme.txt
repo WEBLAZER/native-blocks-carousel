@@ -4,7 +4,7 @@ Tags: carousel, slider, block, gutenberg, woocommerce
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.5
+Stable tag: 1.0.5.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,7 +16,7 @@ Gutenberg carousel slider block: transform any WordPress block into a responsive
 
 == Try it out ==
 Experience the plugin in seconds without installing anything! Launch our interactive demo:
-https://playground.wordpress.net/?blueprint-url=https://native-blocks-carousel.weblazer.fr/playground/blueprint.json
+[Launch Playround Demo](https://playground.wordpress.net/?blueprint-url=https://native-blocks-carousel.weblazer.fr/playground/blueprint.json)
 
 Unlike many all-in-one carousel slider blocks that require you to add a dedicated "Carousel" block and rebuild every slide, **Any Block Carousel Slider** hooks straight into the Gutenberg blocks you already use. The result: a Query Loop/Post Template, Group, or Gallery block can become a carousel slider in one click, without content duplication or extra maintenance.
 
@@ -174,6 +174,10 @@ Visual arrows remain visible (disabled state) and users navigate via touch scrol
 5. Custom CSS variables to adapt the carousel slider design.
 
 == Changelog ==
+
+= 1.0.5.1 - 2026-03-11 =
+* 🎮 Added official blueprint.json for 'Live Preview' button on WordPress.org.
+* 🔗 Improved playground link formatting.
 
 = 1.0.5 - 2026-03-11 =
 * 🎮 Added official WordPress Playground interactive demo.
