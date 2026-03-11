@@ -8,6 +8,13 @@
 			"password": "password"
 		},
 		{
+			"step": "installPlugin",
+			"pluginData": {
+				"resource": "url",
+				"url": "https://native-blocks-carousel.weblazer.fr/playground/plugin.zip"
+			}
+		},
+		{
 			"step": "installTheme",
 			"themeData": {
 				"resource": "url",
@@ -40,7 +47,7 @@
 		},
 		{
 			"step": "runPHP",
-			"code": "<?php \nrequire_once 'wp-load.php';\nrequire_once ABSPATH . 'wp-admin/includes/image.php';\nrequire_once ABSPATH . 'wp-admin/includes/file.php';\nrequire_once ABSPATH . 'wp-admin/includes/media.php';\n\n// 1. Set Site Icon\n$icon_url = 'https://native-blocks-carousel.weblazer.fr/playground/site-icon.png';\n$tmp = download_url($icon_url);\nif (!is_wp_error($tmp)) {\n    $file_array = array('name' => 'site-icon.png', 'tmp_name' => $tmp);\n    $attachment_id = media_handle_sideload($file_array, 0);\n    if (!is_wp_error($attachment_id)) {\n        update_option('site_icon', $attachment_id);\n    }\n}\n\n// 2. Flush Rewrite Rules\nflush_rewrite_rules(true);\n"
+			"code": "<?php \nrequire_once 'wp-load.php';\nrequire_once ABSPATH . 'wp-admin/includes/image.php';\nrequire_once ABSPATH . 'wp-admin/includes/file.php';\nrequire_once ABSPATH . 'wp-admin/includes/media.php';\nrequire_once ABSPATH . 'wp-admin/includes/post.php';\n\n// 1. Delete default content\nwp_delete_post( 1, true ); // Hello World\nwp_delete_post( 2, true ); // Sample Page\n\n// 2. Set Site Icon\n$icon_url = 'https://native-blocks-carousel.weblazer.fr/playground/site-icon.png';\n$tmp = download_url($icon_url);\nif (!is_wp_error($tmp)) {\n    $file_array = array('name' => 'site-icon.png', 'tmp_name' => $tmp);\n    $attachment_id = media_handle_sideload($file_array, 0);\n    if (!is_wp_error($attachment_id)) {\n        update_option('site_icon', $attachment_id);\n    }\n}\n\n// 3. Flush Rewrite Rules\nflush_rewrite_rules(true);\n"
 		}
 	],
 	"landingPage": "/"

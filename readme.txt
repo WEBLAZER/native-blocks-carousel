@@ -4,7 +4,7 @@ Tags: carousel, slider, block, gutenberg, woocommerce
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.5.1
+Stable tag: 1.0.5.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -174,6 +174,10 @@ Visual arrows remain visible (disabled state) and users navigate via touch scrol
 5. Custom CSS variables to adapt the carousel slider design.
 
 == Changelog ==
+
+= 1.0.5.2 - 2026-03-11 =
+* 🧹 Removed default "Hello World" post from playground.
+* 🎨 Fixed site icon (favicon) in playground demo.
 
 = 1.0.5.1 - 2026-03-11 =
 * 🎮 Added official blueprint.json for 'Live Preview' button on WordPress.org.
