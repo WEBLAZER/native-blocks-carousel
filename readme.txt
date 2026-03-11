@@ -4,7 +4,7 @@ Tags: carousel, slider, block, gutenberg, woocommerce
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.4.4
+Stable tag: 1.0.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,6 +13,10 @@ Gutenberg carousel slider block: transform any WordPress block into a responsive
 == Description ==
 
 **Any Block Carousel Slider** is a Gutenberg carousel slider block plugin that instantly converts supported native WordPress blocks (Query Loop/Post Template, Group, Gallery) into a responsive carousel slider without adding a dedicated block or loading a JavaScript library. Simply enable the "Carousel" toggle in the Gutenberg editor: your content stays 100% native, your DOM stays lightweight, and your Lighthouse performance scores remain intact. This includes WooCommerce product listings rendered via the Query Loop/Post Template block, so you can showcase products without relying on the legacy Products block.
+
+== Try it out ==
+Experience the plugin in seconds without installing anything! Launch our interactive demo:
+[https://playground.wordpress.net/?blueprint-url=https://native-blocks-carousel.weblazer.fr/playground/blueprint.json](https://playground.wordpress.net/?blueprint-url=https://native-blocks-carousel.weblazer.fr/playground/blueprint.json)
 
 Unlike many all-in-one carousel slider blocks that require you to add a dedicated "Carousel" block and rebuild every slide, **Any Block Carousel Slider** hooks straight into the Gutenberg blocks you already use. The result: a Query Loop/Post Template, Group, or Gallery block can become a carousel slider in one click, without content duplication or extra maintenance.
 
@@ -170,7 +174,10 @@ Visual arrows remain visible (disabled state) and users navigate via touch scrol
 5. Custom CSS variables to adapt the carousel slider design.
 
 == Changelog ==
- 
+
+= 1.0.5 - 2026-03-11 =
+* 🎮 Added official WordPress Playground interactive demo.
+* 🏷️ Maintenance and performance optimizations.
  = 1.0.4.4 - 2026-03-05 =
  * ✨ Improved button color synchronization in the Site Editor (FSE).
  * 🎨 Carousel buttons now directly follow global theme styles by reading WordPress CSS variables (`--wp--style--elements--button--color--*`).
