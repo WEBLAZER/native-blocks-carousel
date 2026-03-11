@@ -11,11 +11,12 @@
 			"step": "installPlugin",
 			"pluginZipFile": {
 				"resource": "url",
-				"url": "https://github.com/WEBLAZER/native-blocks-carousel/archive/refs/heads/main.zip"
-			},
-			"options": {
-				"activate": true
+				"url": "https://raw.githubusercontent.com/WEBLAZER/native-blocks-carousel/main/assets/plugin.zip"
 			}
+		},
+		{
+			"step": "activatePlugin",
+			"pluginName": "native-blocks-carousel"
 		},
 		{
 			"step": "installTheme",
