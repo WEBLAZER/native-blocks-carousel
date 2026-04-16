@@ -2,9 +2,9 @@
 Contributors: weblazer
 Tags: carousel, slider, block, gutenberg, woocommerce
 Requires at least: 6.0
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.0.5.3
+Stable tag: 1.0.5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -174,6 +174,10 @@ Visual arrows remain visible (disabled state) and users navigate via touch scrol
 5. Custom CSS variables to adapt the carousel slider design.
 
 == Changelog ==
+
+= 1.0.5.4 - 2026-04-16 =
+* ✅ Verified compatibility with WordPress 7.0 (Gutenberg Phase 3: Collaboration).
+* 🚀 Maintenance release.
 
 = 1.0.5.3 - 2026-03-11 =
 * 🎨 Removed redundant parent positioning CSS rule for better theme compatibility.
