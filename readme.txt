@@ -4,7 +4,7 @@ Tags: carousel, slider, block, gutenberg, woocommerce
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.0.5.4
+Stable tag: 2.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,7 +24,7 @@ Unlike many all-in-one carousel slider blocks that require you to add a dedicate
 
 * **WordPress loops without friction** – Transform Query Loop and Post Template Gutenberg blocks into a "loop slider" without creating a block per slide.
 * **Familiar editorial experience** – Content editors keep the Gutenberg interface they know (patterns, global styles, alignments, inner blocks).
-* **Zero JavaScript on the frontend** – Native scroll, `scroll-snap`, GPU-friendly, no Swiper/Slick bundle to load.
+* **Zero JavaScript on the frontend** – Native scroll, `scroll-snap`, GPU-friendly, no Swiper/Slick bundle to load. Only a lightweight script handles navigation controls.
 * **Full compatibility** – Works with classic themes and block themes while respecting the structure of your Query Loop/Post Template, Group, and Gallery blocks.
 * **Accessibility + SEO** – Keyboard navigation, respects `prefers-reduced-motion` preferences, clean DOM for crawling.
 
@@ -40,14 +40,14 @@ Unlike many all-in-one carousel slider blocks that require you to add a dedicate
 
 - **Activation**: Any Block Carousel Slider – toggle an existing Gutenberg block. Classic carousel slider blocks – add a dedicated slider block and rebuild every slide.
 - **WordPress loop**: Any Block Carousel Slider – works with Query Loop and Post Template blocks without duplication. Competitor carousels – require one block per slide or custom code.
-- **Frontend JavaScript**: Any Block Carousel Slider – zero JavaScript, 100% CSS carousel slider. Competitor carousels – load Swiper/Slick and additional scripts.
+- **Frontend JavaScript**: Any Block Carousel Slider – minimal JavaScript (< 5KB), CSS-powered carousel slider. Competitor carousels – load Swiper/Slick and additional scripts.
 - **Performance**: Any Block Carousel Slider – lightweight DOM, no external assets. Competitor carousels – multiply files, reflow, and downloads.
 - **Content maintenance**: Any Block Carousel Slider – single Gutenberg block to update. Competitor carousels – duplicate content in dedicated slides.
 - **Security & upkeep**: Any Block Carousel Slider – no third-party libraries to monitor. Competitor carousels – depend on external JS libraries like Swiper/Slick.
 
 = Key features =
 
-* **100% CSS** – Smooth carousel slider with `scroll-snap`, `::scroll-button`, and `::scroll-marker`. No script to bundle.
+* **CSS-powered scroll** – Smooth carousel slider with `scroll-snap` and lightweight JavaScript navigation controls. No heavy libraries.
 * **Loop functionality** – Enable infinite scrolling with seamless reset to start/end when reaching boundaries.
 * **Autoplay support** – Automatic slide progression with configurable delay and pause on hover/interaction.
 * **Smart responsive** – Automatically handles visible columns, spacing, and control sizes according to WordPress breakpoints (1280, 1024, 782, 600, 480, 375).
@@ -72,7 +72,7 @@ Unlike many all-in-one carousel slider blocks that require you to add a dedicate
 * **Auto mode (fixed width)** – Perfect for card-based sliders (posts, testimonials, product highlights) with pixel-perfect widths like 280px, 320px, or 360px.
 * **Padding and gaps** – Automatic management via CSS vars `--carousel-padding-*`, `--wp--style--block-gap`.
 * **Themes & `theme.json`** – Override variables to align controls with your design system.
-* **Graceful degradation** – If a browser doesn't support `::scroll-button`, users keep touch and mouse scrolling.
+* **Cross-browser compatible** – Works seamlessly on Chrome, Firefox, Safari, and all modern browsers with real HTML navigation controls.
 
 = Technical architecture =
 
@@ -122,7 +122,7 @@ Yes. The Gutenberg carousel slider block plugin reads style variables generated 
 
 = Does it require JavaScript on the frontend? =
 
-No. Everything relies on native CSS. Only a few lines of JavaScript executed in the editor handle the toggle interface. This means zero JavaScript bundle to load (unlike plugins using Swiper.js or Slick), resulting in better Lighthouse scores and Core Web Vitals.
+No heavy JavaScript libraries. The plugin uses native CSS `scroll-snap` for smooth scrolling and a lightweight script (< 5KB) for navigation controls (arrows, dots). This is dramatically lighter than plugins using Swiper.js or Slick, resulting in better Lighthouse scores and Core Web Vitals.
 
 = How do I transform a Query Loop into a carousel? =
 
@@ -161,9 +161,9 @@ In your theme or via a CSS snippets plugin, override the variables:
 
 If the navigation buttons look offset or partially hidden, wrap the carousel-enabled block inside a parent Group (or another container block) so the wrapper can provide the proper padding and overflow context for the controls.
 
-= What happens if the browser doesn't support `::scroll-button`? =
+= Is it compatible with all browsers? =
 
-Visual arrows remain visible (disabled state) and users navigate via touch scroll or mouse wheel. The experience remains responsive.
+Yes! Navigation buttons, pagination dots, and scroll behavior all use standard HTML and CSS supported by every modern browser (Chrome, Firefox, Safari, Edge). The plugin uses native `scroll-snap` for smooth scrolling and lightweight JavaScript for interactive navigation controls.
 
 == Screenshots ==
 
@@ -174,6 +174,14 @@ Visual arrows remain visible (disabled state) and users navigate via touch scrol
 5. Custom CSS variables to adapt the carousel slider design.
 
 == Changelog ==
+
+= 2.0.0 - 2026-05-22 =
+* 🌐 Major: Navigation buttons and pagination dots are now real HTML elements for full cross-browser compatibility.
+* ✅ Works seamlessly on Chrome, Firefox, Safari, and all modern browsers.
+* 🎯 Clickable pagination dots with active slide tracking via IntersectionObserver.
+* ♿ Improved keyboard accessibility with focusable buttons and ARIA attributes.
+* 🧹 Removed dependency on experimental CSS `::scroll-button` and `::scroll-marker` pseudo-elements.
+* 🚀 Simplified loop logic with direct button click handling.
 
 = 1.0.5.4 - 2026-04-16 =
 * ✅ Verified compatibility with WordPress 7.0 (Gutenberg Phase 3: Collaboration).

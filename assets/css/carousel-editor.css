@@ -134,38 +134,11 @@
 	}
 }
 
-:has(> .abcs.abcs-hide-arrows)::after {
+/* Hide navigation in editor context */
+.abcs.abcs-hide-arrows ~ .abcs-nav-btn {
 	display: none !important;
-	content: none !important;
 }
 
-:has(> .abcs.abcs-hide-markers)::after {
+.abcs.abcs-hide-markers ~ .abcs-markers {
 	display: none !important;
-	content: none !important;
-}
-
-@supports selector(::scroll-button(*)) {
-	.abcs.abcs-hide-arrows::scroll-button(*) {
-		display: none !important;
-		opacity: 0 !important;
-		visibility: hidden !important;
-		pointer-events: none !important;
-	}
-}
-
-@supports selector(::scroll-marker-group) {
-	.abcs.abcs-hide-markers::scroll-marker-group {
-		display: none !important;
-		opacity: 0 !important;
-		visibility: hidden !important;
-		pointer-events: none !important;
-	}
-}
-
-@supports selector(::scroll-marker) {
-	.abcs.abcs-hide-markers>*::scroll-marker {
-		opacity: 0 !important;
-		cursor: default !important;
-		pointer-events: none !important;
-	}
 }

@@ -1021,19 +1021,58 @@
    * Variables are already injected from React attributes via withCarouselStyles.
    */
   function copyPaddingVariablesToParent() {
-    const carousels = document.querySelectorAll('.abcs');
-    carousels.forEach(function (carousel) {
-      const computedStyle = window.getComputedStyle(carousel);
+    const docsToSearch = new Set();
+    docsToSearch.add(document);
 
-      // Read CSS variables already injected through React attributes
-      const paddingLeft = computedStyle.getPropertyValue('--carousel-padding-left').trim() || '0px';
-      const paddingRight = computedStyle.getPropertyValue('--carousel-padding-right').trim() || '0px';
+    const iframeSelectors = [
+      '.editor-canvas iframe',
+      'iframe[name="editor-canvas"]',
+      '.edit-site-visual-editor__editor-canvas',
+    ];
 
-      // Copy the variables to the parent element for fallback buttons
-      const parent = carousel.parentElement;
-      if (parent) {
-        parent.style.setProperty('--carousel-padding-left', paddingLeft);
-        parent.style.setProperty('--carousel-padding-right', paddingRight);
+    iframeSelectors.forEach((selector) => {
+      const iframe = document.querySelector(selector);
+      if (iframe && iframe.contentDocument) {
+        docsToSearch.add(iframe.contentDocument);
+      }
+    });
+
+    docsToSearch.forEach((doc) => {
+      try {
+        const carousels = doc.querySelectorAll('.abcs');
+        carousels.forEach(function (carousel) {
+          const computedStyle = doc.defaultView.getComputedStyle(carousel);
+
+          const paddingLeft = computedStyle.paddingLeft;
+          const paddingRight = computedStyle.paddingRight;
+
+          const parent = carousel.parentElement;
+          const parentStyle = parent ? doc.defaultView.getComputedStyle(parent) : null;
+
+          const normalizePadding = (value, fallback, axis) => {
+            if (value && value !== '0px') {
+              return value;
+            }
+            const parentValue = parentStyle ? parentStyle[axis] : null;
+            if (parentValue && parentValue !== '0px') {
+              return parentValue;
+            }
+            return fallback;
+          };
+
+          const paddingLeftValue = normalizePadding(paddingLeft, '0px', 'paddingLeft');
+          const paddingRightValue = normalizePadding(paddingRight, '0px', 'paddingRight');
+
+          carousel.style.setProperty('--carousel-padding-left', paddingLeftValue);
+          carousel.style.setProperty('--carousel-padding-right', paddingRightValue);
+
+          if (parent) {
+            parent.style.setProperty('--carousel-padding-left', paddingLeftValue);
+            parent.style.setProperty('--carousel-padding-right', paddingRightValue);
+          }
+        });
+      } catch (e) {
+        // Ignorer les contextes non accessibles
       }
     });
   }
@@ -1255,6 +1294,248 @@
     return convertColorToHexForSvg(baseColor || '#ffffff', doc);
   }
 
+  function getSlideWidth(carousel) {
+    const firstChild = carousel.firstElementChild;
+    if (!firstChild) {
+      return 0;
+    }
+    const computedStyle = window.getComputedStyle(carousel);
+    const gap = computedStyle.getPropertyValue('gap') || computedStyle.getPropertyValue('--wp--style--block-gap') || '1rem';
+    let gapValue = 0;
+    if (gap && gap !== 'normal') {
+      const gapNum = parseFloat(gap);
+      if (!isNaN(gapNum)) {
+        if (gap.includes('rem')) {
+          const rootFontSize = parseFloat(window.getComputedStyle(carousel.ownerDocument.documentElement).fontSize) || 16;
+          gapValue = gapNum * rootFontSize;
+        } else if (gap.includes('em')) {
+          const parentFontSize = parseFloat(computedStyle.fontSize) || 16;
+          gapValue = gapNum * parentFontSize;
+        } else {
+          gapValue = gapNum;
+        }
+      }
+    }
+    return firstChild.offsetWidth + gapValue;
+  }
+
+  function cleanOrphanedEditorNavigation(searchDoc) {
+    if (!searchDoc || typeof searchDoc.querySelectorAll !== 'function') {
+      return;
+    }
+
+    const prevButtons = searchDoc.querySelectorAll('.abcs-nav-btn--prev');
+    const nextButtons = searchDoc.querySelectorAll('.abcs-nav-btn--next');
+    const markersContainers = searchDoc.querySelectorAll('.abcs-markers');
+
+    const cleanElement = (el) => {
+      const parent = el.parentElement;
+      if (parent) {
+        const hasCarousel = parent.querySelector('.abcs');
+        if (!hasCarousel) {
+          el.remove();
+        }
+      }
+    };
+
+    prevButtons.forEach(cleanElement);
+    nextButtons.forEach(cleanElement);
+    markersContainers.forEach(cleanElement);
+  }
+
+  function updateEditorCarouselNavigation(carousel, baseDoc) {
+    if (!carousel) {
+      return;
+    }
+
+    const parent = carousel.parentElement;
+    if (!parent) {
+      return;
+    }
+
+    // 0. Compute and copy padding variables from computed styles (syncing with frontend)
+    const computedStyle = carousel.ownerDocument.defaultView.getComputedStyle(carousel);
+    const parentStyle = parent ? carousel.ownerDocument.defaultView.getComputedStyle(parent) : null;
+
+    const paddingLeft = computedStyle.paddingLeft;
+    const paddingRight = computedStyle.paddingRight;
+
+    const normalizePadding = (value, fallback, axis) => {
+      if (value && value !== '0px') {
+        return value;
+      }
+      const parentValue = parentStyle ? parentStyle[axis] : null;
+      if (parentValue && parentValue !== '0px') {
+        return parentValue;
+      }
+      return fallback;
+    };
+
+    const paddingLeftValue = normalizePadding(paddingLeft, '0px', 'paddingLeft');
+    const paddingRightValue = normalizePadding(paddingRight, '0px', 'paddingRight');
+
+    carousel.style.setProperty('--carousel-padding-left', paddingLeftValue);
+    carousel.style.setProperty('--carousel-padding-right', paddingRightValue);
+
+    if (parent) {
+      parent.style.setProperty('--carousel-padding-left', paddingLeftValue);
+      parent.style.setProperty('--carousel-padding-right', paddingRightValue);
+    }
+
+    const hideArrows = carousel.classList.contains('abcs-hide-arrows') || carousel.closest('.abcs-hide-arrows');
+    const hideMarkers = carousel.classList.contains('abcs-hide-markers') || carousel.closest('.abcs-hide-markers');
+    
+    const styleKey = resolveCarouselArrowStyleFromElement(carousel);
+
+    let arrowColor = '#ffffff';
+    if (typeof window !== 'undefined') {
+      const textVar = computedStyle.getPropertyValue('--carousel-button-color').trim();
+      if (textVar) {
+        arrowColor = convertColorToHexForSvg(textVar, carousel.ownerDocument);
+      }
+    }
+
+    // 1. Manage Navigation Arrows
+    const existingPrev = parent.querySelector(':scope > .abcs-nav-btn--prev');
+    const existingNext = parent.querySelector(':scope > .abcs-nav-btn--next');
+
+    if (hideArrows) {
+      if (existingPrev) existingPrev.remove();
+      if (existingNext) existingNext.remove();
+    } else {
+      const isUpToDate = existingPrev && existingNext && 
+                         existingPrev.dataset.abcsArrowStyle === styleKey &&
+                         existingPrev.dataset.abcsArrowColor === arrowColor;
+
+      if (!isUpToDate) {
+        if (existingPrev) existingPrev.remove();
+        if (existingNext) existingNext.remove();
+
+        const prevBtn = document.createElement('button');
+        prevBtn.className = 'abcs-nav-btn abcs-nav-btn--prev';
+        prevBtn.setAttribute('type', 'button');
+        prevBtn.setAttribute('aria-label', 'Previous slide');
+        prevBtn.dataset.abcsArrowStyle = styleKey;
+        prevBtn.dataset.abcsArrowColor = arrowColor;
+        prevBtn.innerHTML = generateArrowMarkup('left', arrowColor, styleKey);
+
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'abcs-nav-btn abcs-nav-btn--next';
+        nextBtn.setAttribute('type', 'button');
+        nextBtn.setAttribute('aria-label', 'Next slide');
+        nextBtn.dataset.abcsArrowStyle = styleKey;
+        nextBtn.dataset.abcsArrowColor = arrowColor;
+        nextBtn.innerHTML = generateArrowMarkup('right', arrowColor, styleKey);
+
+        // Insert as siblings immediately after carousel
+        parent.insertBefore(nextBtn, carousel.nextSibling);
+        parent.insertBefore(prevBtn, carousel.nextSibling);
+
+        // Click handlers
+        prevBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const slideWidth = getSlideWidth(carousel);
+          carousel.scrollBy({ left: -slideWidth, behavior: 'smooth' });
+        });
+
+        nextBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const slideWidth = getSlideWidth(carousel);
+          carousel.scrollBy({ left: slideWidth, behavior: 'smooth' });
+        });
+      }
+    }
+
+    // 2. Manage Pagination Markers
+    const existingMarkers = parent.querySelector(':scope > .abcs-markers');
+
+    if (hideMarkers) {
+      if (existingMarkers) existingMarkers.remove();
+    } else {
+      const children = Array.from(carousel.children).filter(child => {
+        return !child.classList.contains('abcs-nav-btn') && 
+               !child.classList.contains('abcs-markers') &&
+               !child.classList.contains('block-editor-block-list__insertion-point') &&
+               !child.classList.contains('block-list-appender');
+      });
+
+      const existingDots = existingMarkers ? existingMarkers.querySelectorAll('.abcs-marker') : [];
+      const needsReconstruction = !existingMarkers || existingDots.length !== children.length;
+
+      if (needsReconstruction) {
+        if (existingMarkers) existingMarkers.remove();
+
+        if (children.length > 0) {
+          const markersContainer = document.createElement('div');
+          markersContainer.className = 'abcs-markers';
+          markersContainer.setAttribute('role', 'tablist');
+
+          const markers = [];
+          for (let i = 0; i < children.length; i++) {
+            const marker = document.createElement('button');
+            marker.className = 'abcs-marker';
+            marker.setAttribute('role', 'tab');
+            marker.setAttribute('type', 'button');
+            marker.setAttribute('aria-label', 'Slide ' + (i + 1));
+
+            if (i === 0) {
+              marker.classList.add('is-active');
+            }
+
+            (function (slideIndex) {
+              marker.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const slide = children[slideIndex];
+                if (slide) {
+                  carousel.scrollTo({
+                    left: slide.offsetLeft - carousel.offsetLeft,
+                    behavior: 'smooth'
+                  });
+                }
+              });
+            })(i);
+
+            markers.push(marker);
+            markersContainer.appendChild(marker);
+          }
+
+          parent.appendChild(markersContainer);
+
+          const onScroll = function () {
+            const scrollLeft = carousel.scrollLeft;
+            let activeIndex = 0;
+            let minDistance = Infinity;
+
+            children.forEach((slide, idx) => {
+              const slidePos = slide.offsetLeft - carousel.offsetLeft;
+              const distance = Math.abs(slidePos - scrollLeft);
+              if (distance < minDistance) {
+                minDistance = distance;
+                activeIndex = idx;
+              }
+            });
+
+            markers.forEach((m, idx) => {
+              if (idx === activeIndex) {
+                m.classList.add('is-active');
+                m.setAttribute('aria-selected', 'true');
+              } else {
+                m.classList.remove('is-active');
+                m.setAttribute('aria-selected', 'false');
+              }
+            });
+          };
+
+          carousel.addEventListener('scroll', onScroll);
+          carousel._abcsEditorOnScroll = onScroll;
+        }
+      }
+    }
+  }
+
   function applyArrowIconsToCarousels(color, docContext, overrideConfig) {
     const baseDoc = docContext || document;
 
@@ -1273,7 +1554,6 @@
         docsToSearch.add(baseDoc);
       }
 
-      // When the script runs in the admin, blocks are rendered inside an iframe
       if (baseDoc === document) {
         const iframeSelectors = [
           '.editor-canvas iframe',
@@ -1291,6 +1571,7 @@
 
       docsToSearch.forEach((searchDoc) => {
         try {
+          cleanOrphanedEditorNavigation(searchDoc);
           const found = Array.from(searchDoc.querySelectorAll('.abcs'));
           if (found.length) {
             found.forEach((node) => {
@@ -1300,7 +1581,7 @@
             });
           }
         } catch (e) {
-          // Ignorer les contextes non accessibles (CORS, etc.)
+          // Ignorer les contextes non accessibles
         }
       });
     }
@@ -1309,7 +1590,6 @@
       return;
     }
 
-    // Remove potential duplicates
     carousels = Array.from(new Set(carousels));
 
     const arrowColorCache = new WeakMap();
@@ -1320,14 +1600,7 @@
       }
 
       const parent = carousel.parentElement;
-
-      if (carousel.classList && carousel.classList.contains('abcs-hide-arrows')) {
-        carousel.style.setProperty('--carousel-button-arrow-left', 'none');
-        carousel.style.setProperty('--carousel-button-arrow-right', 'none');
-        if (parent) {
-          parent.style.setProperty('--carousel-button-arrow-left', 'none');
-          parent.style.setProperty('--carousel-button-arrow-right', 'none');
-        }
+      if (!parent) {
         return;
       }
 
@@ -1337,29 +1610,23 @@
         arrowColor = resolveArrowColor(color, carouselDoc);
         arrowColorCache.set(carouselDoc, arrowColor);
       }
+      
       const overrideStyle = overrideConfig && overrideConfig.styleKey ? normalizeStyleKey(overrideConfig.styleKey) : null;
       const styleKey = overrideStyle && isValidArrowStyle(overrideStyle)
         ? overrideStyle
         : resolveCarouselArrowStyleFromElement(carousel);
-      const leftArrowSvg = generateArrowSvg('left', arrowColor, styleKey);
-      const rightArrowSvg = generateArrowSvg('right', arrowColor, styleKey);
 
       if (carousel.dataset) {
         carousel.dataset.abcsCarouselArrowStyle = styleKey;
         carousel.dataset.abcsArrowStyle = styleKey;
       }
 
-      carousel.style.setProperty('--carousel-button-arrow-left', `url("${leftArrowSvg}")`);
-      carousel.style.setProperty('--carousel-button-arrow-right', `url("${rightArrowSvg}")`);
-
-      if (parent) {
-        if (parent.dataset) {
-          parent.dataset.abcsCarouselArrowStyle = styleKey;
-          parent.dataset.abcsArrowStyle = styleKey;
-        }
-        parent.style.setProperty('--carousel-button-arrow-left', `url("${leftArrowSvg}")`);
-        parent.style.setProperty('--carousel-button-arrow-right', `url("${rightArrowSvg}")`);
+      if (parent && parent.dataset) {
+        parent.dataset.abcsCarouselArrowStyle = styleKey;
+        parent.dataset.abcsArrowStyle = styleKey;
       }
+
+      updateEditorCarouselNavigation(carousel, carouselDoc);
     });
   }
 

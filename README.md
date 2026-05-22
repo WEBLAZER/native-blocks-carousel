@@ -12,9 +12,9 @@ Experience the plugin in seconds with **WordPress Playground**! No installation 
 
 ## Why Any Block Carousel Slider?
 
-- **Zero JavaScript on the frontend**: GPU-friendly, native scroll performance.
+- **Minimal JavaScript**: GPU-friendly, native CSS scroll with lightweight navigation controls.
 - **WordPress Native**: Works directly on your existing Query Loop, Group, or Gallery blocks.
-- **Lightweight**: No external libraries like Swiper or Slick.
+- **Lightweight**: No Swiper/Slick dependencies. Under 5KB of JavaScript.
 - **Performance**: High Lighthouse scores out of the box.
 
 ## Installation

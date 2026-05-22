@@ -42,7 +42,7 @@
    ========================================================================== */
 
 /* Force every parent containing a carousel to use position: relative */
-/* Required so ::scroll-button and ::scroll-marker are positioned correctly */
+/* Required so navigation buttons and markers are positioned correctly */
 
 .abcs {
 	position: relative !important;
@@ -83,8 +83,6 @@
 	-ms-overflow-style: none;
 	scrollbar-width: none;
 	-webkit-scrollbar: none;
-
-	scroll-marker-group: after;
 
 	isolation: isolate;
 	contain: layout !important;
@@ -300,180 +298,134 @@
 }
 
 /* ==========================================================================
-   BOUTONS DE NAVIGATION (CSS natif futur)
+   NAVIGATION BUTTONS
    ========================================================================== */
 
-/* Fallback : indicateur de pagination pour navigateurs non compatibles */
-:has(> .abcs)::after {
-	content: '';
+.abcs-nav-btn {
 	position: absolute;
-	z-index: calc(var(--carousel-z-index, 999999) - 1);
-	left: var(--carousel-padding-left, 0px);
-	bottom: calc(var(--carousel-marker-bottom-offset, -2rem) + var(--carousel-padding-bottom, 1rem));
-	transform: translate(0, 100%);
-	display: block;
-	width: var(--carousel-marker-size, 0.66rem);
-	height: var(--carousel-marker-size, 0.66rem);
+	z-index: var(--carousel-z-index);
+	top: 50%;
+	width: var(--carousel-button-size);
+	height: var(--carousel-button-size);
+	border-radius: 100rem;
+	background-color: var(--carousel-button-bg);
+	border: 2px solid var(--carousel-button-bg);
+	color: var(--carousel-button-color);
+	opacity: 1;
+	visibility: visible;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: var(--carousel-shadow);
+	transition: all var(--carousel-transition-duration) var(--carousel-transition-easing);
+	padding: 0;
+	margin: 0;
+	overflow: hidden;
+	-webkit-appearance: none;
+	appearance: none;
+	line-height: 1;
+}
+
+.abcs-nav-btn svg {
+	width: 50%;
+	height: 50%;
+	fill: currentColor;
 	pointer-events: none;
-	color: var(--carousel-button-bg, #007cba);
-	opacity: 0.55;
-	border-radius: 999px;
-	background-color: currentColor;
-	box-shadow:
-		calc(var(--carousel-marker-size, 0.66rem) + var(--carousel-marker-gap, 0.5rem)) 0 0 currentColor,
-		calc(2 * (var(--carousel-marker-size, 0.66rem) + var(--carousel-marker-gap, 0.5rem))) 0 0 currentColor;
-	filter: drop-shadow(var(--carousel-shadow, 0 2px 8px rgba(0, 0, 0, 0.1)));
-	transition: opacity var(--carousel-transition-duration, 0.3s) var(--carousel-transition-easing, cubic-bezier(0.4, 0, 0.2, 1));
+	flex-shrink: 0;
 }
 
-:has(> .abcs)::hover::after {
-	opacity: 0.75;
+.abcs-nav-btn:hover {
+	box-shadow: var(--carousel-shadow), 0 6px 20px rgba(0, 0, 0, 0.2);
+	background-color: var(--carousel-button-bg);
+	filter: brightness(1.1);
 }
 
-:has(> .abcs.abcs-hide-arrows)::after,
-:has(> .abcs.abcs-hide-markers)::after {
+.abcs-nav-btn:focus-visible {
+	outline: 2px solid var(--carousel-button-bg);
+	outline-offset: 2px;
+}
+
+.abcs-nav-btn:disabled {
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+	cursor: default;
+}
+
+.abcs-nav-btn--prev {
+	left: calc(var(--carousel-padding-left, 0px) + var(--carousel-button-offset, 0px));
+	transform: translate(-50%, -50%);
+}
+
+.abcs-nav-btn--next {
+	right: calc(var(--carousel-padding-right, 0px) + var(--carousel-button-offset, 0px));
+	left: auto;
+	transform: translate(50%, -50%);
+}
+
+/* Hide navigation buttons */
+.abcs.abcs-hide-arrows ~ .abcs-nav-btn {
 	display: none !important;
-	content: none !important;
-}
-
-/* Sur les navigateurs compatibles, masquer les fallbacks et afficher les vrais boutons */
-@supports selector(::scroll-button(*)) {
-	:has(> .abcs)::after {
-		display: none;
-	}
-
-	.abcs::scroll-button(*) {
-		position: absolute;
-		z-index: var(--carousel-z-index);
-		top: 50%;
-		width: var(--carousel-button-size);
-		height: var(--carousel-button-size);
-		line-height: 1em;
-		border-radius: 100rem;
-		background-color: var(--carousel-button-bg);
-		border: 2px solid var(--carousel-button-bg);
-		color: var(--carousel-button-color);
-		opacity: 1;
-		visibility: visible;
-		cursor: pointer;
-		text-align: center;
-		display: inline-block;
-		box-shadow: var(--carousel-shadow);
-		transition: all var(--carousel-transition-duration) var(--carousel-transition-easing);
-		font-size: 0px;
-		overflow: hidden;
-		left: auto;
-		right: auto;
-	}
-
-	.abcs::scroll-button(*):hover {
-		box-shadow: var(--carousel-shadow), 0 6px 20px rgba(0, 0, 0, 0.2);
-		background-color: var(--carousel-button-bg);
-		filter: brightness(1.1);
-	}
-
-	.abcs::scroll-button(*):disabled {
-		opacity: 0;
-		visibility: hidden;
-		pointer-events: none;
-		cursor: default;
-	}
-
-	/* Keep scroll buttons enabled when loop is active */
-	.abcs[data-abcs-loop="true"]::scroll-button(*):disabled {
-		opacity: 1;
-		visibility: visible;
-		pointer-events: auto;
-		cursor: pointer;
-	}
-
-	.abcs::scroll-button(left) {
-		left: calc(var(--carousel-padding-left, 0px) + var(--carousel-button-offset, 0px));
-		content: '';
-		transform: translate(-50%, -50%);
-		background-image: var(--carousel-button-arrow-left, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'%3E%3Cpath fill='white' d='M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z'/%3E%3C/svg%3E"));
-		background-repeat: no-repeat;
-		background-position: center;
-		background-size: 50% 50%;
-	}
-
-	.abcs::scroll-button(right) {
-		right: calc(var(--carousel-padding-right, 0px) + var(--carousel-button-offset, 0px));
-		left: auto;
-		content: '';
-		transform: translate(50%, -50%);
-		background-image: var(--carousel-button-arrow-right, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'%3E%3Cpath fill='white' d='M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z'/%3E%3C/svg%3E"));
-		background-repeat: no-repeat;
-		background-position: center;
-		background-size: 50% 50%;
-	}
-
-	.abcs.abcs-hide-arrows::scroll-button(*) {
-		display: none !important;
-		opacity: 0 !important;
-		visibility: hidden !important;
-		pointer-events: none !important;
-	}
-
-	.abcs.abcs-hide-markers::scroll-marker-group {
-		display: none !important;
-		opacity: 0 !important;
-		visibility: hidden !important;
-		pointer-events: none !important;
-	}
+	opacity: 0 !important;
+	visibility: hidden !important;
+	pointer-events: none !important;
 }
 
 /* ==========================================================================
-   MARQUEURS DE SCROLL (CSS natif futur)
+   PAGINATION MARKERS (DOTS)
    ========================================================================== */
 
-@supports selector(::scroll-marker-group) {
-	:has(> .abcs)::after {
-		display: none;
-	}
-
-	.abcs::scroll-marker-group {
-		position: absolute;
-		z-index: var(--carousel-z-index);
-		bottom: calc(var(--carousel-marker-bottom-offset) + var(--carousel-padding-bottom, 1rem));
-		left: var(--carousel-padding-left, 0);
-		display: flex;
-		justify-content: center;
-		gap: var(--carousel-marker-gap);
-		transform: translate(0, 100%);
-		transition: opacity var(--carousel-transition-duration) var(--carousel-transition-easing);
-	}
+.abcs-markers {
+	position: absolute;
+	z-index: var(--carousel-z-index);
+	bottom: calc(var(--carousel-marker-bottom-offset) + var(--carousel-padding-bottom, 1rem));
+	left: var(--carousel-padding-left, 0);
+	width: calc(100% - var(--carousel-padding-left, 0px) - var(--carousel-padding-right, 0px));
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: var(--carousel-marker-gap);
+	transform: translate(0, 100%);
+	transition: opacity var(--carousel-transition-duration) var(--carousel-transition-easing);
 }
 
-@supports selector(::scroll-marker) {
-	.abcs>*::scroll-marker {
-		position: relative;
-		content: '';
-		width: var(--carousel-marker-size);
-		height: var(--carousel-marker-size);
-		background: var(--carousel-button-bg);
-		border-radius: 50%;
-		opacity: 0.5;
-		box-shadow: var(--carousel-shadow);
-		transition: opacity var(--carousel-transition-duration) var(--carousel-transition-easing);
-		cursor: pointer;
-	}
+.abcs-marker {
+	width: var(--carousel-marker-size);
+	height: var(--carousel-marker-size);
+	background: var(--carousel-button-bg);
+	border-radius: 50%;
+	opacity: 0.5;
+	box-shadow: var(--carousel-shadow);
+	transition: opacity var(--carousel-transition-duration) var(--carousel-transition-easing);
+	cursor: pointer;
+	border: none;
+	padding: 0;
+	margin: 0;
+	-webkit-appearance: none;
+	appearance: none;
+}
 
-	.abcs.abcs-hide-markers>*::scroll-marker {
-		opacity: 0 !important;
-		cursor: default !important;
-		pointer-events: none !important;
-	}
+.abcs-marker:hover {
+	opacity: 0.75;
+}
 
+.abcs-marker:focus-visible {
+	outline: 2px solid var(--carousel-button-bg);
+	outline-offset: 2px;
+}
 
-	.abcs>*::scroll-marker:hover {
-		opacity: 0.75;
-	}
+.abcs-marker.is-active {
+	opacity: 1;
+	cursor: default;
+}
 
-	.abcs>*::scroll-marker:target-current {
-		opacity: 1;
-		cursor: default;
-	}
+/* Hide pagination markers */
+.abcs.abcs-hide-markers ~ .abcs-markers {
+	display: none !important;
+	opacity: 0 !important;
+	visibility: hidden !important;
+	pointer-events: none !important;
 }
 
 /* ==========================================================================
@@ -855,24 +807,22 @@
 		scroll-behavior: auto;
 	}
 
-	.abcs::scroll-button(*),
-	*:has(>.abcs)::after {
+	.abcs-nav-btn {
 		transition: none;
 	}
 
-	.abcs>*::scroll-marker {
+	.abcs-marker {
 		transition: none;
 	}
 }
 
 @media (prefers-contrast: high) {
 
-	.abcs::scroll-button(*),
-	*:has(>.abcs)::after {
+	.abcs-nav-btn {
 		border-width: 3px;
 	}
 
-	.abcs>*::scroll-marker {
+	.abcs-marker {
 		border: 2px solid currentColor;
 	}
 }
