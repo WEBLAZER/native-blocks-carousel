@@ -4,15 +4,15 @@ Tags: carousel, slider, block, gutenberg, woocommerce
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.0.0
+Stable tag: 2.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Gutenberg carousel slider block: transform any WordPress block into a responsive carousel with pure CSS. Zero JavaScript.
+Transform any WordPress block into a responsive carousel using native CSS scroll-snap. Lightweight JS handles navigation, loops, and autoplay.
 
 == Description ==
 
-**Any Block Carousel Slider** is a Gutenberg carousel slider block plugin that instantly converts supported native WordPress blocks (Query Loop/Post Template, Group, Gallery) into a responsive carousel slider without adding a dedicated block or loading a JavaScript library. Simply enable the "Carousel" toggle in the Gutenberg editor: your content stays 100% native, your DOM stays lightweight, and your Lighthouse performance scores remain intact. This includes WooCommerce product listings rendered via the Query Loop/Post Template block, so you can showcase products without relying on the legacy Products block.
+**Any Block Carousel Slider** is a Gutenberg carousel slider block plugin that instantly converts supported native WordPress blocks (Query Loop/Post Template, Group, Gallery) into a responsive carousel slider. Simply enable the "Carousel" toggle in the Gutenberg editor: your content stays 100% native, your DOM stays lightweight, and your Lighthouse performance scores remain intact. This includes WooCommerce product listings rendered via the Query Loop/Post Template block, so you can showcase products without relying on the legacy Products block.
 
 == Try it out ==
 Experience the plugin in seconds without installing anything! Launch our interactive demo:
@@ -24,7 +24,7 @@ Unlike many all-in-one carousel slider blocks that require you to add a dedicate
 
 * **WordPress loops without friction** – Transform Query Loop and Post Template Gutenberg blocks into a "loop slider" without creating a block per slide.
 * **Familiar editorial experience** – Content editors keep the Gutenberg interface they know (patterns, global styles, alignments, inner blocks).
-* **Zero JavaScript on the frontend** – Native scroll, `scroll-snap`, GPU-friendly, no Swiper/Slick bundle to load. Only a lightweight script handles navigation controls.
+* **Native scroll & performance** – Native CSS scroll-snap layout, GPU-friendly, no heavy Swiper/Slick bundle to load. Only a lightweight script handles navigation, loops, and autoplay.
 * **Full compatibility** – Works with classic themes and block themes while respecting the structure of your Query Loop/Post Template, Group, and Gallery blocks.
 * **Accessibility + SEO** – Keyboard navigation, respects `prefers-reduced-motion` preferences, clean DOM for crawling.
 
@@ -40,7 +40,7 @@ Unlike many all-in-one carousel slider blocks that require you to add a dedicate
 
 - **Activation**: Any Block Carousel Slider – toggle an existing Gutenberg block. Classic carousel slider blocks – add a dedicated slider block and rebuild every slide.
 - **WordPress loop**: Any Block Carousel Slider – works with Query Loop and Post Template blocks without duplication. Competitor carousels – require one block per slide or custom code.
-- **Frontend JavaScript**: Any Block Carousel Slider – minimal JavaScript (< 5KB), CSS-powered carousel slider. Competitor carousels – load Swiper/Slick and additional scripts.
+- **Frontend JavaScript**: Any Block Carousel Slider – extremely lightweight script, CSS-powered carousel slider. Competitor carousels – load Swiper/Slick and additional scripts.
 - **Performance**: Any Block Carousel Slider – lightweight DOM, no external assets. Competitor carousels – multiply files, reflow, and downloads.
 - **Content maintenance**: Any Block Carousel Slider – single Gutenberg block to update. Competitor carousels – duplicate content in dedicated slides.
 - **Security & upkeep**: Any Block Carousel Slider – no third-party libraries to monitor. Competitor carousels – depend on external JS libraries like Swiper/Slick.
@@ -79,7 +79,7 @@ Unlike many all-in-one carousel slider blocks that require you to add a dedicate
 * `render_block` hook to inject variables based on context (block type, columns, gaps).
 * Dedicated service for translating labels and help messages.
 * Separate editor/frontend styles for a transparent Gutenberg experience.
-* Code organized by PSR-4 services (see `ARCHITECTURE.md` for details).
+* Code organized by PSR-4 services.
 
 == Installation ==
 
@@ -122,7 +122,7 @@ Yes. The Gutenberg carousel slider block plugin reads style variables generated 
 
 = Does it require JavaScript on the frontend? =
 
-No heavy JavaScript libraries. The plugin uses native CSS `scroll-snap` for smooth scrolling and a lightweight script (< 5KB) for navigation controls (arrows, dots). This is dramatically lighter than plugins using Swiper.js or Slick, resulting in better Lighthouse scores and Core Web Vitals.
+No heavy JavaScript libraries (like Swiper.js or Slick). The plugin uses native CSS `scroll-snap` for smooth layout and scrolling, accompanied by an extremely lightweight frontend script (~40KB raw source, <15KB minified/gzipped) to manage navigation arrows, pagination dots, autoplay, and loop behaviors.
 
 = How do I transform a Query Loop into a carousel? =
 
@@ -142,7 +142,7 @@ Yes, when your products are rendered via the Query Loop/Post Template block (for
 
 = Is there an autoplay mode, infinite loop, or custom arrows? =
 
-The plugin focuses on native scroll and performance. You can add a light custom script if you want autoplay, but most sites get a better Core Web Vitals score by keeping native behavior.
+Yes! The plugin includes built-in infinite looping (Loop mode) and automatic slide progression (Autoplay with configurable delay) controllable directly from the Gutenberg block settings. You can also customize, show, or hide navigation arrows and pagination markers independently.
 
 = Can I have multiple carousels on the same page? =
 
@@ -174,6 +174,12 @@ Yes! Navigation buttons, pagination dots, and scroll behavior all use standard H
 5. Custom CSS variables to adapt the carousel slider design.
 
 == Changelog ==
+
+= 2.0.1 - 2026-06-03 =
+* 📝 Documentation: Updated plugin headers, README, and readme.txt to align with v2.0.0 features.
+* 🎮 Playground: Switched to database-driven homepage layout with templates/index.html to match the test site.
+* 🔧 Maintenance: Shortened the readme.txt short description to comply with WordPress.org 150-character limit.
+* 🛠️ Tooling: Added update-playground.sh utility for seamless synchronizations.
 
 = 2.0.0 - 2026-05-22 =
 * 🌐 Major: Navigation buttons and pagination dots are now real HTML elements for full cross-browser compatibility.

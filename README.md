@@ -1,6 +1,6 @@
 # Any Block Carousel Slider
 
-Transform any WordPress block (Query Loop/Post Template, Group, Gallery) into a performant, responsive carousel with **pure CSS**. Zero JavaScript on the frontend.
+Transform any WordPress block (Query Loop/Post Template, Group, Gallery) into a performant, responsive carousel with native CSS scroll-snap. Extremely lightweight JavaScript handles navigation, loop, and autoplay controls.
 
 ## 🚀 Try it now (Interactive Demo)
 
@@ -12,9 +12,9 @@ Experience the plugin in seconds with **WordPress Playground**! No installation 
 
 ## Why Any Block Carousel Slider?
 
-- **Minimal JavaScript**: GPU-friendly, native CSS scroll with lightweight navigation controls.
+- **Native Scroll & Performance**: GPU-friendly, native CSS scroll-snap layout. No heavy external libraries like Swiper/Slick.
 - **WordPress Native**: Works directly on your existing Query Loop, Group, or Gallery blocks.
-- **Lightweight**: No Swiper/Slick dependencies. Under 5KB of JavaScript.
+- **Lightweight**: No external dependencies. Extremely lightweight script (~40KB raw source, <15KB minified/gzipped) for controls, loop, and autoplay.
 - **Performance**: High Lighthouse scores out of the box.
 
 ## Installation
