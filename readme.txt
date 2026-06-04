@@ -4,7 +4,7 @@ Tags: carousel, slider, block, gutenberg, woocommerce
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.0.1
+Stable tag: 2.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -174,6 +174,10 @@ Yes! Navigation buttons, pagination dots, and scroll behavior all use standard H
 5. Custom CSS variables to adapt the carousel slider design.
 
 == Changelog ==
+
+= 2.0.2 - 2026-06-04 =
+* 🎨 CSS: Adjusted responsive marker sizes and gaps in carousel.css.
+* 🔧 Maintenance: Bumped version to 2.0.2.
 
 = 2.0.1 - 2026-06-03 =
 * 📝 Documentation: Updated plugin headers, README, and readme.txt to align with v2.0.0 features.

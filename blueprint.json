@@ -11,14 +11,14 @@
 			"step": "installPlugin",
 			"pluginData": {
 				"resource": "url",
-				"url": "https://native-blocks-carousel.weblazer.fr/playground/plugin.zip"
+				"url": "https://native-blocks-carousel.weblazer.fr/playground/plugin.zip?v=1780558434"
 			}
 		},
 		{
 			"step": "installTheme",
 			"themeData": {
 				"resource": "url",
-				"url": "https://native-blocks-carousel.weblazer.fr/playground/theme.zip"
+				"url": "https://native-blocks-carousel.weblazer.fr/playground/theme.zip?v=1780558434"
 			}
 		},
 		{
@@ -37,7 +37,7 @@
 			"step": "importWxr",
 			"file": {
 				"resource": "url",
-				"url": "https://native-blocks-carousel.weblazer.fr/playground/demo-home.xml"
+				"url": "https://native-blocks-carousel.weblazer.fr/playground/demo-home.xml?v=1780558434"
 			}
 		},
 		{
@@ -51,7 +51,7 @@
 		},
 		{
 			"step": "runPHP",
-			"code": "<?php \nrequire_once 'wp-load.php';\nrequire_once ABSPATH . 'wp-admin/includes/image.php';\nrequire_once ABSPATH . 'wp-admin/includes/file.php';\nrequire_once ABSPATH . 'wp-admin/includes/media.php';\nrequire_once ABSPATH . 'wp-admin/includes/post.php';\n\n// 1. Set Site Icon\n$icon_url = 'https://native-blocks-carousel.weblazer.fr/playground/site-icon.png';\n$tmp = download_url($icon_url);\nif (!is_wp_error($tmp)) {\n    $file_array = array('name' => 'site-icon.png', 'tmp_name' => $tmp);\n    $attachment_id = media_handle_sideload($file_array, 0);\n    if (!is_wp_error($attachment_id)) {\n        update_option('site_icon', $attachment_id);\n    }\n}\n\n// 2. Set Site Logo\n$logo_url = 'https://native-blocks-carousel.weblazer.fr/wp-content/uploads/icon.svg';\n$tmp_logo = download_url($logo_url);\nif (!is_wp_error($tmp_logo)) {\n    $file_array = array('name' => 'icon.svg', 'tmp_name' => $tmp_logo);\n    $attachment_id = media_handle_sideload($file_array, 0);\n    if (!is_wp_error($attachment_id)) {\n        update_option('site_logo', $attachment_id);\n    }\n}\n\n// 3. Flush Rewrite Rules\nflush_rewrite_rules(true);\n"
+			"code": "<?php \nrequire_once 'wp-load.php';\nrequire_once ABSPATH . 'wp-admin/includes/image.php';\nrequire_once ABSPATH . 'wp-admin/includes/file.php';\nrequire_once ABSPATH . 'wp-admin/includes/media.php';\nrequire_once ABSPATH . 'wp-admin/includes/post.php';\n\n// 1. Set Site Icon\n$icon_url = 'https://native-blocks-carousel.weblazer.fr/playground/site-icon.png';\n$tmp = download_url($icon_url);\nif (!is_wp_error($tmp)) {\n    $file_array = array('name' => 'site-icon.png', 'tmp_name' => $tmp);\n    $attachment_id = media_handle_sideload($file_array, 0);\n    if (!is_wp_error($attachment_id)) {\n        update_option('site_icon', $attachment_id);\n    }\n}\n\n// 2. Set Site Logo\n$logo_url = 'https://native-blocks-carousel.weblazer.fr/wp-content/uploads/icon.svg';\n$tmp_logo = download_url($logo_url);\nif (!is_wp_error($tmp_logo)) {\n    $file_array = array('name' => 'icon.svg', 'tmp_name' => $tmp_logo);\n    $attachment_id = media_handle_sideload($file_array, 0);\n    if (!is_wp_error($attachment_id)) {\n        update_option('site_logo', $attachment_id);\n    }\n}\n\n// 3. Flush Rewrite Rules\nflush_rewrite_rules(true);\n\n// 4. Reset Theme and Clean FSE Caches\nif (function_exists('wp_clean_theme_json_cache')) {\n    wp_clean_theme_json_cache();\n}\nif (class_exists('WP_Theme_JSON_Resolver')) {\n    WP_Theme_JSON_Resolver::clean_cached_data();\n}\nwp_clean_themes_cache();\n\n// Re-activate theme to force rebuild of all FSE styles and transients\n$current_theme = get_stylesheet();\nswitch_theme($current_theme);\n\n// Delete FSE and theme transients\nglobal $wpdb;\n$wpdb->query(\"DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_wp_core_block_css_files%'\");\n$wpdb->query(\"DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_global_styles%'\");\n$wpdb->query(\"DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_theme_json%'\");\n\nwp_cache_flush();\n"
 		}
 	],
 	"landingPage": "/"

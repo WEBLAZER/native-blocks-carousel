@@ -17,8 +17,8 @@
 :root {
 	--carousel-button-size: 2.8rem;
 	--carousel-button-offset: 0px;
-	--carousel-marker-size: 0.66rem;
-	--carousel-marker-gap: 0.5rem;
+	--carousel-marker-size: 0.75rem;
+	--carousel-marker-gap: 0.75rem;
 	--carousel-marker-bottom-offset: -2rem;
 	--carousel-z-index: 5;
 	--carousel-transition-duration: 0.3s;
@@ -679,7 +679,7 @@
 	:root {
 		--carousel-button-size: 2.75rem;
 		--carousel-button-offset: 0.5rem;
-		--carousel-marker-size: 0.5rem;
+		--carousel-marker-size: 0.75rem;
 	}
 }
 
@@ -687,8 +687,8 @@
 	:root {
 		--carousel-button-size: 2.5rem;
 		--carousel-button-offset: 0.5rem;
-		--carousel-marker-size: 0.45rem;
-		--carousel-marker-gap: 0.4rem;
+		--carousel-marker-size: 0.75rem;
+		--carousel-marker-gap: 0.75rem;
 	}
 
 	.abcs {
@@ -718,8 +718,8 @@
 	:root {
 		--carousel-button-size: 2rem;
 		--carousel-button-offset: 0.25rem;
-		--carousel-marker-size: 0.4rem;
-		--carousel-marker-gap: 0.35rem;
+		--carousel-marker-size: 0.75rem;
+		--carousel-marker-gap: 0.75rem;
 		--carousel-marker-bottom-offset: -1.5rem;
 	}
 
@@ -732,7 +732,7 @@
 @media (max-width: 375px) {
 	:root {
 		--carousel-button-size: 1.75rem;
-		--carousel-marker-size: 0.35rem;
+		--carousel-marker-size: 0.75rem;
 	}
 }
 
