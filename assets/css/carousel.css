@@ -115,6 +115,16 @@
 	padding-right: initial;
 }
 
+/* Cover block carousel full-width support */
+.abcs:has(.wp-block-cover),
+.block-editor-block-list__layout .abcs:has(.wp-block-cover),
+.editor-styles-wrapper .abcs:has(.wp-block-cover) {
+	padding-left: 0 !important;
+	padding-right: 0 !important;
+	scroll-padding-left: 0 !important;
+	scroll-padding-right: 0 !important;
+}
+
 .abcs .has-background,
 .block-editor-block-list__layout .abcs .has-background,
 .editor-styles-wrapper .abcs .has-background {

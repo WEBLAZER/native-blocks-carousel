@@ -228,10 +228,47 @@
 			}
 
 			// Read computed padding directly (works even when defined via inline style)
-			const paddingLeft = computedStyle.paddingLeft;
-			const paddingRight = computedStyle.paddingRight;
-			const paddingTop = computedStyle.paddingTop;
-			const paddingBottom = computedStyle.paddingBottom;
+			const hasCover = carousel.querySelector('.wp-block-cover') !== null || carousel.classList.contains('wp-block-cover');
+
+			// If we override the physical padding of the carousel for cover blocks,
+			// try to read the values from CSS variables first (set by PHP) or inline styles.
+			const getOriginalPadding = (axis, computedVal) => {
+				if (!hasCover) {
+					return computedVal;
+				}
+				const customProp = computedStyle.getPropertyValue('--carousel-padding-' + axis);
+				if (customProp && customProp.trim() !== '' && customProp.trim() !== '0px') {
+					return customProp.trim();
+				}
+				const inlinePadding = carousel.style['padding' + axis.charAt(0).toUpperCase() + axis.slice(1)];
+				if (inlinePadding && inlinePadding.trim() !== '') {
+					return inlinePadding.trim();
+				}
+				const inlinePaddingShorthand = carousel.style.padding;
+				if (inlinePaddingShorthand && inlinePaddingShorthand.trim() !== '') {
+					const parts = inlinePaddingShorthand.trim().split(/\s+/);
+					if (parts.length === 1) {
+						return parts[0];
+					} else if (parts.length === 2 || parts.length === 3) {
+						if (axis === 'left' || axis === 'right') {
+							return parts[1];
+						} else {
+							return parts[0];
+						}
+					} else if (parts.length === 4) {
+						if (axis === 'top') return parts[0];
+						if (axis === 'right') return parts[1];
+						if (axis === 'bottom') return parts[2];
+						if (axis === 'left') return parts[3];
+					}
+				}
+				return computedVal;
+			};
+
+			const paddingLeft = getOriginalPadding('left', computedStyle.paddingLeft);
+			const paddingRight = getOriginalPadding('right', computedStyle.paddingRight);
+			const paddingTop = getOriginalPadding('top', computedStyle.paddingTop);
+			const paddingBottom = getOriginalPadding('bottom', computedStyle.paddingBottom);
 
 			const parent = carousel.parentElement;
 			const parentStyle = parent ? window.getComputedStyle(parent) : null;

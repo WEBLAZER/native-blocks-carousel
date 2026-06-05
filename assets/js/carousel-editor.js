@@ -1020,6 +1020,107 @@
    * (required for fallback buttons positioned on the parent).
    * Variables are already injected from React attributes via withCarouselStyles.
    */
+  /**
+   * Resolves the padding value for a carousel element in the editor.
+   * Handles Cover blocks by checking block attributes and inline styles first,
+   * avoiding the post-reset 0px computed style.
+   */
+  function resolveEditorPadding(carousel, side) {
+    const parent = carousel.parentElement;
+    const computedStyle = carousel.ownerDocument.defaultView.getComputedStyle(carousel);
+    const parentStyle = parent ? carousel.ownerDocument.defaultView.getComputedStyle(parent) : null;
+    const axis = 'padding' + side.charAt(0).toUpperCase() + side.slice(1);
+    
+    let clientId = carousel.getAttribute('data-block') || 
+                   (carousel.id && carousel.id.startsWith('block-') ? carousel.id.substring(6) : null);
+                     
+    let hasCover = false;
+    if (clientId && window.wp && window.wp.data) {
+      try {
+        const innerBlocks = window.wp.data.select('core/block-editor').getBlocks(clientId);
+        if (innerBlocks) {
+          hasCover = innerBlocks.some(block => block.name === 'core/cover');
+        }
+      } catch (err) {}
+    }
+    if (!hasCover) {
+      hasCover = carousel.querySelector('.wp-block-cover, [data-type="core/cover"]') !== null || 
+                 carousel.classList.contains('wp-block-cover') || 
+                 carousel.getAttribute('data-type') === 'core/cover';
+    }
+
+    // 1. Try block attributes in Gutenberg store
+    let attrValue = null;
+    if (clientId && window.wp && window.wp.data) {
+      try {
+        const block = window.wp.data.select('core/block-editor').getBlock(clientId);
+        if (block && block.attributes && block.attributes.style && block.attributes.style.spacing) {
+          const padding = block.attributes.style.spacing.padding;
+          if (padding) {
+            if (typeof padding === 'object') {
+              attrValue = padding[side] || null;
+            } else if (typeof padding === 'string' && padding !== '') {
+              attrValue = padding;
+            }
+          }
+        }
+      } catch (err) {}
+    }
+
+    if (attrValue !== null && attrValue !== undefined && attrValue !== '') {
+      if (typeof attrValue === 'string' && attrValue.startsWith('var:preset|spacing|')) {
+        const presetSlug = attrValue.replace('var:preset|spacing|', '');
+        attrValue = `var(--wp--preset--spacing--${presetSlug})`;
+      }
+      return attrValue === '0' || attrValue === 0 ? '0px' : attrValue;
+    }
+
+    // 2. Try inline styles on the carousel element itself
+    let inlineVal = carousel.style[axis];
+    if (inlineVal && inlineVal.trim() !== '') {
+      return inlineVal.trim();
+    }
+
+    // 3. Try shorthand inline padding on the carousel element
+    if (carousel.style.padding && carousel.style.padding.trim() !== '') {
+      const parts = carousel.style.padding.trim().split(/\s+/);
+      if (parts.length === 1) {
+        return parts[0];
+      } else if (parts.length === 2 || parts.length === 3) {
+        return parts[1];
+      } else if (parts.length === 4) {
+        return side === 'left' ? parts[3] : parts[1];
+      }
+    }
+
+    // 4. Try inline styles on the parent element
+    if (parent) {
+      let parentInlineVal = parent.style[axis];
+      if (parentInlineVal && parentInlineVal.trim() !== '' && parentInlineVal.indexOf('--carousel') === -1) {
+        return parentInlineVal.trim();
+      }
+    }
+
+    // 5. Fallback to computed styles (only if not a Cover block)
+    if (!hasCover) {
+      const computedVal = computedStyle ? computedStyle[axis] : null;
+      if (computedVal && computedVal !== '0px') {
+        return computedVal;
+      }
+      const parentVal = parentStyle ? parentStyle[axis] : null;
+      if (parentVal && parentVal !== '0px') {
+        return parentVal;
+      }
+    }
+
+    return '0px';
+  }
+
+  /**
+   * Copies carousel padding variables to the parent element
+   * (required for fallback buttons positioned on the parent).
+   * Variables are already injected from React attributes via withCarouselStyles.
+   */
   function copyPaddingVariablesToParent() {
     const docsToSearch = new Set();
     docsToSearch.add(document);
@@ -1041,31 +1142,13 @@
       try {
         const carousels = doc.querySelectorAll('.abcs');
         carousels.forEach(function (carousel) {
-          const computedStyle = doc.defaultView.getComputedStyle(carousel);
-
-          const paddingLeft = computedStyle.paddingLeft;
-          const paddingRight = computedStyle.paddingRight;
-
-          const parent = carousel.parentElement;
-          const parentStyle = parent ? doc.defaultView.getComputedStyle(parent) : null;
-
-          const normalizePadding = (value, fallback, axis) => {
-            if (value && value !== '0px') {
-              return value;
-            }
-            const parentValue = parentStyle ? parentStyle[axis] : null;
-            if (parentValue && parentValue !== '0px') {
-              return parentValue;
-            }
-            return fallback;
-          };
-
-          const paddingLeftValue = normalizePadding(paddingLeft, '0px', 'paddingLeft');
-          const paddingRightValue = normalizePadding(paddingRight, '0px', 'paddingRight');
+          const paddingLeftValue = resolveEditorPadding(carousel, 'left');
+          const paddingRightValue = resolveEditorPadding(carousel, 'right');
 
           carousel.style.setProperty('--carousel-padding-left', paddingLeftValue);
           carousel.style.setProperty('--carousel-padding-right', paddingRightValue);
 
+          const parent = carousel.parentElement;
           if (parent) {
             parent.style.setProperty('--carousel-padding-left', paddingLeftValue);
             parent.style.setProperty('--carousel-padding-right', paddingRightValue);
@@ -1098,7 +1181,12 @@
     // Observe DOM mutations in the editor to copy variables when they change
     if (window.MutationObserver) {
       let timeout;
+      const observedTargets = new WeakSet();
+
       const observer = new MutationObserver(function () {
+        // Try to attach observers to any new iframes that may have loaded
+        attachObservers();
+
         clearTimeout(timeout);
         timeout = setTimeout(function () {
           requestAnimationFrame(function () {
@@ -1110,16 +1198,46 @@
         }, 50);
       });
 
-      // Observe the editor body
-      const editorBody = document.querySelector('.editor-styles-wrapper') || document.body;
-      if (editorBody) {
-        observer.observe(editorBody, {
-          childList: true,
-          subtree: true,
-          attributes: true,
-          attributeFilter: ['style', 'class']
+      function attachObservers() {
+        const docsToObserve = new Set();
+        docsToObserve.add(document);
+
+        const iframeSelectors = [
+          '.editor-canvas iframe',
+          'iframe[name="editor-canvas"]',
+          '.edit-site-visual-editor__editor-canvas',
+        ];
+
+        iframeSelectors.forEach((selector) => {
+          try {
+            const iframe = document.querySelector(selector);
+            if (iframe && iframe.contentDocument) {
+              docsToObserve.add(iframe.contentDocument);
+            }
+          } catch (e) {
+            // Ignore cross-origin access issues
+          }
+        });
+
+        docsToObserve.forEach((doc) => {
+          try {
+            const target = doc.querySelector('.editor-styles-wrapper') || doc.body;
+            if (target && !observedTargets.has(target)) {
+              observer.observe(target, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: ['style', 'class']
+              });
+              observedTargets.add(target);
+            }
+          } catch (e) {
+            // Ignore issues accessing elements
+          }
         });
       }
+
+      attachObservers();
     }
   }
 
@@ -1353,26 +1471,9 @@
       return;
     }
 
-    // 0. Compute and copy padding variables from computed styles (syncing with frontend)
-    const computedStyle = carousel.ownerDocument.defaultView.getComputedStyle(carousel);
-    const parentStyle = parent ? carousel.ownerDocument.defaultView.getComputedStyle(parent) : null;
-
-    const paddingLeft = computedStyle.paddingLeft;
-    const paddingRight = computedStyle.paddingRight;
-
-    const normalizePadding = (value, fallback, axis) => {
-      if (value && value !== '0px') {
-        return value;
-      }
-      const parentValue = parentStyle ? parentStyle[axis] : null;
-      if (parentValue && parentValue !== '0px') {
-        return parentValue;
-      }
-      return fallback;
-    };
-
-    const paddingLeftValue = normalizePadding(paddingLeft, '0px', 'paddingLeft');
-    const paddingRightValue = normalizePadding(paddingRight, '0px', 'paddingRight');
+    // 0. Compute and copy padding variables (syncing with frontend)
+    const paddingLeftValue = resolveEditorPadding(carousel, 'left');
+    const paddingRightValue = resolveEditorPadding(carousel, 'right');
 
     carousel.style.setProperty('--carousel-padding-left', paddingLeftValue);
     carousel.style.setProperty('--carousel-padding-right', paddingRightValue);
@@ -1387,6 +1488,7 @@
     
     const styleKey = resolveCarouselArrowStyleFromElement(carousel);
 
+    const computedStyle = carousel.ownerDocument.defaultView.getComputedStyle(carousel);
     let arrowColor = '#ffffff';
     if (typeof window !== 'undefined') {
       const textVar = computedStyle.getPropertyValue('--carousel-button-color').trim();
@@ -1634,153 +1736,177 @@
    * Initialises dynamic color syncing within the Site Editor.
    * Observes changes to <style> tags under .editor-styles-wrapper.
    */
-  function initThemeEditorColorSync() {
-    let lastButtonBg = '';
-    let lastButtonColor = '';
-    let referenceButton = null;
+  let lastButtonBg = '';
+  let lastButtonColor = '';
+  let referenceButton = null;
+  let colorSyncObserver = null;
 
-    // Helper to retrieve the preview iframe in the Site Editor
-    function getPreviewIframe() {
-      // Try to find the iframe specifically used by Site Editor (FSE)
-      const iframeElement = document.querySelector('iframe[name="editor-canvas"]') || 
-                            document.querySelector('.edit-site-visual-editor__editor-canvas') ||
-                            document.querySelector('.editor-canvas iframe');
+  // Helper to retrieve the preview iframe in the Site Editor
+  function getPreviewIframe() {
+    // Try to find the iframe specifically used by Site Editor (FSE)
+    const iframeElement = document.querySelector('iframe[name="editor-canvas"]') || 
+                          document.querySelector('.edit-site-visual-editor__editor-canvas') ||
+                          document.querySelector('.editor-canvas iframe');
  
-      if (!iframeElement) return null;
+    if (!iframeElement) return null;
  
-      if (iframeElement.contentDocument) {
-        return iframeElement.contentDocument;
-      } else if (iframeElement.contentWindow) {
-        try {
-          return iframeElement.contentWindow.document;
-        } catch (e) {
-          return null;
-        }
+    if (iframeElement.contentDocument) {
+      return iframeElement.contentDocument;
+    } else if (iframeElement.contentWindow) {
+      try {
+        return iframeElement.contentWindow.document;
+      } catch (e) {
+        return null;
       }
-      return null;
     }
+    return null;
+  }
 
-    // Helper to create or keep a reference button that represents GLOBAL styles
-    function getReferenceButtonInAnyContext() {
-      // Try iframe first (Site Editor) then main page
-      const contexts = [];
-      const iframeDoc = getPreviewIframe();
-      if (iframeDoc) contexts.push(iframeDoc);
-      contexts.push(document);
+  // Helper to create or keep a reference button that represents GLOBAL styles
+  function getReferenceButtonInAnyContext() {
+    // Try iframe first (Site Editor) then main page
+    const contexts = [];
+    const iframeDoc = getPreviewIframe();
+    if (iframeDoc) contexts.push(iframeDoc);
+    contexts.push(document);
 
-      for (const doc of contexts) {
-        const editorWrapper = doc.querySelector('.editor-styles-wrapper');
-        if (!editorWrapper) continue;
+    for (const doc of contexts) {
+      const editorWrapper = doc.querySelector('.editor-styles-wrapper');
+      if (!editorWrapper) continue;
 
-        // Search for our specific, clean reference button by ID
-        let button = doc.getElementById('abcs-global-theme-ref-button');
-        
-        // If not found, create a hidden one at the ROOT of the editor styles
-        // This ensures we get theme.json styles without picking up block-level overrides
-        if (!button) {
-          button = doc.createElement('button');
-          button.id = 'abcs-global-theme-ref-button';
-          button.className = 'wp-element-button';
-          button.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;top:-9999px;left:-9999px;';
-          button.textContent = 'Global Ref';
-          
-          // Prepend to editor-styles-wrapper to avoid being affected by local block containers
-          editorWrapper.prepend(button);
-        }
-
-        if (button) return { button, doc };
-      }
-      return null;
-    }
-
-    // Update routine with change detection
-    function checkAndUpdateColors() {
-      const iframeDoc = getPreviewIframe();
-      const contexts = iframeDoc ? [iframeDoc, document] : [document];
+      // Search for our specific, clean reference button by ID
+      let button = doc.getElementById('abcs-global-theme-ref-button');
       
-      let currentBg = '';
-      let currentColor = '';
-      let activeDoc = document;
-
-      // Direct method: Read variables from the wrapper (Source of truth in FSE)
-      for (const doc of contexts) {
-        const wrapper = doc.querySelector('.editor-styles-wrapper');
-        if (wrapper) {
-          const styles = doc.defaultView.getComputedStyle(wrapper);
-          const bgVar = styles.getPropertyValue('--wp--style--elements--button--color--background').trim();
-          const textVar = styles.getPropertyValue('--wp--style--elements--button--color--text').trim();
-          
-          if (bgVar && bgVar !== 'rgba(0, 0, 0, 0)') {
-            currentBg = bgVar;
-            currentColor = textVar;
-            activeDoc = doc;
-            break; 
-          }
-        }
+      // If not found, create a hidden one at the ROOT of the editor styles
+      // This ensures we get theme.json styles without picking up block-level overrides
+      if (!button) {
+        button = doc.createElement('button');
+        button.id = 'abcs-global-theme-ref-button';
+        button.className = 'wp-element-button';
+        button.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;top:-9999px;left:-9999px;';
+        button.textContent = 'Global Ref';
+        
+        // Prepend to editor-styles-wrapper to avoid being affected by local block containers
+        editorWrapper.prepend(button);
       }
 
-      // Legacy fallback: Use our specific hidden reference button if variables are missing
-      if (!currentBg) {
-        const buttonData = getReferenceButtonInAnyContext();
-        if (buttonData && buttonData.button) {
-          const buttonStyles = buttonData.doc.defaultView.getComputedStyle(buttonData.button);
-          currentBg = buttonStyles.backgroundColor;
-          currentColor = buttonStyles.color;
-          activeDoc = buttonData.doc;
+      if (button) return { button, doc };
+    }
+    return null;
+  }
+
+  // Update routine with change detection
+  function checkAndUpdateColors() {
+    const iframeDoc = getPreviewIframe();
+    const contexts = iframeDoc ? [iframeDoc, document] : [document];
+    
+    let currentBg = '';
+    let currentColor = '';
+    let activeDoc = document;
+
+    // Direct method: Read variables from the wrapper (Source of truth in FSE)
+    for (const doc of contexts) {
+      const wrapper = doc.querySelector('.editor-styles-wrapper');
+      if (wrapper) {
+        const styles = doc.defaultView.getComputedStyle(wrapper);
+        const bgVar = styles.getPropertyValue('--wp--style--elements--button--color--background').trim();
+        const textVar = styles.getPropertyValue('--wp--style--elements--button--color--text').trim();
+        
+        if (bgVar && bgVar !== 'rgba(0, 0, 0, 0)') {
+          currentBg = bgVar;
+          currentColor = textVar;
+          activeDoc = doc;
+          break; 
         }
-      }
-
-      if (!currentBg || currentBg === 'rgba(0, 0, 0, 0)' || currentBg === 'transparent') {
-        return;
-      }
-
-      // Check whether the colors changed
-      const bgChanged = currentBg !== lastButtonBg &&
-        currentBg !== 'rgba(0, 0, 0, 0)' &&
-        currentBg !== 'transparent' &&
-        currentBg !== '';
-      const colorChanged = currentColor !== lastButtonColor &&
-        currentColor !== 'rgba(0, 0, 0, 0)' &&
-        currentColor !== '';
-
-      // Update if a change is detected
-      if (bgChanged || colorChanged || !lastButtonBg) {
-        lastButtonBg = currentBg;
-        lastButtonColor = currentColor;
-
-        // Apply colors inside the appropriate document (iframe or main page)
-        const variables = {};
-
-        if (currentBg) {
-          variables['--carousel-button-bg'] = currentBg;
-        }
-
-        if (currentColor) {
-          variables['--carousel-button-color'] = currentColor;
-
-          // Generate arrow SVGs using the button text color
-          const arrowColor = convertColorToHexForSvg(currentColor, activeDoc);
-          const leftArrowSvg = generateArrowSvg('left', arrowColor, DEFAULT_ARROW_STYLE);
-          const rightArrowSvg = generateArrowSvg('right', arrowColor, DEFAULT_ARROW_STYLE);
-
-          variables['--carousel-button-arrow-left'] = `url("${leftArrowSvg}")`;
-          variables['--carousel-button-arrow-right'] = `url("${rightArrowSvg}")`;
-        }
-
-        // Inject all variables at once in a style tag
-        if (Object.keys(variables).length > 0) {
-          injectCssVariablesInStyleTag(variables, activeDoc);
-          // Also inject in main document if activeDoc was iframe, to be safe
-          if (activeDoc !== document) {
-            injectCssVariablesInStyleTag(variables, document);
-          }
-        }
-
-        applyArrowIconsToCarousels(currentColor, activeDoc);
       }
     }
 
+    // Legacy fallback: Use our specific hidden reference button if variables are missing
+    if (!currentBg) {
+      const buttonData = getReferenceButtonInAnyContext();
+      if (buttonData && buttonData.button) {
+        const buttonStyles = buttonData.doc.defaultView.getComputedStyle(buttonData.button);
+        currentBg = buttonStyles.backgroundColor;
+        currentColor = buttonStyles.color;
+        activeDoc = buttonData.doc;
+      }
+    }
 
+    if (!currentBg || currentBg === 'rgba(0, 0, 0, 0)' || currentBg === 'transparent') {
+      return;
+    }
+
+    // Check whether the colors changed
+    const bgChanged = currentBg !== lastButtonBg &&
+      currentBg !== 'rgba(0, 0, 0, 0)' &&
+      currentBg !== 'transparent' &&
+      currentBg !== '';
+    const colorChanged = currentColor !== lastButtonColor &&
+      currentColor !== 'rgba(0, 0, 0, 0)' &&
+      currentColor !== '';
+
+    // Update if a change is detected
+    if (bgChanged || colorChanged || !lastButtonBg) {
+      lastButtonBg = currentBg;
+      lastButtonColor = currentColor;
+
+      // Apply colors inside the appropriate document (iframe or main page)
+      const variables = {};
+
+      if (currentBg) {
+        variables['--carousel-button-bg'] = currentBg;
+      }
+
+      if (currentColor) {
+        variables['--carousel-button-color'] = currentColor;
+
+        // Generate arrow SVGs using the button text color
+        const arrowColor = convertColorToHexForSvg(currentColor, activeDoc);
+        const leftArrowSvg = generateArrowSvg('left', arrowColor, DEFAULT_ARROW_STYLE);
+        const rightArrowSvg = generateArrowSvg('right', arrowColor, DEFAULT_ARROW_STYLE);
+
+        variables['--carousel-button-arrow-left'] = `url("${leftArrowSvg}")`;
+        variables['--carousel-button-arrow-right'] = `url("${rightArrowSvg}")`;
+      }
+
+      // Inject all variables at once in a style tag
+      if (Object.keys(variables).length > 0) {
+        injectCssVariablesInStyleTag(variables, activeDoc);
+        // Also inject in main document if activeDoc was iframe, to be safe
+        if (activeDoc !== document) {
+          injectCssVariablesInStyleTag(variables, document);
+        }
+      }
+
+      applyArrowIconsToCarousels(currentColor, activeDoc);
+    }
+  }
+
+  // Observe .editor-styles-wrapper inside the iframe and the main page
+  function observeEditorWrapper(doc) {
+    const editorWrapper = doc.querySelector('.editor-styles-wrapper');
+    if (editorWrapper && colorSyncObserver) {
+      colorSyncObserver.observe(editorWrapper, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+        attributes: true,
+        attributeFilter: ['style', 'class']
+      });
+
+      // Also observe every existing <style> tag
+      const styleTags = editorWrapper.querySelectorAll('style');
+      styleTags.forEach(function (styleTag) {
+        colorSyncObserver.observe(styleTag, {
+          childList: true,
+          subtree: true,
+          characterData: true
+        });
+      });
+    }
+  }
+
+  function initThemeEditorColorSync() {
     // Initial update after a short delay so WordPress can load styles
     setTimeout(function () {
       checkAndUpdateColors();
@@ -1789,7 +1915,7 @@
     // Observe <style> tags in .editor-styles-wrapper
     // WordPress updates those tags whenever styles change
     if (window.MutationObserver) {
-      const observer = new MutationObserver(function (mutations) {
+      colorSyncObserver = new MutationObserver(function (mutations) {
         let shouldUpdate = false;
 
         mutations.forEach(function (mutation) {
@@ -1807,7 +1933,7 @@
 
           // If the contents of a <style> tag change
           if (mutation.type === 'characterData' ||
-            (mutation.type === 'attributes' && (mutation.target.tagName === 'STYLE' || mutation.attributeName === 'class'))) {
+            (mutation.type === 'characterData' || (mutation.type === 'attributes' && (mutation.target.tagName === 'STYLE' || mutation.attributeName === 'class')))) {
             shouldUpdate = true;
           }
         });
@@ -1821,30 +1947,6 @@
           }, 50);
         }
       });
-
-      // Observe .editor-styles-wrapper inside the iframe and the main page
-      function observeEditorWrapper(doc) {
-        const editorWrapper = doc.querySelector('.editor-styles-wrapper');
-        if (editorWrapper) {
-          observer.observe(editorWrapper, {
-            childList: true,
-            subtree: true,
-            characterData: true,
-            attributes: true,
-            attributeFilter: ['style', 'class']
-          });
-
-          // Also observe every existing <style> tag
-          const styleTags = editorWrapper.querySelectorAll('style');
-          styleTags.forEach(function (styleTag) {
-            observer.observe(styleTag, {
-              childList: true,
-              subtree: true,
-              characterData: true
-            });
-          });
-        }
-      }
 
       // Watch the iframe (Site Editor)
       const iframeDoc = getPreviewIframe();

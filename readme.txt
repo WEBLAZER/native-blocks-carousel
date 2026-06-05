@@ -4,7 +4,7 @@ Tags: carousel, slider, block, gutenberg, woocommerce
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.0.2
+Stable tag: 2.0.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -174,6 +174,12 @@ Yes! Navigation buttons, pagination dots, and scroll behavior all use standard H
 5. Custom CSS variables to adapt the carousel slider design.
 
 == Changelog ==
+
+= 2.0.3 - 2026-06-05 =
+* 🎨 CSS: Added container padding reset for carousels containing Cover blocks (`.wp-block-cover`) to allow images to stretch full-width.
+* ⚡ Editor: Implemented a robust padding resolver (`resolveEditorPadding`) in the Gutenberg editor to retrieve original spacing settings from block attributes and inline element styles, preventing arrows from collapsing to the edge.
+* 🐛 JS: Fixed a scope reference bug where Gutenberg's change listener could not access the color synchronization routine, preventing `checkAndUpdateColors` ReferenceErrors in the console.
+* 🔧 Maintenance: Bumped version to 2.0.3.
 
 = 2.0.2 - 2026-06-04 =
 * 🎨 CSS: Adjusted responsive marker sizes and gaps in carousel.css.
