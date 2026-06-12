@@ -4,7 +4,7 @@ Tags: carousel, slider, block, gutenberg, woocommerce
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.0.3
+Stable tag: 2.0.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -168,12 +168,16 @@ Yes! Navigation buttons, pagination dots, and scroll behavior all use standard H
 == Screenshots ==
 
 1. "Carousel" option in the Gutenberg block sidebar panel.
-2. Query Loop / Post Template carousel slider rendered with 100% CSS.
-3. Group block converted into a responsive carousel.
-4. Native Gallery block displayed in carousel slider mode.
-5. Custom CSS variables to adapt the carousel slider design.
+2. Cover blocks carousel slider with full-width background images.
+3. Query Loop / Post Template carousel slider rendered with 100% CSS.
+4. Group block converted into a responsive carousel.
+5. Native Gallery block displayed in carousel slider mode.
 
 == Changelog ==
+
+= 2.0.4 - 2026-06-12 =
+* 🐛 PHP: Fixed an Array to string conversion warning when using split block spacing/gap settings on parent blocks (e.g., core/group, core/columns).
+* 🔧 Maintenance: Bumped version to 2.0.4.
 
 = 2.0.3 - 2026-06-05 =
 * 🎨 CSS: Added container padding reset for carousels containing Cover blocks (`.wp-block-cover`) to allow images to stretch full-width.

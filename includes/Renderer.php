@@ -189,7 +189,7 @@ class Renderer implements ServiceInterface
     {
         $block_gap = $block['attrs']['style']['spacing']['blockGap'] ?? null;
 
-        if ('core/gallery' === ($block['blockName'] ?? '') && \is_array($block_gap)) {
+        if (\is_array($block_gap)) {
             $block_gap = $block_gap['left'] ?? $block_gap['top'] ?? null;
         }
 
