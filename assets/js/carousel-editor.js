@@ -6,8 +6,8 @@
   const { addFilter } = wp.hooks;
   const { createHigherOrderComponent } = wp.compose;
   const { Fragment, useEffect, useMemo, createElement, RawHTML } = wp.element;
-  const { InspectorControls, BlockListBlock } = wp.blockEditor;
-  const { PanelBody, ToggleControl, RangeControl, Tooltip, __experimentalToggleGroupControl: ToggleGroupControl, __experimentalToggleGroupControlOption: ToggleGroupControlOption, __experimentalToggleGroupControlOptionIcon: ToggleGroupControlOptionIcon } = wp.components;
+  const { InspectorControls, BlockListBlock, PanelColorSettings } = wp.blockEditor;
+  const { PanelBody, ToggleControl, RangeControl, Tooltip, ColorPalette, __experimentalToggleGroupControl: ToggleGroupControl, __experimentalToggleGroupControlOption: ToggleGroupControlOption, __experimentalToggleGroupControlOptionIcon: ToggleGroupControlOptionIcon } = wp.components;
   const { __ } = wp.i18n;
 
   /**
@@ -16,112 +16,35 @@
   const SUPPORTED_BLOCKS = ['core/group', 'core/post-template', 'core/gallery'];
 
   const SHARED = window.AnyBlockCarouselSliderShared || {};
-  const FALLBACK_DEFAULT_ARROW_STYLE = 'chevron';
-  const DEFAULT_ARROW_STYLE = SHARED.DEFAULT_ARROW_STYLE || FALLBACK_DEFAULT_ARROW_STYLE;
+  const DEFAULT_ARROW_STYLE = SHARED.DEFAULT_ARROW_STYLE || 'chevron';
 
-  const FALLBACK_ICON_BASE = {
-    chevron: {
-      viewBox: '0 0 640 640',
-      paths: {
-        right: {
-          d: 'M471.1 297.4C483.6 309.9 483.6 330.2 471.1 342.7L279.1 534.7C266.6 547.2 246.3 547.2 233.8 534.7C221.3 522.2 221.3 501.9 233.8 489.4L403.2 320L233.9 150.6C221.4 138.1 221.4 117.8 233.9 105.3C246.4 92.8 266.7 92.8 279.2 105.3L471.2 297.3z'
-        },
-        left: {
-          d: 'M471.1 297.4C483.6 309.9 483.6 330.2 471.1 342.7L279.1 534.7C266.6 547.2 246.3 547.2 233.8 534.7C221.3 522.2 221.3 501.9 233.8 489.4L403.2 320L233.9 150.6C221.4 138.1 221.4 117.8 233.9 105.3C246.4 92.8 266.7 92.8 279.2 105.3L471.2 297.3z',
-          transform: 'scale(-1 1) translate(-640 0)'
-        }
-      }
-    },
-    arrow: {
-      viewBox: '0 0 640 640',
-      paths: {
-        right: {
-          d: 'M566.6 342.6C579.1 330.1 579.1 309.8 566.6 297.3L406.6 137.3C394.1 124.8 373.8 124.8 361.3 137.3C348.8 149.8 348.8 170.1 361.3 182.6L466.7 288L96 288C78.3 288 64 302.3 64 320C64 337.7 78.3 352 96 352L466.7 352L361.3 457.4C348.8 469.9 348.8 490.2 361.3 502.7C373.8 515.2 394.1 515.2 406.6 502.7L566.6 342.7z'
-        },
-        left: {
-          d: 'M566.6 342.6C579.1 330.1 579.1 309.8 566.6 297.3L406.6 137.3C394.1 124.8 373.8 124.8 361.3 137.3C348.8 149.8 348.8 170.1 361.3 182.6L466.7 288L96 288C78.3 288 64 302.3 64 320C64 337.7 78.3 352 96 352L466.7 352L361.3 457.4C348.8 469.9 348.8 490.2 361.3 502.7C373.8 515.2 394.1 515.2 406.6 502.7L566.6 342.7z',
-          transform: 'scale(-1 1) translate(-640 0)'
-        }
-      }
-    },
-    angles: {
-      viewBox: '0 0 640 640',
-      paths: {
-        right: {
-          d: 'M535.1 342.6C547.6 330.1 547.6 309.8 535.1 297.3L375.1 137.3C362.6 124.8 342.3 124.8 329.8 137.3C317.3 149.8 317.3 170.1 329.8 182.6L467.2 320L329.9 457.4C317.4 469.9 317.4 490.2 329.9 502.7C342.4 515.2 362.7 515.2 375.2 502.7L535.2 342.7zM183.1 502.6L343.1 342.6C355.6 330.1 355.6 309.8 343.1 297.3L183.1 137.3C170.6 124.8 150.3 124.8 137.8 137.3C125.3 149.8 125.3 170.1 137.8 182.6L275.2 320L137.9 457.4C125.4 469.9 125.4 490.2 137.9 502.7C150.4 515.2 170.7 515.2 183.2 502.7z'
-        },
-        left: {
-          d: 'M535.1 342.6C547.6 330.1 547.6 309.8 535.1 297.3L375.1 137.3C362.6 124.8 342.3 124.8 329.8 137.3C317.3 149.8 317.3 170.1 329.8 182.6L467.2 320L329.9 457.4C317.4 469.9 317.4 490.2 329.9 502.7C342.4 515.2 362.7 515.2 375.2 502.7L535.2 342.7zM183.1 502.6L343.1 342.6C355.6 330.1 355.6 309.8 343.1 297.3L183.1 137.3C170.6 124.8 150.3 124.8 137.8 137.3C125.3 149.8 125.3 170.1 137.8 182.6L275.2 320L137.9 457.4C125.4 469.9 125.4 490.2 137.9 502.7C150.4 515.2 170.7 515.2 183.2 502.7z',
-          transform: 'scale(-1 1) translate(-640 0)'
-        }
-      }
+  const normalizeStyleKey = (styleKey) => {
+    if (typeof SHARED.normalizeStyleKey === 'function') {
+      return SHARED.normalizeStyleKey(styleKey);
     }
+    return styleKey || DEFAULT_ARROW_STYLE;
   };
 
-  const FALLBACK_ICON_ALIASES = {
-    classic: 'chevron',
-    'solid-full': 'arrow',
-    arrowfull: 'arrow',
-    'angles-right-solid-full': 'angles',
+  const generateArrowSvg = (direction, color, styleKey) => {
+    if (typeof SHARED.generateArrowSvg === 'function') {
+      return SHARED.generateArrowSvg(direction, color, styleKey);
+    }
+    return '';
   };
 
-  const FALLBACK_ARROW_ICONS = {
-    ...FALLBACK_ICON_BASE,
-    classic: FALLBACK_ICON_BASE.chevron,
-    'solid-full': FALLBACK_ICON_BASE.arrow,
-    angles: FALLBACK_ICON_BASE.angles,
+  const generateArrowMarkup = (direction, color, styleKey) => {
+    if (typeof SHARED.generateArrowMarkup === 'function') {
+      return SHARED.generateArrowMarkup(direction, color, styleKey);
+    }
+    return '';
   };
 
-  const fallbackNormalizeStyleKey = (styleKey) => {
-    if (!styleKey) {
-      return FALLBACK_DEFAULT_ARROW_STYLE;
+  const isValidArrowStyle = (styleKey) => {
+    if (typeof SHARED.getIconDefinition === 'function') {
+      return !!SHARED.getIconDefinition(styleKey);
     }
-    if (FALLBACK_ICON_BASE[styleKey]) {
-      return styleKey;
-    }
-    if (FALLBACK_ICON_ALIASES[styleKey]) {
-      return FALLBACK_ICON_ALIASES[styleKey];
-    }
-    return FALLBACK_DEFAULT_ARROW_STYLE;
+    return false;
   };
-
-  const normalizeStyleKey = typeof SHARED.normalizeStyleKey === 'function'
-    ? (styleKey) => SHARED.normalizeStyleKey(styleKey)
-    : fallbackNormalizeStyleKey;
-
-  const getIconDefinition = typeof SHARED.getIconDefinition === 'function'
-    ? (styleKey) => SHARED.getIconDefinition(styleKey)
-    : (styleKey) => FALLBACK_ARROW_ICONS[fallbackNormalizeStyleKey(styleKey)];
-
-  const fallbackBuildSvg = (direction, color, styleKey, toDataUrl = false) => {
-    const normalizedKey = fallbackNormalizeStyleKey(styleKey);
-    const icon = FALLBACK_ARROW_ICONS[normalizedKey] || FALLBACK_ARROW_ICONS[FALLBACK_DEFAULT_ARROW_STYLE];
-    const directionKey = direction === 'left' ? 'left' : 'right';
-    const pathConfig = icon.paths[directionKey] || icon.paths.right;
-    const attributes = [`fill='${color}'`, `d='${pathConfig.d}'`];
-
-    if (pathConfig.transform) {
-      attributes.push(`transform='${pathConfig.transform}'`);
-    }
-
-    const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${icon.viewBox}'><path ${attributes.join(' ')} /></svg>`;
-
-    if (toDataUrl) {
-      return `data:image/svg+xml,${encodeURIComponent(svg)}`;
-    }
-
-    return svg;
-  };
-
-  const generateArrowSvg = typeof SHARED.generateArrowSvg === 'function'
-    ? (direction, color, styleKey) => SHARED.generateArrowSvg(direction, color, styleKey)
-    : (direction, color, styleKey) => fallbackBuildSvg(direction, color, styleKey, true);
-
-  const generateArrowMarkup = typeof SHARED.generateArrowMarkup === 'function'
-    ? (direction, color, styleKey) => SHARED.generateArrowMarkup(direction, color, styleKey)
-    : (direction, color, styleKey) => fallbackBuildSvg(direction, color, styleKey, false);
-
-  const isValidArrowStyle = (styleKey) => !!getIconDefinition(styleKey);
 
   const findBlockWrapperElements = (rootDoc, targetClientId) => {
     if (!targetClientId) {
@@ -209,6 +132,30 @@
           type: 'number',
           default: 3000,
         },
+        carouselSnapStop: {
+          type: 'boolean',
+          default: false,
+        },
+        carouselMarkersAlign: {
+          type: 'string',
+          default: 'center',
+        },
+        carouselMarkersStyle: {
+          type: 'string',
+          default: 'dots',
+        },
+        carouselArrowOffset: {
+          type: 'number',
+          default: 0,
+        },
+        carouselButtonBg: {
+          type: 'string',
+          default: '',
+        },
+        carouselButtonColor: {
+          type: 'string',
+          default: '',
+        },
       },
     };
   }
@@ -233,6 +180,12 @@
         carouselLoop = false,
         carouselAutoplay = false,
         carouselAutoplayDelay = 3000,
+        carouselSnapStop = false,
+        carouselMarkersAlign = 'center',
+        carouselMarkersStyle = 'dots',
+        carouselArrowOffset = 0,
+        carouselButtonBg = '',
+        carouselButtonColor = '',
       } = attributes;
       const normalizedArrowStyle = wp.element.useMemo(
         () => normalizeStyleKey(carouselArrowStyle),
@@ -257,6 +210,32 @@
         {
           value: 'angles',
           label: __('Angles', 'native-blocks-carousel'),
+        },
+      ];
+
+      const markerStyleOptions = [
+        {
+          value: 'dots',
+          label: __('Dots', 'native-blocks-carousel'),
+        },
+        {
+          value: 'lines',
+          label: __('Lines', 'native-blocks-carousel'),
+        },
+      ];
+
+      const markerAlignOptions = [
+        {
+          value: 'left',
+          label: __('Left', 'native-blocks-carousel'),
+        },
+        {
+          value: 'center',
+          label: __('Center', 'native-blocks-carousel'),
+        },
+        {
+          value: 'right',
+          label: __('Right', 'native-blocks-carousel'),
         },
       ];
 
@@ -474,6 +453,9 @@
         const baseClasses = classArray.filter(
           (cls) =>
             !cls.startsWith('abcs-icon-') &&
+            !cls.startsWith('abcs-markers-align-') &&
+            !cls.startsWith('abcs-markers-style-') &&
+            cls !== 'abcs-snap-stop' &&
             cls !== 'abcs-hide-arrows' &&
             cls !== 'abcs-hide-markers'
         );
@@ -494,6 +476,13 @@
           if (!carouselShowMarkers && !nextClasses.includes('abcs-hide-markers')) {
             nextClasses.push('abcs-hide-markers');
           }
+
+          if (carouselSnapStop) {
+            nextClasses.push('abcs-snap-stop');
+          }
+
+          nextClasses.push(`abcs-markers-align-${carouselMarkersAlign}`);
+          nextClasses.push(`abcs-markers-style-${carouselMarkersStyle}`);
         }
 
         const nextClassName = nextClasses.join(' ').trim();
@@ -578,7 +567,7 @@
             });
           }
         }
-      }, [carouselEnabled, carouselArrowStyle, carouselShowArrows, carouselShowMarkers, clientId, attributes.className]);
+      }, [carouselEnabled, carouselArrowStyle, carouselShowArrows, carouselShowMarkers, carouselSnapStop, carouselMarkersAlign, carouselMarkersStyle, clientId, attributes.className]);
 
       const ensureArrowStyleControlsCss = () => {
         if (typeof document === 'undefined') {
@@ -594,20 +583,12 @@
         style.id = styleId;
         style.type = 'text/css';
         style.textContent = `
-          .abcs-arrow-style-panel .components-base-control__field,
-          .abcs-arrow-style-panel .components-toggle-group-control {
-            display: grid;
-            justify-content: center;
-          }
-          .abcs-arrow-style-panel .components-toggle-group-control {
-            width: 100%;
-          }
-          .abcs-arrow-style-panel .abcs-arrow-style-group {
-            gap: 8px;
-          }
-          .abcs-arrow-style-group.components-toggle-group-control {
+          .abcs-arrow-style-panel .abcs-arrow-style-group.components-toggle-group-control {
             display: flex;
+            justify-content: center;
             flex-wrap: wrap;
+            gap: 8px;
+            width: 100%;
           }
           .abcs-arrow-style-group .components-toggle-group-control__option {
             --abcs-arrow-option-size: 44px;
@@ -752,6 +733,63 @@
                   ),
               })
               : null,
+            carouselEnabled && carouselShowMarkers
+              ? createElement(
+                PanelBody,
+                {
+                  title: __('Markers layout & style', 'native-blocks-carousel'),
+                  initialOpen: true,
+                },
+                createElement(
+                  'div',
+                  { style: { marginBottom: '12px' } },
+                  createElement('span', { style: { fontWeight: '600', display: 'block', marginBottom: '8px' } }, __('Markers style', 'native-blocks-carousel')),
+                  createElement(
+                    ToggleGroupControl,
+                    {
+                      value: carouselMarkersStyle,
+                      isBlock: true,
+                      __next40pxDefaultSize: true,
+                      __nextHasNoMarginBottom: true,
+                      onChange: (value) => {
+                        setAttributes({ carouselMarkersStyle: value || 'dots' });
+                      },
+                    },
+                    markerStyleOptions.map((option) =>
+                      createElement(ToggleGroupControlOption, {
+                        key: option.value,
+                        value: option.value,
+                        label: option.label,
+                      })
+                    )
+                  )
+                ),
+                createElement(
+                  'div',
+                  null,
+                  createElement('span', { style: { fontWeight: '600', display: 'block', marginBottom: '8px' } }, __('Markers alignment', 'native-blocks-carousel')),
+                  createElement(
+                    ToggleGroupControl,
+                    {
+                      value: carouselMarkersAlign,
+                      isBlock: true,
+                      __next40pxDefaultSize: true,
+                      __nextHasNoMarginBottom: true,
+                      onChange: (value) => {
+                        setAttributes({ carouselMarkersAlign: value || 'center' });
+                      },
+                    },
+                    markerAlignOptions.map((option) =>
+                      createElement(ToggleGroupControlOption, {
+                        key: option.value,
+                        value: option.value,
+                        label: option.label,
+                      })
+                    )
+                  )
+                )
+              )
+              : null,
             carouselEnabled
               ? createElement(ToggleControl, {
                 label: __('Enable loop', 'native-blocks-carousel'),
@@ -767,6 +805,25 @@
                   )
                   : __(
                     'Loop is disabled. The carousel stops at the end.',
+                    'native-blocks-carousel'
+                  ),
+              })
+              : null,
+            carouselEnabled
+              ? createElement(ToggleControl, {
+                label: __('Force stop on each slide (Snap Stop)', 'native-blocks-carousel'),
+                checked: carouselSnapStop,
+                __nextHasNoMarginBottom: true,
+                onChange: (value) => {
+                  setAttributes({ carouselSnapStop: value });
+                },
+                help: carouselSnapStop
+                  ? __(
+                    'Scrolling will stop on every slide, preventing users from skipping multiple slides at once.',
+                    'native-blocks-carousel'
+                  )
+                  : __(
+                    'Users can swipe past multiple slides quickly.',
                     'native-blocks-carousel'
                   ),
               })
@@ -811,10 +868,21 @@
               ? createElement(
                 PanelBody,
                 {
-                  title: __('Arrow style', 'native-blocks-carousel'),
+                  title: __('Arrow style & position', 'native-blocks-carousel'),
                   initialOpen: true,
                   className: 'abcs-arrow-style-panel',
                 },
+                createElement('span', {
+                  style: {
+                    fontSize: '11px',
+                    fontWeight: '500',
+                    textTransform: 'uppercase',
+                    display: 'block',
+                    marginBottom: '10px',
+                    letterSpacing: '0.05em',
+                    color: '#757575'
+                  }
+                }, __('Arrow Design', 'native-blocks-carousel')),
                 createElement(
                   ToggleGroupControl,
                   {
@@ -839,10 +907,55 @@
                       showTooltip: true,
                     })
                   )
+                ),
+                createElement('span', {
+                  style: {
+                    fontSize: '11px',
+                    fontWeight: '500',
+                    textTransform: 'uppercase',
+                    display: 'block',
+                    marginTop: '24px',
+                    marginBottom: '8px',
+                    letterSpacing: '0.05em',
+                    color: '#757575'
+                  }
+                }, __('Position', 'native-blocks-carousel')),
+                createElement(
+                  'div',
+                  { style: { marginTop: '8px' } },
+                  createElement(RangeControl, {
+                    label: __('Arrow offset (px)', 'native-blocks-carousel'),
+                    value: carouselArrowOffset,
+                    onChange: (value) => {
+                      setAttributes({ carouselArrowOffset: value !== undefined ? value : 0 });
+                    },
+                    min: -100,
+                    max: 100,
+                    step: 1,
+                    __nextHasNoMarginBottom: true,
+                  })
                 )
               )
               : null
-          )
+          ),
+          carouselEnabled && carouselShowArrows
+            ? createElement(PanelColorSettings, {
+                title: __('Arrow colors', 'native-blocks-carousel'),
+                initialOpen: false,
+                colorSettings: [
+                  {
+                    value: carouselButtonColor,
+                    onChange: (value) => setAttributes({ carouselButtonColor: value || '' }),
+                    label: __('Arrow color', 'native-blocks-carousel'),
+                  },
+                  {
+                    value: carouselButtonBg,
+                    onChange: (value) => setAttributes({ carouselButtonBg: value || '' }),
+                    label: __('Arrow background color', 'native-blocks-carousel'),
+                  },
+                ],
+              })
+            : null
         )
       );
     };
@@ -862,6 +975,16 @@
       }
 
       const customStyles = {};
+
+      if (attributes.carouselArrowOffset !== undefined) {
+        customStyles['--carousel-button-offset'] = `${attributes.carouselArrowOffset}px`;
+      }
+      if (attributes.carouselButtonBg) {
+        customStyles['--carousel-button-bg'] = attributes.carouselButtonBg;
+      }
+      if (attributes.carouselButtonColor) {
+        customStyles['--carousel-button-color'] = attributes.carouselButtonColor;
+      }
 
       // Adjust the gap using the computed value directly
       if (typeof window !== 'undefined' && window.getComputedStyle) {
@@ -989,6 +1112,12 @@
           'data-abcs-loop': attributes.carouselLoop ? 'true' : 'false',
           'data-abcs-autoplay': attributes.carouselAutoplay ? 'true' : 'false',
           'data-abcs-autoplay-delay': attributes.carouselAutoplayDelay || 3000,
+          'data-abcs-snap-stop': attributes.carouselSnapStop ? 'true' : 'false',
+          'data-abcs-markers-align': attributes.carouselMarkersAlign || 'center',
+          'data-abcs-markers-style': attributes.carouselMarkersStyle || 'dots',
+          'data-abcs-arrow-offset': attributes.carouselArrowOffset !== undefined ? attributes.carouselArrowOffset : 0,
+          'data-abcs-button-bg': attributes.carouselButtonBg || '',
+          'data-abcs-button-color': attributes.carouselButtonColor || '',
         },
       };
 
@@ -1022,8 +1151,6 @@
    */
   /**
    * Resolves the padding value for a carousel element in the editor.
-   * Handles Cover blocks by checking block attributes and inline styles first,
-   * avoiding the post-reset 0px computed style.
    */
   function resolveEditorPadding(carousel, side) {
     const parent = carousel.parentElement;
@@ -1034,21 +1161,6 @@
     let clientId = carousel.getAttribute('data-block') || 
                    (carousel.id && carousel.id.startsWith('block-') ? carousel.id.substring(6) : null);
                      
-    let hasCover = false;
-    if (clientId && window.wp && window.wp.data) {
-      try {
-        const innerBlocks = window.wp.data.select('core/block-editor').getBlocks(clientId);
-        if (innerBlocks) {
-          hasCover = innerBlocks.some(block => block.name === 'core/cover');
-        }
-      } catch (err) {}
-    }
-    if (!hasCover) {
-      hasCover = carousel.querySelector('.wp-block-cover, [data-type="core/cover"]') !== null || 
-                 carousel.classList.contains('wp-block-cover') || 
-                 carousel.getAttribute('data-type') === 'core/cover';
-    }
-
     // 1. Try block attributes in Gutenberg store
     let attrValue = null;
     if (clientId && window.wp && window.wp.data) {
@@ -1101,16 +1213,14 @@
       }
     }
 
-    // 5. Fallback to computed styles (only if not a Cover block)
-    if (!hasCover) {
-      const computedVal = computedStyle ? computedStyle[axis] : null;
-      if (computedVal && computedVal !== '0px') {
-        return computedVal;
-      }
-      const parentVal = parentStyle ? parentStyle[axis] : null;
-      if (parentVal && parentVal !== '0px') {
-        return parentVal;
-      }
+    // 5. Fallback to computed styles
+    const computedVal = computedStyle ? computedStyle[axis] : null;
+    if (computedVal && computedVal !== '0px') {
+      return computedVal;
+    }
+    const parentVal = parentStyle ? parentStyle[axis] : null;
+    if (parentVal && parentVal !== '0px') {
+      return parentVal;
     }
 
     return '0px';
@@ -1483,6 +1593,40 @@
       parent.style.setProperty('--carousel-padding-right', paddingRightValue);
     }
 
+    // Copy offset and colors to parent
+    const buttonOffset = carousel.getAttribute('data-abcs-arrow-offset') || (parent ? parent.getAttribute('data-abcs-arrow-offset') : null) || '0';
+    const buttonBg = carousel.getAttribute('data-abcs-button-bg') || (parent ? parent.getAttribute('data-abcs-button-bg') : null) || '';
+    const buttonColorAttr = carousel.getAttribute('data-abcs-button-color') || (parent ? parent.getAttribute('data-abcs-button-color') : null) || '';
+
+    carousel.style.setProperty('--carousel-button-offset', `${buttonOffset}px`);
+    if (parent) {
+      parent.style.setProperty('--carousel-button-offset', `${buttonOffset}px`);
+    }
+
+    if (buttonBg) {
+      carousel.style.setProperty('--carousel-button-bg', buttonBg);
+      if (parent) {
+        parent.style.setProperty('--carousel-button-bg', buttonBg);
+      }
+    } else {
+      carousel.style.removeProperty('--carousel-button-bg');
+      if (parent) {
+        parent.style.removeProperty('--carousel-button-bg');
+      }
+    }
+
+    if (buttonColorAttr) {
+      carousel.style.setProperty('--carousel-button-color', buttonColorAttr);
+      if (parent) {
+        parent.style.setProperty('--carousel-button-color', buttonColorAttr);
+      }
+    } else {
+      carousel.style.removeProperty('--carousel-button-color');
+      if (parent) {
+        parent.style.removeProperty('--carousel-button-color');
+      }
+    }
+
     const hideArrows = carousel.classList.contains('abcs-hide-arrows') || carousel.closest('.abcs-hide-arrows');
     const hideMarkers = carousel.classList.contains('abcs-hide-markers') || carousel.closest('.abcs-hide-markers');
     
@@ -1491,7 +1635,11 @@
     const computedStyle = carousel.ownerDocument.defaultView.getComputedStyle(carousel);
     let arrowColor = '#ffffff';
     if (typeof window !== 'undefined') {
-      const textVar = computedStyle.getPropertyValue('--carousel-button-color').trim();
+      let textVar = computedStyle.getPropertyValue('--carousel-button-color').trim();
+      if (!textVar) {
+        const rootStyle = carousel.ownerDocument.defaultView.getComputedStyle(carousel.ownerDocument.documentElement);
+        textVar = rootStyle.getPropertyValue('--carousel-button-color').trim();
+      }
       if (textVar) {
         arrowColor = convertColorToHexForSvg(textVar, carousel.ownerDocument);
       }
@@ -1608,17 +1756,24 @@
 
           const onScroll = function () {
             const scrollLeft = carousel.scrollLeft;
+            const maxScroll = carousel.scrollWidth - carousel.offsetWidth;
             let activeIndex = 0;
-            let minDistance = Infinity;
 
-            children.forEach((slide, idx) => {
-              const slidePos = slide.offsetLeft - carousel.offsetLeft;
-              const distance = Math.abs(slidePos - scrollLeft);
-              if (distance < minDistance) {
-                minDistance = distance;
-                activeIndex = idx;
-              }
-            });
+            if (scrollLeft >= maxScroll - 10) {
+              activeIndex = children.length - 1;
+            } else if (scrollLeft <= 10) {
+              activeIndex = 0;
+            } else {
+              let minDistance = Infinity;
+              children.forEach((slide, idx) => {
+                const slidePos = slide.offsetLeft - carousel.offsetLeft;
+                const distance = Math.abs(slidePos - scrollLeft);
+                if (distance < minDistance) {
+                  minDistance = distance;
+                  activeIndex = idx;
+                }
+              });
+            }
 
             markers.forEach((m, idx) => {
               if (idx === activeIndex) {

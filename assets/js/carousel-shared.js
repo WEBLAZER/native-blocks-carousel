@@ -1,4 +1,4 @@
-(function (global) {
+((global) => {
   'use strict';
 
   const shared = global.AnyBlockCarouselSliderShared || {};
@@ -60,7 +60,7 @@
 
   const hasOwn = Object.prototype.hasOwnProperty;
 
-  function normalizeStyleKey(styleKey) {
+  const normalizeStyleKey = (styleKey) => {
     if (!styleKey) {
       return DEFAULT_ARROW_STYLE;
     }
@@ -74,14 +74,14 @@
     }
 
     return DEFAULT_ARROW_STYLE;
-  }
+  };
 
-  function getIconDefinition(styleKey) {
+  const getIconDefinition = (styleKey) => {
     const normalized = normalizeStyleKey(styleKey);
     return ARROW_ICONS[normalized] || ARROW_ICONS[DEFAULT_ARROW_STYLE];
-  }
+  };
 
-  function buildSvgElement(direction, color, styleKey, fillAttr) {
+  const buildSvgElement = (direction, color, styleKey, fillAttr) => {
     const icon = getIconDefinition(styleKey);
     const directionKey = direction === 'left' ? 'left' : 'right';
     const pathConfig = icon.paths[directionKey] || icon.paths.right;
@@ -92,16 +92,16 @@
     }
 
     return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${icon.viewBox}' aria-hidden='true'><path ${attributes.join(' ')} /></svg>`;
-  }
+  };
 
-  function generateArrowSvg(direction, color, styleKey) {
+  const generateArrowSvg = (direction, color, styleKey) => {
     const svg = buildSvgElement(direction, color, styleKey, 'fill');
-    return 'data:image/svg+xml,' + encodeURIComponent(svg);
-  }
+    return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+  };
 
-  function generateArrowMarkup(direction, color, styleKey) {
+  const generateArrowMarkup = (direction, color, styleKey) => {
     return buildSvgElement(direction, color, styleKey, 'fill');
-  }
+  };
 
   shared.DEFAULT_ARROW_STYLE = DEFAULT_ARROW_STYLE;
   shared.normalizeStyleKey = normalizeStyleKey;

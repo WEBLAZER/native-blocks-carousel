@@ -4,7 +4,7 @@ Tags: carousel, slider, block, gutenberg, woocommerce
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.0.4
+Stable tag: 2.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -174,6 +174,13 @@ Yes! Navigation buttons, pagination dots, and scroll behavior all use standard H
 5. Native Gallery block displayed in carousel slider mode.
 
 == Changelog ==
+
+= 2.1.0 - 2026-06-16 =
+* 🚀 Refactoring: Modernized codebases to clean ES6 Javascript and consolidated redundant utility logic in carousel-shared.js.
+* ♿ Accessibility: Implemented full ARIA roles, tabindex, dynamic states, and support for keyboard Arrow navigation with infinite loop controls.
+* 🎨 Gutenberg Customization: Added native PanelColorSettings for buttons background and SVG color, RangeControl for arrow horizontal offset, and alignment/style settings for pagination indicators (Dots vs Lines).
+* ⚡ Performance: Replaced ratio-based IntersectionObserver highlighting logic with distance calculations for pixel-perfect active marker highlights on multi-column viewports.
+* 🧹 Simplification: Removed hardcoded Cover block padding exceptions in CSS and Javascript, allowing standard block properties and custom arrow offset controls to determine spacing.
 
 = 2.0.4 - 2026-06-12 =
 * 🐛 PHP: Fixed an Array to string conversion warning when using split block spacing/gap settings on parent blocks (e.g., core/group, core/columns).

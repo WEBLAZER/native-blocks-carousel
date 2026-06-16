@@ -54,6 +54,21 @@ class Renderer implements ServiceInterface
         $this->maybeAddBlockGapVariable($custom_styles, $block);
         $this->maybeAddPaddingVariables($custom_styles, $block, $block_content);
 
+        // Get custom button offset and colors
+        $arrow_offset = $block['attrs']['carouselArrowOffset'] ?? null;
+        $button_bg = $block['attrs']['carouselButtonBg'] ?? null;
+        $button_color = $block['attrs']['carouselButtonColor'] ?? null;
+
+        if (null !== $arrow_offset) {
+            $custom_styles['--carousel-button-offset'] = $arrow_offset . 'px';
+        }
+        if (!empty($button_bg)) {
+            $custom_styles['--carousel-button-bg'] = $button_bg;
+        }
+        if (!empty($button_color)) {
+            $custom_styles['--carousel-button-color'] = $button_color;
+        }
+
         // Get loop and autoplay attributes
         $loop = $block['attrs']['carouselLoop'] ?? false;
         $autoplay = $block['attrs']['carouselAutoplay'] ?? false;

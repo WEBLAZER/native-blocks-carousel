@@ -7,158 +7,59 @@
  * @author weblazer35
  */
 
-(function () {
+(() => {
 	'use strict';
 
 	const SHARED = window.AnyBlockCarouselSliderShared || {};
-	const FALLBACK_DEFAULT_ARROW_STYLE = 'chevron';
-	const DEFAULT_ARROW_STYLE = SHARED.DEFAULT_ARROW_STYLE || FALLBACK_DEFAULT_ARROW_STYLE;
+	const DEFAULT_ARROW_STYLE = SHARED.DEFAULT_ARROW_STYLE || 'chevron';
 
-	const FALLBACK_ICON_BASE = {
-		chevron: {
-			viewBox: '0 0 640 640',
-			paths: {
-				right: {
-					d: 'M471.1 297.4C483.6 309.9 483.6 330.2 471.1 342.7L279.1 534.7C266.6 547.2 246.3 547.2 233.8 534.7C221.3 522.2 221.3 501.9 233.8 489.4L403.2 320L233.9 150.6C221.4 138.1 221.4 117.8 233.9 105.3C246.4 92.8 266.7 92.8 279.2 105.3L471.2 297.3z'
-				},
-				left: {
-					d: 'M471.1 297.4C483.6 309.9 483.6 330.2 471.1 342.7L279.1 534.7C266.6 547.2 246.3 547.2 233.8 534.7C221.3 522.2 221.3 501.9 233.8 489.4L403.2 320L233.9 150.6C221.4 138.1 221.4 117.8 233.9 105.3C246.4 92.8 266.7 92.8 279.2 105.3L471.2 297.3z',
-					transform: 'scale(-1 1) translate(-640 0)'
-				}
-			}
-		},
-		arrow: {
-			viewBox: '0 0 640 640',
-			paths: {
-				right: {
-					d: 'M566.6 342.6C579.1 330.1 579.1 309.8 566.6 297.3L406.6 137.3C394.1 124.8 373.8 124.8 361.3 137.3C348.8 149.8 348.8 170.1 361.3 182.6L466.7 288L96 288C78.3 288 64 302.3 64 320C64 337.7 78.3 352 96 352L466.7 352L361.3 457.4C348.8 469.9 348.8 490.2 361.3 502.7C373.8 515.2 394.1 515.2 406.6 502.7L566.6 342.7z'
-				},
-				left: {
-					d: 'M566.6 342.6C579.1 330.1 579.1 309.8 566.6 297.3L406.6 137.3C394.1 124.8 373.8 124.8 361.3 137.3C348.8 149.8 348.8 170.1 361.3 182.6L466.7 288L96 288C78.3 288 64 302.3 64 320C64 337.7 78.3 352 96 352L466.7 352L361.3 457.4C348.8 469.9 348.8 490.2 361.3 502.7C373.8 515.2 394.1 515.2 406.6 502.7L566.6 342.7z',
-					transform: 'scale(-1 1) translate(-640 0)'
-				}
-			}
-		},
-		angles: {
-			viewBox: '0 0 640 640',
-			paths: {
-				right: {
-					d: 'M535.1 342.6C547.6 330.1 547.6 309.8 535.1 297.3L375.1 137.3C362.6 124.8 342.3 124.8 329.8 137.3C317.3 149.8 317.3 170.1 329.8 182.6L467.2 320L329.9 457.4C317.4 469.9 317.4 490.2 329.9 502.7C342.4 515.2 362.7 515.2 375.2 502.7L535.2 342.7zM183.1 502.6L343.1 342.6C355.6 330.1 355.6 309.8 343.1 297.3L183.1 137.3C170.6 124.8 150.3 124.8 137.8 137.3C125.3 149.8 125.3 170.1 137.8 182.6L275.2 320L137.9 457.4C125.4 469.9 125.4 490.2 137.9 502.7C150.4 515.2 170.7 515.2 183.2 502.7z'
-				},
-				left: {
-					d: 'M535.1 342.6C547.6 330.1 547.6 309.8 535.1 297.3L375.1 137.3C362.6 124.8 342.3 124.8 329.8 137.3C317.3 149.8 317.3 170.1 329.8 182.6L467.2 320L329.9 457.4C317.4 469.9 317.4 490.2 329.9 502.7C342.4 515.2 362.7 515.2 375.2 502.7L535.2 342.7zM183.1 502.6L343.1 342.6C355.6 330.1 355.6 309.8 343.1 297.3L183.1 137.3C170.6 124.8 150.3 124.8 137.8 137.3C125.3 149.8 125.3 170.1 137.8 182.6L275.2 320L137.9 457.4C125.4 469.9 125.4 490.2 137.9 502.7C150.4 515.2 170.7 515.2 183.2 502.7z',
-					transform: 'scale(-1 1) translate(-640 0)'
-				}
-			}
+	const normalizeStyleKey = (styleKey) => {
+		if (typeof SHARED.normalizeStyleKey === 'function') {
+			return SHARED.normalizeStyleKey(styleKey);
 		}
+		return styleKey || DEFAULT_ARROW_STYLE;
 	};
 
-	const FALLBACK_ICON_ALIASES = {
-		classic: 'chevron',
-		'solid-full': 'arrow',
-		arrowfull: 'arrow',
-		'angles-right-solid-full': 'angles'
+	const generateArrowMarkup = (direction, color, styleKey) => {
+		if (typeof SHARED.generateArrowMarkup === 'function') {
+			return SHARED.generateArrowMarkup(direction, color, styleKey);
+		}
+		return '';
 	};
-
-	const FALLBACK_ARROW_ICONS = {
-		...FALLBACK_ICON_BASE,
-		classic: FALLBACK_ICON_BASE.chevron,
-		'solid-full': FALLBACK_ICON_BASE.arrow,
-		angles: FALLBACK_ICON_BASE.angles,
-	};
-
-	const fallbackNormalizeStyleKey = (styleKey) => {
-		if (!styleKey) {
-			return FALLBACK_DEFAULT_ARROW_STYLE;
-		}
-		if (FALLBACK_ICON_BASE[styleKey]) {
-			return styleKey;
-		}
-		if (FALLBACK_ICON_ALIASES[styleKey]) {
-			return FALLBACK_ICON_ALIASES[styleKey];
-		}
-		return FALLBACK_DEFAULT_ARROW_STYLE;
-	};
-
-	const normalizeStyleKey = typeof SHARED.normalizeStyleKey === 'function'
-		? (styleKey) => SHARED.normalizeStyleKey(styleKey)
-		: fallbackNormalizeStyleKey;
-
-	const getIconDefinition = typeof SHARED.getIconDefinition === 'function'
-		? (styleKey) => SHARED.getIconDefinition(styleKey)
-		: (styleKey) => FALLBACK_ARROW_ICONS[fallbackNormalizeStyleKey(styleKey)];
-
-	const fallbackBuildSvg = (direction, color, styleKey, toDataUrl = false) => {
-		const normalizedKey = fallbackNormalizeStyleKey(styleKey);
-		const icon = FALLBACK_ARROW_ICONS[normalizedKey] || FALLBACK_ARROW_ICONS[FALLBACK_DEFAULT_ARROW_STYLE];
-		const directionKey = direction === 'left' ? 'left' : 'right';
-		const pathConfig = icon.paths[directionKey] || icon.paths.right;
-		const attributes = [`fill='${color}'`, `d='${pathConfig.d}'`];
-
-		if (pathConfig.transform) {
-			attributes.push(`transform='${pathConfig.transform}'`);
-		}
-
-		const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${icon.viewBox}'><path ${attributes.join(' ')} /></svg>`;
-
-		if (toDataUrl) {
-			return `data:image/svg+xml,${encodeURIComponent(svg)}`;
-		}
-
-		return svg;
-	};
-
-	const generateArrowSvg = typeof SHARED.generateArrowSvg === 'function'
-		? (direction, color, styleKey) => SHARED.generateArrowSvg(direction, color, styleKey)
-		: (direction, color, styleKey) => fallbackBuildSvg(direction, color, styleKey, true);
-
-	const generateArrowMarkup = typeof SHARED.generateArrowMarkup === 'function'
-		? (direction, color, styleKey) => SHARED.generateArrowMarkup(direction, color, styleKey)
-		: (direction, color, styleKey) => fallbackBuildSvg(direction, color, styleKey, false);
-
-	const isValidArrowStyle = (styleKey) => !!getIconDefinition(styleKey);
 
 	/**
 	 * Extrait la valeur minimumColumnWidth depuis grid-template-columns
-	 * WordPress generates: grid-template-columns: repeat(auto-fill, minmax(min(38rem, 100%), 1fr))
+	 * WordPress génère : grid-template-columns: repeat(auto-fill, minmax(min(38rem, 100%), 1fr))
 	 */
-	function extractMinWidthFromGridTemplateColumns(gridTemplateColumns) {
+	const extractMinWidthFromGridTemplateColumns = (gridTemplateColumns) => {
 		if (!gridTemplateColumns || gridTemplateColumns === 'none') {
 			return null;
 		}
 
-		// Look for minmax(min(XXX, 100%), 1fr)
+		// Recherche de minmax(min(XXX, 100%), 1fr)
 		const match = gridTemplateColumns.match(/minmax\(min\(([^,]+),\s*100%\)/);
-		if (match && match[1]) {
-			return match[1].trim();
-		}
-
-		return null;
-	}
+		return match && match[1] ? match[1].trim() : null;
+	};
 
 	/**
-	 * Finds the grid-template-columns CSS rule for a carousel from the stylesheets.
+	 * Recherche la règle CSS grid-template-columns pour un carrousel dans les feuilles de style.
 	 */
-	function findGridTemplateColumnsRule(carousel) {
-		// Look for a unique wp-container class on the carousel
-		const containerClass = Array.from(carousel.classList).find(function (cls) {
-			return cls.startsWith('wp-container-');
-		});
+	const findGridTemplateColumnsRule = (carousel) => {
+		const containerClass = Array.from(carousel.classList).find(cls => cls.startsWith('wp-container-'));
 
 		if (!containerClass) {
 			return null;
 		}
 
-		// Iterate over every stylesheet
 		const styleSheets = Array.from(document.styleSheets);
 
-		for (var i = 0; i < styleSheets.length; i++) {
+		for (const sheet of styleSheets) {
 			try {
-				const rules = styleSheets[i].cssRules || styleSheets[i].rules;
+				const rules = sheet.cssRules || sheet.rules;
 				if (!rules) continue;
 
-				for (var j = 0; j < rules.length; j++) {
-					const rule = rules[j];
+				for (let i = 0; i < rules.length; i++) {
+					const rule = rules[i];
 					if (rule.selectorText && rule.selectorText.includes(containerClass)) {
 						const gridTemplateColumns = rule.style.gridTemplateColumns;
 						if (gridTemplateColumns && gridTemplateColumns !== 'none') {
@@ -167,108 +68,53 @@
 					}
 				}
 			} catch (e) {
-				// Ignore CORS errors for external stylesheets
+				// Ignorer les erreurs CORS pour les feuilles de style externes
 				continue;
 			}
 		}
 
 		return null;
-	}
+	};
 
 	/**
-	 * Injects --carousel-min-width for carousels using minimumColumnWidth mode.
+	 * Injecte --carousel-min-width pour les carrousels utilisant le mode minimumColumnWidth.
 	 */
-	function injectMinWidthVariables() {
-		// Find all carousels with the abcs-min-width class
+	const injectMinWidthVariables = () => {
 		const carousels = document.querySelectorAll('.abcs.abcs-min-width');
 
-		carousels.forEach(function (carousel) {
-			// Check whether the variable is already defined
+		carousels.forEach(carousel => {
 			const computedStyle = window.getComputedStyle(carousel);
 			const currentMinWidth = computedStyle.getPropertyValue('--carousel-min-width');
 
-			// If already defined (by PHP), do nothing
 			if (currentMinWidth && currentMinWidth.trim() !== '') {
 				return;
 			}
 
-			// Locate the grid-template-columns rule inside stylesheets
 			const gridTemplateColumns = findGridTemplateColumnsRule(carousel);
-
 			if (!gridTemplateColumns) {
-				// Silent in production—the variable might eventually be set by PHP
 				return;
 			}
 
-			// Extract the minimumColumnWidth value
 			const minWidth = extractMinWidthFromGridTemplateColumns(gridTemplateColumns);
-
 			if (minWidth) {
-				// Inject the CSS variable
 				carousel.style.setProperty('--carousel-min-width', minWidth);
 			}
 		});
-	}
+	};
 
 	/**
-	 * Injects padding variables by reading computed padding directly.
-	 * Optimal approach: rely on the browser's computed values (which include every style)
-	 * and inject them as CSS variables. Works even when PHP fails to extract padding.
+	 * Injecte les variables de padding en lisant directement les valeurs calculées.
 	 */
-	function injectPaddingVariables() {
+	const injectPaddingVariables = () => {
 		const carousels = document.querySelectorAll('.abcs');
 
-		carousels.forEach(function (carousel) {
+		carousels.forEach(carousel => {
 			const computedStyle = window.getComputedStyle(carousel);
 
-			// Read the computed gap to adjust widths
 			const computedGap = computedStyle.gap || computedStyle.columnGap || computedStyle.rowGap;
 			if (computedGap && computedGap !== 'normal' && computedGap.trim() !== '') {
 				carousel.style.setProperty('--wp--style--block-gap', computedGap);
 			}
-
-			// Read computed padding directly (works even when defined via inline style)
-			const hasCover = carousel.querySelector('.wp-block-cover') !== null || carousel.classList.contains('wp-block-cover');
-
-			// If we override the physical padding of the carousel for cover blocks,
-			// try to read the values from CSS variables first (set by PHP) or inline styles.
-			const getOriginalPadding = (axis, computedVal) => {
-				if (!hasCover) {
-					return computedVal;
-				}
-				const customProp = computedStyle.getPropertyValue('--carousel-padding-' + axis);
-				if (customProp && customProp.trim() !== '' && customProp.trim() !== '0px') {
-					return customProp.trim();
-				}
-				const inlinePadding = carousel.style['padding' + axis.charAt(0).toUpperCase() + axis.slice(1)];
-				if (inlinePadding && inlinePadding.trim() !== '') {
-					return inlinePadding.trim();
-				}
-				const inlinePaddingShorthand = carousel.style.padding;
-				if (inlinePaddingShorthand && inlinePaddingShorthand.trim() !== '') {
-					const parts = inlinePaddingShorthand.trim().split(/\s+/);
-					if (parts.length === 1) {
-						return parts[0];
-					} else if (parts.length === 2 || parts.length === 3) {
-						if (axis === 'left' || axis === 'right') {
-							return parts[1];
-						} else {
-							return parts[0];
-						}
-					} else if (parts.length === 4) {
-						if (axis === 'top') return parts[0];
-						if (axis === 'right') return parts[1];
-						if (axis === 'bottom') return parts[2];
-						if (axis === 'left') return parts[3];
-					}
-				}
-				return computedVal;
-			};
-
-			const paddingLeft = getOriginalPadding('left', computedStyle.paddingLeft);
-			const paddingRight = getOriginalPadding('right', computedStyle.paddingRight);
-			const paddingTop = getOriginalPadding('top', computedStyle.paddingTop);
-			const paddingBottom = getOriginalPadding('bottom', computedStyle.paddingBottom);
 
 			const parent = carousel.parentElement;
 			const parentStyle = parent ? window.getComputedStyle(parent) : null;
@@ -284,12 +130,11 @@
 				return fallback;
 			};
 
-			const paddingLeftValue = normalizePadding(paddingLeft, '0px', 'paddingLeft');
-			const paddingRightValue = normalizePadding(paddingRight, '0px', 'paddingRight');
-			const paddingTopValue = normalizePadding(paddingTop, '1rem', 'paddingTop');
-			const paddingBottomValue = normalizePadding(paddingBottom, '1rem', 'paddingBottom');
+			const paddingLeftValue = normalizePadding(computedStyle.paddingLeft, '0px', 'paddingLeft');
+			const paddingRightValue = normalizePadding(computedStyle.paddingRight, '0px', 'paddingRight');
+			const paddingTopValue = normalizePadding(computedStyle.paddingTop, '1rem', 'paddingTop');
+			const paddingBottomValue = normalizePadding(computedStyle.paddingBottom, '1rem', 'paddingBottom');
 
-			// Apply to the carousel
 			carousel.style.setProperty('--carousel-padding-left', paddingLeftValue);
 			carousel.style.setProperty('--carousel-padding-right', paddingRightValue);
 			carousel.style.setProperty('--carousel-padding-top', paddingTopValue);
@@ -297,19 +142,41 @@
 			carousel.style.setProperty('--carousel-scroll-padding-left', paddingLeftValue);
 			carousel.style.setProperty('--carousel-scroll-padding-right', paddingRightValue);
 
-			// Mirror the values on the parent for button/marker positioning
+			const buttonOffset = computedStyle.getPropertyValue('--carousel-button-offset');
+			if (buttonOffset && buttonOffset.trim() !== '') {
+				carousel.style.setProperty('--carousel-button-offset', buttonOffset);
+			}
+			const buttonBg = computedStyle.getPropertyValue('--carousel-button-bg');
+			if (buttonBg && buttonBg.trim() !== '') {
+				carousel.style.setProperty('--carousel-button-bg', buttonBg);
+			}
+			const buttonColor = computedStyle.getPropertyValue('--carousel-button-color');
+			if (buttonColor && buttonColor.trim() !== '') {
+				carousel.style.setProperty('--carousel-button-color', buttonColor);
+			}
+
 			if (parent) {
 				parent.style.setProperty('--carousel-padding-left', paddingLeftValue);
 				parent.style.setProperty('--carousel-padding-right', paddingRightValue);
 				parent.style.setProperty('--carousel-padding-bottom', paddingBottomValue);
+
+				if (buttonOffset && buttonOffset.trim() !== '') {
+					parent.style.setProperty('--carousel-button-offset', buttonOffset);
+				}
+				if (buttonBg && buttonBg.trim() !== '') {
+					parent.style.setProperty('--carousel-button-bg', buttonBg);
+				}
+				if (buttonColor && buttonColor.trim() !== '') {
+					parent.style.setProperty('--carousel-button-color', buttonColor);
+				}
 			}
 		});
-	}
+	};
 
 	/**
-	 * Converts a CSS color to hexadecimal for SVGs.
+	 * Convertit une couleur CSS en hexadécimal pour les SVG.
 	 */
-	function convertColorToHexForSvg(color) {
+	const convertColorToHexForSvg = (color) => {
 		if (!color) return '#ffffff';
 
 		if (color.startsWith('#')) {
@@ -322,14 +189,13 @@
 				const r = parseInt(matches[0]);
 				const g = parseInt(matches[1]);
 				const b = parseInt(matches[2]);
-				return '#' + [r, g, b].map(function (x) {
+				return '#' + [r, g, b].map(x => {
 					const hex = x.toString(16);
 					return hex.length === 1 ? '0' + hex : hex;
 				}).join('');
 			}
 		}
 
-		// Fallback: create a temporary element to retrieve the hex value
 		const temp = document.createElement('div');
 		temp.style.color = color;
 		temp.style.position = 'absolute';
@@ -344,7 +210,7 @@
 				const r = parseInt(matches[0]);
 				const g = parseInt(matches[1]);
 				const b = parseInt(matches[2]);
-				return '#' + [r, g, b].map(function (x) {
+				return '#' + [r, g, b].map(x => {
 					const hex = x.toString(16);
 					return hex.length === 1 ? '0' + hex : hex;
 				}).join('');
@@ -352,26 +218,23 @@
 		}
 
 		return '#ffffff';
-	}
+	};
 
-	function resolveCarouselArrowStyleFromElement(element) {
+	const resolveCarouselArrowStyleFromElement = (element) => {
 		if (!element || !element.classList) {
 			return DEFAULT_ARROW_STYLE;
 		}
 
-		const iconClass = Array.prototype.find.call(element.classList, function (cls) {
-			return cls.indexOf('abcs-icon-') === 0;
-		});
-
+		const iconClass = Array.from(element.classList).find(cls => cls.startsWith('abcs-icon-'));
 		if (iconClass) {
 			const styleKey = iconClass.replace('abcs-icon-', '');
 			return normalizeStyleKey(styleKey);
 		}
 
 		return DEFAULT_ARROW_STYLE;
-	}
+	};
 
-	function resolveArrowColor(color, docContext) {
+	const resolveArrowColor = (color, docContext) => {
 		const doc = docContext || document;
 		let actualColor = color;
 		if (!actualColor || actualColor === '' || actualColor === 'rgba(0, 0, 0, 0)' || actualColor === 'transparent') {
@@ -389,37 +252,34 @@
 		}
 
 		return convertColorToHexForSvg(actualColor || '#ffffff');
-	}
+	};
 
-	/**
-	 * Resolves the button text color for SVG arrow icons.
-	 */
-	function resolveButtonColor() {
-		const root = document.documentElement;
-		const rootStyle = window.getComputedStyle(root);
-		let buttonColor = rootStyle.getPropertyValue('--carousel-button-color').trim();
+	const resolveButtonColorForCarousel = (carousel) => {
+		const computedStyle = window.getComputedStyle(carousel);
+		let buttonColor = computedStyle.getPropertyValue('--carousel-button-color').trim();
+
+		if (!buttonColor || buttonColor === '') {
+			const root = document.documentElement;
+			const rootStyle = window.getComputedStyle(root);
+			buttonColor = rootStyle.getPropertyValue('--carousel-button-color').trim();
+		}
 
 		if (!buttonColor || buttonColor === '') {
 			const wpButton = document.querySelector('.wp-element-button, button.wp-element-button');
 			if (wpButton) {
-				const buttonStyle = window.getComputedStyle(wpButton);
-				buttonColor = buttonStyle.color;
+				buttonColor = window.getComputedStyle(wpButton).color;
 			} else {
 				buttonColor = '#ffffff';
 			}
 		}
 
 		return convertColorToHexForSvg(buttonColor);
-	}
-
-	/* ==========================================================================
-	   NAVIGATION UI INJECTION
-	   ========================================================================== */
+	};
 
 	/**
-	 * Calculates the scroll distance for one slide.
+	 * Calcule la distance de défilement pour une diapositive.
 	 */
-	function getSlideWidth(carousel) {
+	const getSlideWidth = (carousel) => {
 		const firstChild = carousel.firstElementChild;
 		if (!firstChild) {
 			return 0;
@@ -442,16 +302,76 @@
 			}
 		}
 		return firstChild.offsetWidth + gapValue;
-	}
+	};
 
 	/**
-	 * Injects navigation buttons and pagination markers for all carousels.
+	 * Configure l'accessibilité du conteneur du carrousel (A11y).
 	 */
-	function injectNavigationUI() {
+	const setupA11y = (carousel) => {
+		// Rendre le conteneur focalisable au clavier
+		carousel.setAttribute('tabindex', '0');
+		carousel.setAttribute('aria-roledescription', 'carousel');
+		carousel.setAttribute('aria-label', carousel.getAttribute('aria-label') || 'Carousel');
+
+		// Assigner le rôle slide à chaque enfant direct (sauf boutons et puces)
+		const setSlidesA11y = () => {
+			Array.from(carousel.children).forEach((child, index) => {
+				if (
+					!child.classList.contains('abcs-nav-btn') &&
+					!child.classList.contains('abcs-markers') &&
+					child.nodeType === 1
+				) {
+					child.setAttribute('aria-roledescription', 'slide');
+					child.setAttribute('aria-label', `Slide ${index + 1}`);
+				}
+			});
+		};
+
+		setSlidesA11y();
+
+		// Observer les changements pour appliquer l'A11y sur les nouveaux slides
+		if (typeof MutationObserver !== 'undefined') {
+			const observer = new MutationObserver(setSlidesA11y);
+			observer.observe(carousel, { childList: true });
+		}
+
+		// Gestion du défilement avec les touches directionnelles Gauche / Droite
+		carousel.addEventListener('keydown', (e) => {
+			if (e.key === 'ArrowLeft') {
+				e.preventDefault();
+				const isLoopEnabled = carousel.getAttribute('data-abcs-loop') === 'true';
+				const atStart = carousel.scrollLeft <= 5;
+				if (isLoopEnabled && atStart) {
+					carousel.style.scrollBehavior = 'auto';
+					carousel.scrollTo({ left: carousel.scrollWidth, behavior: 'auto' });
+					carousel.style.scrollBehavior = '';
+				} else {
+					const slideWidth = getSlideWidth(carousel);
+					carousel.scrollBy({ left: -slideWidth, behavior: 'smooth' });
+				}
+			} else if (e.key === 'ArrowRight') {
+				e.preventDefault();
+				const isLoopEnabled = carousel.getAttribute('data-abcs-loop') === 'true';
+				const atEnd = carousel.scrollLeft + carousel.offsetWidth >= carousel.scrollWidth - 5;
+				if (isLoopEnabled && atEnd) {
+					carousel.style.scrollBehavior = 'auto';
+					carousel.scrollTo({ left: 0, behavior: 'auto' });
+					carousel.style.scrollBehavior = '';
+				} else {
+					const slideWidth = getSlideWidth(carousel);
+					carousel.scrollBy({ left: slideWidth, behavior: 'smooth' });
+				}
+			}
+		});
+	};
+
+	/**
+	 * Injecte les boutons de navigation et les puces pour tous les carrousels.
+	 */
+	const injectNavigationUI = () => {
 		const carousels = document.querySelectorAll('.abcs');
 
-		carousels.forEach(function (carousel) {
-			// Skip if already initialized
+		carousels.forEach(carousel => {
 			if (carousel.dataset.abcsNavInitialized) {
 				return;
 			}
@@ -462,52 +382,47 @@
 			const hideArrows = carousel.classList.contains('abcs-hide-arrows');
 			const hideMarkers = carousel.classList.contains('abcs-hide-markers');
 
-			// Inject navigation buttons
 			if (!hideArrows) {
 				injectNavigationButtons(carousel, parent);
 			}
 
-			// Inject pagination markers
 			if (!hideMarkers) {
 				injectPaginationMarkers(carousel, parent);
 			}
 
+			setupA11y(carousel);
+
 			carousel.dataset.abcsNavInitialized = 'true';
 		});
-	}
+	};
 
 	/**
-	 * Creates and inserts prev/next navigation buttons for a carousel.
+	 * Crée et insère les boutons Précédent/Suivant.
 	 */
-	function injectNavigationButtons(carousel, parent) {
+	const injectNavigationButtons = (carousel, parent) => {
 		const arrowStyle = resolveCarouselArrowStyleFromElement(carousel);
-		const arrowColor = resolveButtonColor();
+		const arrowColor = resolveButtonColorForCarousel(carousel);
 
-		// Create prev button
 		const prevBtn = document.createElement('button');
 		prevBtn.className = 'abcs-nav-btn abcs-nav-btn--prev';
 		prevBtn.setAttribute('type', 'button');
 		prevBtn.setAttribute('aria-label', 'Previous slide');
 		prevBtn.innerHTML = generateArrowMarkup('left', arrowColor, arrowStyle);
 
-		// Create next button
 		const nextBtn = document.createElement('button');
 		nextBtn.className = 'abcs-nav-btn abcs-nav-btn--next';
 		nextBtn.setAttribute('type', 'button');
 		nextBtn.setAttribute('aria-label', 'Next slide');
 		nextBtn.innerHTML = generateArrowMarkup('right', arrowColor, arrowStyle);
 
-		// Insert into parent
 		parent.appendChild(prevBtn);
 		parent.appendChild(nextBtn);
 
-		// Click handlers with loop support
-		prevBtn.addEventListener('click', function () {
+		prevBtn.addEventListener('click', () => {
 			const isLoopEnabled = carousel.getAttribute('data-abcs-loop') === 'true';
 			const atStart = carousel.scrollLeft <= 5;
 
 			if (isLoopEnabled && atStart) {
-				// Reset to end
 				carousel.style.scrollBehavior = 'auto';
 				carousel.scrollTo({ left: carousel.scrollWidth, behavior: 'auto' });
 				carousel.style.scrollBehavior = '';
@@ -517,12 +432,11 @@
 			}
 		});
 
-		nextBtn.addEventListener('click', function () {
+		nextBtn.addEventListener('click', () => {
 			const isLoopEnabled = carousel.getAttribute('data-abcs-loop') === 'true';
 			const atEnd = carousel.scrollLeft + carousel.offsetWidth >= carousel.scrollWidth - 5;
 
 			if (isLoopEnabled && atEnd) {
-				// Reset to start
 				carousel.style.scrollBehavior = 'auto';
 				carousel.scrollTo({ left: 0, behavior: 'auto' });
 				carousel.style.scrollBehavior = '';
@@ -532,8 +446,7 @@
 			}
 		});
 
-		// Update disabled state based on scroll position
-		function updateButtonStates() {
+		const updateButtonStates = () => {
 			const isLoopEnabled = carousel.getAttribute('data-abcs-loop') === 'true';
 			const threshold = 5;
 			const atStart = carousel.scrollLeft <= threshold;
@@ -546,139 +459,121 @@
 				prevBtn.disabled = atStart;
 				nextBtn.disabled = atEnd;
 			}
-		}
+		};
 
-		// Initial state
 		updateButtonStates();
-
-		// Update on scroll
 		carousel.addEventListener('scroll', updateButtonStates, { passive: true });
 
-		// Store references for external access
 		carousel._abcsNavPrev = prevBtn;
 		carousel._abcsNavNext = nextBtn;
 		carousel._abcsUpdateButtonStates = updateButtonStates;
-	}
+	};
 
 	/**
-	 * Creates and inserts pagination marker dots for a carousel.
+	 * Crée et insère les puces de pagination (markers).
 	 */
-	function injectPaginationMarkers(carousel, parent) {
-		const children = Array.from(carousel.children);
+	const injectPaginationMarkers = (carousel, parent) => {
+		const children = Array.from(carousel.children).filter(child => {
+			return !child.classList.contains('abcs-nav-btn') && !child.classList.contains('abcs-markers');
+		});
 		if (!children.length) return;
 
-		// Create markers container
 		const markersContainer = document.createElement('div');
 		markersContainer.className = 'abcs-markers';
 		markersContainer.setAttribute('role', 'tablist');
 		markersContainer.setAttribute('aria-label', 'Carousel pagination');
 
-		// Create a marker for each slide
 		const markers = [];
-		for (var i = 0; i < children.length; i++) {
+		children.forEach((child, i) => {
 			const marker = document.createElement('button');
 			marker.className = 'abcs-marker';
 			marker.setAttribute('role', 'tab');
 			marker.setAttribute('type', 'button');
-			marker.setAttribute('aria-label', 'Slide ' + (i + 1));
+			marker.setAttribute('aria-label', `Slide ${i + 1}`);
 
-			// Click handler - scroll to corresponding slide
-			(function (slideIndex) {
-				marker.addEventListener('click', function () {
-					const slide = children[slideIndex];
-					if (slide) {
-						carousel.scrollTo({
-							left: slide.offsetLeft - carousel.offsetLeft,
-							behavior: 'smooth'
-						});
-					}
-				});
-			})(i);
+			marker.addEventListener('click', () => {
+				const slide = children[i];
+				if (slide) {
+					carousel.scrollTo({
+						left: slide.offsetLeft - carousel.offsetLeft,
+						behavior: 'smooth'
+					});
+				}
+			});
 
 			markers.push(marker);
 			markersContainer.appendChild(marker);
-		}
+		});
 
-		// Insert markers container into parent
 		parent.appendChild(markersContainer);
 
-		// Setup active marker tracking with IntersectionObserver
 		setupActiveMarkerTracking(carousel, markers, children);
 
-		// Store references
 		carousel._abcsMarkers = markers;
 		carousel._abcsMarkersContainer = markersContainer;
-	}
+	};
 
 	/**
-	 * Tracks which slide is currently visible and highlights the corresponding dot.
-	 * Uses IntersectionObserver for efficient, real-time tracking.
+	 * Suit la diapositive active et met en valeur la puce correspondante.
 	 */
-	function setupActiveMarkerTracking(carousel, markers, children) {
+	const setupActiveMarkerTracking = (carousel, markers, children) => {
 		if (!('IntersectionObserver' in window) || !markers.length) {
-			// Fallback: just set first marker as active
-			if (markers.length) markers[0].classList.add('is-active');
+			if (markers.length) {
+				markers[0].classList.add('is-active');
+				markers[0].setAttribute('aria-selected', 'true');
+			}
 			return;
 		}
 
-		const visibleSlides = new Map();
+		const observer = new IntersectionObserver(() => {
+			const scrollLeft = carousel.scrollLeft;
+			const maxScroll = carousel.scrollWidth - carousel.offsetWidth;
+			let activeIndex = 0;
 
-		const observer = new IntersectionObserver(function (entries) {
-			entries.forEach(function (entry) {
-				if (entry.isIntersecting) {
-					visibleSlides.set(entry.target, entry.intersectionRatio);
-				} else {
-					visibleSlides.delete(entry.target);
-				}
-			});
-
-			// Find the most visible slide
-			var mostVisibleSlide = null;
-			var highestRatio = 0;
-
-			visibleSlides.forEach(function (ratio, slide) {
-				if (ratio > highestRatio) {
-					highestRatio = ratio;
-					mostVisibleSlide = slide;
-				}
-			});
-
-			if (mostVisibleSlide) {
-				var activeIndex = children.indexOf(mostVisibleSlide);
-				markers.forEach(function (marker, index) {
-					if (index === activeIndex) {
-						marker.classList.add('is-active');
-						marker.setAttribute('aria-selected', 'true');
-					} else {
-						marker.classList.remove('is-active');
-						marker.setAttribute('aria-selected', 'false');
+			if (scrollLeft >= maxScroll - 10) {
+				activeIndex = children.length - 1;
+			} else if (scrollLeft <= 10) {
+				activeIndex = 0;
+			} else {
+				let minDistance = Infinity;
+				children.forEach((slide, idx) => {
+					const slidePos = slide.offsetLeft - carousel.offsetLeft;
+					const distance = Math.abs(slidePos - scrollLeft);
+					if (distance < minDistance) {
+						minDistance = distance;
+						activeIndex = idx;
 					}
 				});
 			}
+
+			markers.forEach((marker, index) => {
+				if (index === activeIndex) {
+					marker.classList.add('is-active');
+					marker.setAttribute('aria-selected', 'true');
+				} else {
+					marker.classList.remove('is-active');
+					marker.setAttribute('aria-selected', 'false');
+				}
+			});
 		}, {
 			root: carousel,
 			threshold: [0, 0.25, 0.5, 0.75, 1],
 			rootMargin: '0px'
 		});
 
-		children.forEach(function (child) {
+		children.forEach(child => {
 			observer.observe(child);
 		});
 
-		// Store observer for cleanup
 		carousel._abcsMarkerObserver = observer;
-	}
+	};
 
 	/**
-	 * Updates the SVG icons inside existing navigation buttons.
-	 * Called when arrow style or color changes.
+	 * Met à jour les icônes de navigation.
 	 */
-	function applyArrowIconsToCarousels(color, docContext, overrideConfig) {
+	const applyArrowIconsToCarousels = (color, docContext, overrideConfig) => {
 		const baseDoc = docContext || document;
-
-		if (!baseDoc) {
-			return;
-		}
+		if (!baseDoc) return;
 
 		let carousels = [];
 
@@ -686,7 +581,6 @@
 			carousels = overrideConfig.elements.filter(Boolean);
 		} else {
 			const docsToSearch = new Set();
-
 			if (baseDoc && typeof baseDoc.querySelectorAll === 'function') {
 				docsToSearch.add(baseDoc);
 			}
@@ -698,7 +592,7 @@
 					'.edit-site-visual-editor__editor-canvas',
 				];
 
-				iframeSelectors.forEach((selector) => {
+				iframeSelectors.forEach(selector => {
 					const iframe = document.querySelector(selector);
 					if (iframe && iframe.contentDocument) {
 						docsToSearch.add(iframe.contentDocument);
@@ -706,77 +600,59 @@
 				});
 			}
 
-			docsToSearch.forEach((searchDoc) => {
+			docsToSearch.forEach(searchDoc => {
 				try {
 					const found = Array.from(searchDoc.querySelectorAll('.abcs'));
-					found.forEach((node) => {
+					found.forEach(node => {
 						if (node) {
 							carousels.push(node);
 						}
 					});
 				} catch (e) {
-					// Ignore contexts that are not accessible
+					// Ignorer
 				}
 			});
 		}
 
-		if (!carousels.length) {
-			return;
-		}
+		if (!carousels.length) return;
 
 		carousels = Array.from(new Set(carousels));
-
-		const arrowColorCache = new WeakMap();
-
-		Array.prototype.forEach.call(carousels, function (carousel) {
-			if (!carousel) {
-				return;
-			}
+		carousels.forEach(carousel => {
+			if (!carousel) return;
 
 			const parent = carousel.parentElement;
-
 			if (carousel.classList && carousel.classList.contains('abcs-hide-arrows')) {
 				return;
 			}
 
-			const docForCarousel = carousel && carousel.ownerDocument ? carousel.ownerDocument : baseDoc;
 			const explicitStyle = overrideConfig && overrideConfig.styleKey ? overrideConfig.styleKey : null;
 			const normalizedKey = normalizeStyleKey(explicitStyle || resolveCarouselArrowStyleFromElement(carousel));
-			const styleKey = isValidArrowStyle(normalizedKey) ? normalizedKey : DEFAULT_ARROW_STYLE;
-			let arrowColor = arrowColorCache.get(docForCarousel);
-			if (!arrowColor) {
-				arrowColor = resolveArrowColor(color, docForCarousel);
-				arrowColorCache.set(docForCarousel, arrowColor);
-			}
 
-			// Update real navigation buttons if they exist
+			const arrowColor = resolveButtonColorForCarousel(carousel);
+
 			const prevBtn = carousel._abcsNavPrev || (parent ? parent.querySelector('.abcs-nav-btn--prev') : null);
 			const nextBtn = carousel._abcsNavNext || (parent ? parent.querySelector('.abcs-nav-btn--next') : null);
 
 			if (prevBtn) {
-				prevBtn.innerHTML = generateArrowMarkup('left', arrowColor, styleKey);
+				prevBtn.innerHTML = generateArrowMarkup('left', arrowColor, normalizedKey);
 			}
 			if (nextBtn) {
-				nextBtn.innerHTML = generateArrowMarkup('right', arrowColor, styleKey);
+				nextBtn.innerHTML = generateArrowMarkup('right', arrowColor, normalizedKey);
 			}
 
 			if (carousel.dataset) {
-				carousel.dataset.abcsCarouselArrowStyle = styleKey;
-				carousel.dataset.abcsArrowStyle = styleKey;
+				carousel.dataset.abcsCarouselArrowStyle = normalizedKey;
+				carousel.dataset.abcsArrowStyle = normalizedKey;
 			}
 
 			if (parent && parent.dataset) {
-				parent.dataset.abcsCarouselArrowStyle = styleKey;
-				parent.dataset.abcsArrowStyle = styleKey;
+				parent.dataset.abcsCarouselArrowStyle = normalizedKey;
+				parent.dataset.abcsArrowStyle = normalizedKey;
 			}
 		});
-	}
+	};
 
-	/* ==========================================================================
-	   AUTOPLAY & LOOP
-	   ========================================================================== */
-
-	// Store intervals and state outside function to persist across calls
+	// Stockage des intervalles et statuts hors fonctions
 	const autoplayIntervals = new WeakMap();
 	const autoplayPaused = new WeakMap();
 	const interactionTimeout = new WeakMap();
@@ -785,52 +661,42 @@
 	const isAutoScrollingMap = new WeakMap();
 
 	/**
-	 * Setup loop functionality for autoplay:
-	 * When autoplay scrolls to the end, waits for the configured delay then resets to start.
+	 * Configuration de la boucle de défilement infini pour l'autoplay.
 	 */
-	function setupLoopReset(carousel) {
-		if (loopResetSetup.has(carousel)) {
-			return;
-		}
+	const setupLoopReset = (carousel) => {
+		if (loopResetSetup.has(carousel)) return;
 
 		const isLoopEnabled = carousel.getAttribute('data-abcs-loop') === 'true';
-		if (!isLoopEnabled) {
-			return;
-		}
+		if (!isLoopEnabled) return;
 
-		if (!carousel.firstElementChild) {
-			return;
-		}
+		if (!carousel.firstElementChild) return;
 
 		let isResetting = false;
 		const autoplayDelay = parseInt(carousel.getAttribute('data-abcs-autoplay-delay'), 10) || 3000;
 
-		function isAtEnd() {
+		const isAtEnd = () => {
 			return carousel.scrollLeft + carousel.offsetWidth >= carousel.scrollWidth - 5;
-		}
+		};
 
-		function resetToStart() {
+		const resetToStart = () => {
 			if (isResetting) return;
 			isResetting = true;
 			carousel.style.scrollBehavior = 'auto';
 			carousel.scrollTo({ left: 0, behavior: 'auto' });
 			carousel.style.scrollBehavior = '';
-			// Update button states after reset
 			if (carousel._abcsUpdateButtonStates) {
 				carousel._abcsUpdateButtonStates();
 			}
-			setTimeout(function () {
+			setTimeout(() => {
 				isResetting = false;
 			}, 100);
-		}
+		};
 
 		let scrollTimeout = null;
 		let wasAtEnd = false;
 
-		function handleScroll() {
-			if (isResetting) {
-				return;
-			}
+		const handleScroll = () => {
+			if (isResetting) return;
 
 			const atEnd = isAtEnd();
 			const isAutoplayActive = isAutoScrollingMap.get(carousel);
@@ -839,11 +705,10 @@
 				clearTimeout(scrollTimeout);
 			}
 
-			// When autoplay reaches the end, reset after a delay
 			if (wasAtEnd && atEnd && isAutoplayActive) {
-				scrollTimeout = setTimeout(function () {
+				scrollTimeout = setTimeout(() => {
 					if (isAtEnd() && !isResetting) {
-						setTimeout(function () {
+						setTimeout(() => {
 							if (!isResetting) {
 								resetToStart();
 							}
@@ -853,11 +718,11 @@
 			}
 
 			wasAtEnd = atEnd;
-		}
+		};
 
 		carousel.addEventListener('scroll', handleScroll, { passive: true });
 
-		carousel._abcsLoopCleanup = function () {
+		carousel._abcsLoopCleanup = () => {
 			carousel.removeEventListener('scroll', handleScroll);
 			if (scrollTimeout) {
 				clearTimeout(scrollTimeout);
@@ -866,29 +731,23 @@
 		};
 
 		loopResetSetup.add(carousel);
-	}
+	};
 
-	function initAutoplay() {
+	const initAutoplay = () => {
 		const carousels = document.querySelectorAll('.abcs[data-abcs-autoplay="true"]');
 
-		carousels.forEach(function (carousel) {
-			// Skip if already initialized
-			if (autoplayInitialized.has(carousel)) {
-				return;
-			}
+		carousels.forEach(carousel => {
+			if (autoplayInitialized.has(carousel)) return;
 
-			// Skip if carousel has no children
-			if (!carousel.firstElementChild) {
-				return;
-			}
+			if (!carousel.firstElementChild) return;
 
 			const autoplayDelay = parseInt(carousel.getAttribute('data-abcs-autoplay-delay'), 10) || 3000;
 			const isLoopEnabled = carousel.getAttribute('data-abcs-loop') === 'true';
 
-			// Setup loop reset if loop is enabled
 			if (isLoopEnabled) {
 				setupLoopReset(carousel);
 			}
+
 			let intervalId = null;
 			let isPaused = false;
 			let isHoverPaused = false;
@@ -896,31 +755,23 @@
 			let isAutoScrolling = false;
 			const RESUME_DELAY = 2000;
 
-			// Check if carousel is at the end
-			function isAtEnd() {
-				if (isLoopEnabled) {
-					return false;
-				}
+			const isAtEnd = () => {
+				if (isLoopEnabled) return false;
 				const threshold = 5;
 				return carousel.scrollLeft + carousel.offsetWidth >= carousel.scrollWidth - threshold;
-			}
+			};
 
-			// Scroll to next slide
-			function scrollToNext() {
+			const scrollToNext = () => {
 				const slideWidth = getSlideWidth(carousel);
-				if (slideWidth === 0) {
-					return;
-				}
+				if (slideWidth === 0) return;
 
 				const currentScroll = carousel.scrollLeft;
 				const nextScroll = currentScroll + slideWidth;
 
-				// If loop is disabled, check if we're at the end
 				if (!isLoopEnabled) {
 					const threshold = 5;
 					const isAtEndNow = currentScroll + carousel.offsetWidth >= carousel.scrollWidth - threshold;
 					if (isAtEndNow) {
-						// Stop autoplay if at the end and loop is disabled
 						if (intervalId) {
 							clearInterval(intervalId);
 							intervalId = null;
@@ -930,7 +781,6 @@
 					}
 				}
 
-				// With loop enabled, the reset handler will detect the end and jump to start
 				isAutoScrolling = true;
 				isAutoScrollingMap.set(carousel, true);
 				carousel.scrollTo({
@@ -938,47 +788,36 @@
 					behavior: 'smooth'
 				});
 
-				// Keep the flag active longer to allow handler to detect end during smooth scroll
-				setTimeout(function () {
+				setTimeout(() => {
 					isAutoScrolling = false;
 					isAutoScrollingMap.set(carousel, false);
 				}, 700);
-			}
+			};
 
-			// Start autoplay
-			function startAutoplay() {
-				if (intervalId || (!isLoopEnabled && isAtEnd())) {
-					return;
-				}
+			const startAutoplay = () => {
+				if (intervalId || (!isLoopEnabled && isAtEnd())) return;
 
-				intervalId = setInterval(function () {
+				intervalId = setInterval(() => {
 					if (!isPaused) {
 						scrollToNext();
 					}
 				}, autoplayDelay);
 				autoplayIntervals.set(carousel, intervalId);
-			}
+			};
 
-			// Pause autoplay
-			function pauseAutoplay() {
+			const pauseAutoplay = () => {
 				isPaused = true;
 				autoplayPaused.set(carousel, true);
-			}
+			};
 
-			// Resume autoplay
-			function resumeAutoplay() {
-				if (!isLoopEnabled && isAtEnd()) {
-					return;
-				}
+			const resumeAutoplay = () => {
+				if (!isLoopEnabled && isAtEnd()) return;
 				isPaused = false;
 				autoplayPaused.delete(carousel);
-			}
+			};
 
-			// Handle interaction - pause and resume after delay
-			function handleInteraction() {
-				if (isAutoScrolling || isAutoScrollingMap.get(carousel)) {
-					return;
-				}
+			const handleInteraction = () => {
+				if (isAutoScrolling || isAutoScrollingMap.get(carousel)) return;
 
 				pauseAutoplay();
 
@@ -986,7 +825,7 @@
 					clearTimeout(interactionTimeoutId);
 				}
 
-				interactionTimeoutId = setTimeout(function () {
+				interactionTimeoutId = setTimeout(() => {
 					if (!isHoverPaused) {
 						resumeAutoplay();
 					}
@@ -994,35 +833,29 @@
 				}, RESUME_DELAY);
 
 				interactionTimeout.set(carousel, interactionTimeoutId);
-			}
+			};
 
-			// Event listeners for pause on hover
-			const handleMouseEnter = function () {
+			const handleMouseEnter = () => {
 				isHoverPaused = true;
 				pauseAutoplay();
 			};
-			const handleMouseLeave = function () {
+			const handleMouseLeave = () => {
 				isHoverPaused = false;
 				if (isLoopEnabled || !isAtEnd()) {
 					resumeAutoplay();
 				}
 			};
+
 			carousel.addEventListener('mouseenter', handleMouseEnter);
 			carousel.addEventListener('mouseleave', handleMouseLeave);
-
-			// Event listeners for pause on interaction
 			carousel.addEventListener('scroll', handleInteraction, { passive: true });
 			carousel.addEventListener('touchstart', handleInteraction, { passive: true });
 			carousel.addEventListener('mousedown', handleInteraction);
 
-			// Start autoplay
 			startAutoplay();
-
-			// Mark as initialized
 			autoplayInitialized.add(carousel);
 
-			// Cleanup function
-			carousel._abcsAutoplayCleanup = function () {
+			carousel._abcsAutoplayCleanup = () => {
 				if (intervalId) {
 					clearInterval(intervalId);
 					intervalId = null;
@@ -1040,69 +873,59 @@
 				carousel.removeEventListener('mousedown', handleInteraction);
 			};
 		});
-	}
+	};
 
-	// Main initialisation function
-	function initCarousel() {
+	const initCarousel = () => {
 		injectMinWidthVariables();
 		injectPaddingVariables();
 		injectNavigationUI();
 		applyArrowIconsToCarousels(null, document);
 
-		// Setup loop reset for all carousels with loop enabled
 		const loopCarousels = document.querySelectorAll('.abcs[data-abcs-loop="true"]');
-		loopCarousels.forEach(function (carousel) {
+		loopCarousels.forEach(carousel => {
 			if (carousel.firstElementChild) {
 				setupLoopReset(carousel);
 			}
 		});
 
 		initAutoplay();
-	}
+	};
 
-	// Run on DOM ready
-	// Use requestAnimationFrame to make sure CSS has loaded
-	function initWhenReady() {
+	const initWhenReady = () => {
 		if (document.readyState === 'loading') {
-			document.addEventListener('DOMContentLoaded', function () {
-				// Wait for CSS to settle
-				requestAnimationFrame(function () {
+			document.addEventListener('DOMContentLoaded', () => {
+				requestAnimationFrame(() => {
 					requestAnimationFrame(initCarousel);
 				});
 			});
 		} else {
-			// DOM already loaded; still wait for CSS to settle
-			requestAnimationFrame(function () {
+			requestAnimationFrame(() => {
 				requestAnimationFrame(initCarousel);
 			});
 		}
-	}
+	};
 
 	initWhenReady();
 
-	// Run again after load (in case styles were loaded later)
-	window.addEventListener('load', function () {
-		// Check whether --carousel-min-width is missing on some carousels
+	window.addEventListener('load', () => {
 		const carousels = document.querySelectorAll('.abcs.abcs-min-width');
 		let needsMinWidthUpdate = false;
-		carousels.forEach(function (carousel) {
-			const computedStyle = window.getComputedStyle(carousel);
-			const minWidth = computedStyle.getPropertyValue('--carousel-min-width');
+		carousels.forEach(carousel => {
+			const minWidth = window.getComputedStyle(carousel).getPropertyValue('--carousel-min-width');
 			if (!minWidth || minWidth.trim() === '') {
 				needsMinWidthUpdate = true;
 			}
 		});
 
-		// Always re-inject padding variables in case styles were deferred.
 		if (needsMinWidthUpdate) {
-			requestAnimationFrame(function () {
-				requestAnimationFrame(function () {
+			requestAnimationFrame(() => {
+				requestAnimationFrame(() => {
 					initCarousel();
 				});
 			});
 		} else {
-			requestAnimationFrame(function () {
-				requestAnimationFrame(function () {
+			requestAnimationFrame(() => {
+				requestAnimationFrame(() => {
 					injectPaddingVariables();
 					applyArrowIconsToCarousels(null, document);
 					initAutoplay();
@@ -1111,39 +934,32 @@
 		}
 	});
 
-	// Handle dynamically added carousels with MutationObserver
-	function setupAutoplayObserver() {
-		// Only set up observer if MutationObserver is available
-		if (typeof MutationObserver === 'undefined') {
-			return;
-		}
+	const setupAutoplayObserver = () => {
+		if (typeof MutationObserver === 'undefined') return;
 
-		const observer = new MutationObserver(function (mutations) {
+		const observer = new MutationObserver(mutations => {
 			let shouldInit = false;
-			mutations.forEach(function (mutation) {
-				mutation.addedNodes.forEach(function (node) {
-					if (node.nodeType === 1) { // Element node
+			mutations.forEach(mutation => {
+				mutation.addedNodes.forEach(node => {
+					if (node.nodeType === 1) {
 						if (node.classList && node.classList.contains('abcs')) {
 							shouldInit = true;
 						}
-						if (node.querySelectorAll) {
-							const foundCarousels = node.querySelectorAll('.abcs');
-							if (foundCarousels.length > 0) {
-								shouldInit = true;
-							}
+						if (node.querySelectorAll && node.querySelectorAll('.abcs').length > 0) {
+							shouldInit = true;
 						}
 					}
 				});
 			});
 
 			if (shouldInit) {
-				requestAnimationFrame(function () {
+				requestAnimationFrame(() => {
 					injectNavigationUI();
 					applyArrowIconsToCarousels(null, document);
 					initAutoplay();
 
 					const loopCarousels = document.querySelectorAll('.abcs[data-abcs-loop="true"]');
-					loopCarousels.forEach(function (carousel) {
+					loopCarousels.forEach(carousel => {
 						if (carousel.firstElementChild && !loopResetSetup.has(carousel)) {
 							setupLoopReset(carousel);
 						}
@@ -1152,25 +968,21 @@
 			}
 		});
 
-		// Start observing the document body for added nodes
 		observer.observe(document.body, {
 			childList: true,
 			subtree: true
 		});
-	}
+	};
 
-	// Set up observer after initial load
 	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', function () {
-			setupAutoplayObserver();
-		});
+		document.addEventListener('DOMContentLoaded', setupAutoplayObserver);
 	} else {
 		setupAutoplayObserver();
 	}
 
 	if (typeof window !== 'undefined') {
 		window.abcsCarousel = window.abcsCarousel || {};
-		window.abcsCarousel.applyArrowIconsToCarousels = function (color, context, overrideConfig) {
+		window.abcsCarousel.applyArrowIconsToCarousels = (color, context, overrideConfig) => {
 			const normalizedConfig = overrideConfig ? {
 				...overrideConfig,
 				styleKey: normalizeStyleKey(overrideConfig.styleKey),
@@ -1180,5 +992,4 @@
 		window.abcsCarousel.initAutoplay = initAutoplay;
 		window.abcsCarousel.injectNavigationUI = injectNavigationUI;
 	}
-
 })();

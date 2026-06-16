@@ -115,15 +115,6 @@
 	padding-right: initial;
 }
 
-/* Cover block carousel full-width support */
-.abcs:has(.wp-block-cover),
-.block-editor-block-list__layout .abcs:has(.wp-block-cover),
-.editor-styles-wrapper .abcs:has(.wp-block-cover) {
-	padding-left: 0 !important;
-	padding-right: 0 !important;
-	scroll-padding-left: 0 !important;
-	scroll-padding-right: 0 !important;
-}
 
 .abcs .has-background,
 .block-editor-block-list__layout .abcs .has-background,
@@ -436,6 +427,37 @@
 	opacity: 0 !important;
 	visibility: hidden !important;
 	pointer-events: none !important;
+}
+
+/* ==========================================================================
+   SNAP STOP, ALIGNMENT & STYLE OPTIONS
+   ========================================================================== */
+
+/* Snap Stop */
+.abcs.abcs-snap-stop > *,
+.block-editor-block-list__layout .abcs.abcs-snap-stop > *,
+.editor-styles-wrapper .abcs.abcs-snap-stop > * {
+	scroll-snap-stop: always !important;
+}
+
+/* Markers alignment options */
+.abcs.abcs-markers-align-left ~ .abcs-markers {
+	justify-content: flex-start !important;
+}
+
+.abcs.abcs-markers-align-center ~ .abcs-markers {
+	justify-content: center !important;
+}
+
+.abcs.abcs-markers-align-right ~ .abcs-markers {
+	justify-content: flex-end !important;
+}
+
+/* Markers style options (dots/lines) */
+.abcs.abcs-markers-style-lines ~ .abcs-markers .abcs-marker {
+	border-radius: 2px !important;
+	width: 24px !important;
+	height: 4px !important;
 }
 
 /* ==========================================================================
