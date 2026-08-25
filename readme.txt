@@ -2,9 +2,9 @@
 Contributors: weblazer
 Tags: carousel, slider, block, gutenberg, woocommerce
 Requires at least: 6.0
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.1.0
+Stable tag: 2.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -174,6 +174,9 @@ Yes! Navigation buttons, pagination dots, and scroll behavior all use standard H
 5. Native Gallery block displayed in carousel slider mode.
 
 == Changelog ==
+
+= 2.1.1 - 2026-08-25 =
+* 🔧 Maintenance: Updated WordPress compatibility up to 7.1.
 
 = 2.1.0 - 2026-06-16 =
 * 🚀 Refactoring: Modernized codebases to clean ES6 Javascript and consolidated redundant utility logic in carousel-shared.js.

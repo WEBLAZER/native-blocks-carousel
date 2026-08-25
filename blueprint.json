@@ -11,14 +11,14 @@
 			"step": "installPlugin",
 			"pluginData": {
 				"resource": "url",
-				"url": "https://native-blocks-carousel.weblazer.fr/playground/plugin.zip?v=1780655650"
+				"url": "https://native-blocks-carousel.weblazer.fr/playground/plugin.zip?v=1787643081"
 			}
 		},
 		{
 			"step": "installTheme",
 			"themeData": {
 				"resource": "url",
-				"url": "https://native-blocks-carousel.weblazer.fr/playground/theme.zip?v=1780655650"
+				"url": "https://native-blocks-carousel.weblazer.fr/playground/theme.zip?v=1787643081"
 			}
 		},
 		{
@@ -31,13 +31,13 @@
 		},
 		{
 			"step": "runPHP",
-			"code": "<?php \nrequire_once 'wp-load.php';\nwp_delete_post( 1, true ); // Hello World\nwp_delete_post( 2, true ); // Sample Page\n"
+			"code": "<?php \nrequire_once 'wp-load.php';\nupdate_option('uploads_use_yearmonth_folders', 0);\nwp_delete_post( 1, true ); // Hello World\nwp_delete_post( 2, true ); // Sample Page\n"
 		},
 		{
 			"step": "importWxr",
 			"file": {
 				"resource": "url",
-				"url": "https://native-blocks-carousel.weblazer.fr/playground/demo-home.xml?v=1780655650"
+				"url": "https://native-blocks-carousel.weblazer.fr/playground/demo-home.xml?v=1787643081"
 			}
 		},
 		{
