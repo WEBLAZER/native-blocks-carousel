@@ -38,6 +38,10 @@ class Activator
                 \esc_html__('PHP version too low', 'native-blocks-carousel')
             );
         }
+
+        if (!\get_option('abcs_first_activated')) {
+            \update_option('abcs_first_activated', \time(), false);
+        }
     }
 
     /**

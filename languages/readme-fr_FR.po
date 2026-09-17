@@ -1,0 +1,92 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Any Block Carousel Slider Readme 2.2.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/native-blocks-carousel\n"
+"POT-Creation-Date: 2026-09-17 12:00+0000\n"
+"PO-Revision-Date: 2026-09-17 12:00+0000\n"
+"Last-Translator: Arthur Ballan <contact@weblazer.fr>\n"
+"Language-Team: French <fr_FR@li.org>\n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Antigravity\n"
+
+msgid "Any Block Carousel Slider – Native Gutenberg & Query Loop Carousel"
+msgstr "Any Block Carousel Slider – Carrousel Gutenberg natif & Boucle de requête"
+
+msgid "Turn Gutenberg Query Loop, Group & Gallery blocks into responsive CSS carousels. Lightweight, zero dependencies, loop & autoplay."
+msgstr "Transformez vos blocs Boucle de requête, Groupe et Galerie en carrousels CSS réactifs. Léger, sans dépendance, boucle et autoplay."
+
+msgid "Any Block Carousel Slider is a Gutenberg carousel slider block plugin that instantly converts supported native WordPress blocks (Query Loop/Post Template, Group, Gallery) into a responsive carousel slider. Simply enable the \"Carousel\" toggle in the Gutenberg editor: your content stays 100% native, your DOM stays lightweight, and your Lighthouse performance scores remain intact. This includes WooCommerce product listings rendered via the Query Loop/Post Template block, so you can showcase products without relying on the legacy Products block."
+msgstr "Any Block Carousel Slider est une extension pour l'éditeur Gutenberg qui transforme instantanément les blocs natifs WordPress pris en charge (Boucle de requête / Modèle de publication, Groupe, Galerie) en un carrousel / slider réactif. Activez simplement l'option « Carrousel » dans l'inspecteur Gutenberg : votre contenu reste 100 % natif, votre DOM reste ultra-léger et vos scores de performance Lighthouse restent intacts. Cela inclut les grilles de produits WooCommerce affichées via le bloc Boucle de requête / Modèle de publication, vous permettant de présenter vos produits sans dépendre de l'ancien bloc Produits."
+
+msgid "Try it out"
+msgstr "Essayez-le"
+
+msgid "Experience the plugin in seconds without installing anything! Launch our interactive demo:"
+msgstr "Testez l'extension en quelques secondes sans rien installer ! Lancez notre démonstration interactive :"
+
+msgid "Launch Playground Demo"
+msgstr "Lancer la démo Playground"
+
+msgid "Unlike many all-in-one carousel slider blocks that require you to add a dedicated \"Carousel\" block and rebuild every slide, Any Block Carousel Slider hooks straight into the Gutenberg blocks you already use. The result: a Query Loop/Post Template, Group, or Gallery block can become a carousel slider in one click, without content duplication or extra maintenance."
+msgstr "Contrairement aux blocs de carrousel tout-en-un qui vous obligent à insérer un bloc « Carrousel » dédié et à reconstruire chaque diapositive, Any Block Carousel Slider se greffe directement sur les blocs Gutenberg que vous utilisez déjà. Résultat : une Boucle de requête, un bloc Groupe ou une Galerie devient un carrousel en un clic, sans duplication de contenu ni maintenance superflue."
+
+msgid "Why Any Block Carousel Slider instead of a dedicated carousel slider block?"
+msgstr "Pourquoi Any Block Carousel Slider plutôt qu'un bloc carrousel dédié ?"
+
+msgid "WordPress loops without friction"
+msgstr "Boucles WordPress sans friction"
+
+msgid "Transform Query Loop and Post Template Gutenberg blocks into a \"loop slider\" without creating a block per slide."
+msgstr "Transformez les blocs Gutenberg Boucle de requête et Modèle de publication en carrousels de boucles sans créer un bloc par diapositive."
+
+msgid "Familiar editorial experience"
+msgstr "Expérience éditoriale familière"
+
+msgid "Content editors keep the Gutenberg interface they know (patterns, global styles, alignments, inner blocks)."
+msgstr "Les éditeurs de contenu conservent l'interface Gutenberg qu'ils connaissent (compositions, styles globaux, alignements, blocs internes)."
+
+msgid "Native scroll & performance"
+msgstr "Défilement natif & performance"
+
+msgid "Native CSS scroll-snap layout, GPU-friendly, no heavy Swiper/Slick bundle to load. Only a lightweight script handles navigation, loops, and autoplay."
+msgstr "Mise en page CSS scroll-snap native, optimisée pour le GPU, aucun paquet lourd Swiper/Slick à charger. Seul un script très léger gère la navigation, les boucles et la lecture automatique."
+
+msgid "Full compatibility"
+msgstr "Compatibilité totale"
+
+msgid "Works with classic themes and block themes while respecting the structure of your Query Loop/Post Template, Group, and Gallery blocks."
+msgstr "Fonctionne avec les thèmes classiques et les thèmes basés sur les blocs (FSE) tout en respectant la structure de vos blocs Boucle de requête, Groupe et Galerie."
+
+msgid "Accessibility + SEO"
+msgstr "Accessibilité + SEO"
+
+msgid "Keyboard navigation, respects prefers-reduced-motion preferences, clean DOM for crawling."
+msgstr "Navigation au clavier, respect des préférences prefers-reduced-motion, DOM propre pour l'exploration par les moteurs de recherche."
+
+msgid "What you can do in 30 seconds"
+msgstr "Ce que vous pouvez faire en 30 secondes"
+
+msgid "Quick comparison"
+msgstr "Comparatif rapide"
+
+msgid "Key features"
+msgstr "Fonctionnalités clés"
+
+msgid "Native Gutenberg block workflow"
+msgstr "Flux de travail natif dans l'éditeur Gutenberg"
+
+msgid "Advanced customization"
+msgstr "Personnalisation avancée"
+
+msgid "Technical architecture"
+msgstr "Architecture technique"
+
+msgid "How to use the plugin"
+msgstr "Comment utiliser l'extension"
+
+msgid "Frequently Asked Questions"
+msgstr "Foire Aux Questions (FAQ)"

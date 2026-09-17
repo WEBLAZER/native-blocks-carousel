@@ -1,0 +1,230 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Any Block Carousel Slider 2.2.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/native-blocks-carousel\n"
+"POT-Creation-Date: 2026-09-17 12:00+0000\n"
+"PO-Revision-Date: 2026-09-17 12:00+0000\n"
+"Last-Translator: Arthur Ballan <contact@weblazer.fr>\n"
+"Language-Team: French <fr_FR@li.org>\n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Antigravity\n"
+
+msgid "This plugin requires WordPress 6.0 or later."
+msgstr "Cette extension nécessite WordPress 6.0 ou une version ultérieure."
+
+msgid "WordPress version too low"
+msgstr "Version de WordPress trop ancienne"
+
+msgid "This plugin requires PHP 7.4 or later."
+msgstr "Cette extension nécessite PHP 7.4 ou une version ultérieure."
+
+msgid "PHP version too low"
+msgstr "Version de PHP trop ancienne"
+
+msgid "Chevron"
+msgstr "Chevron"
+
+msgid "Arrow"
+msgstr "Flèche"
+
+msgid "Angles"
+msgstr "Angles"
+
+msgid "Dots"
+msgstr "Puces"
+
+msgid "Lines"
+msgstr "Lignes"
+
+msgid "Left"
+msgstr "Gauche"
+
+msgid "Center"
+msgstr "Centre"
+
+msgid "Right"
+msgstr "Droite"
+
+msgid "Carousel"
+msgstr "Carrousel"
+
+msgid "Enable carousel"
+msgstr "Activer le carrousel"
+
+msgid "Display navigation arrows"
+msgstr "Afficher les flèches de navigation"
+
+msgid "Display pagination markers"
+msgstr "Afficher les indicateurs de pagination"
+
+msgid "Markers layout & style"
+msgstr "Disposition & style des indicateurs"
+
+msgid "Markers style"
+msgstr "Style des indicateurs"
+
+msgid "Markers alignment"
+msgstr "Alignement des indicateurs"
+
+msgid "Enable loop"
+msgstr "Activer le mode boucle"
+
+msgid "Force stop on each slide (Snap Stop)"
+msgstr "Arrêt forcé sur chaque diapositive (Snap Stop)"
+
+msgid "Enable autoplay"
+msgstr "Activer la lecture automatique (Autoplay)"
+
+msgid "Autoplay delay (ms)"
+msgstr "Délai de lecture automatique (ms)"
+
+msgid "Arrow style & position"
+msgstr "Style & position des flèches"
+
+msgid "Arrow Design"
+msgstr "Design des flèches"
+
+msgid "Position"
+msgstr "Position"
+
+msgid "Arrow offset (px)"
+msgstr "Décalage des flèches (px)"
+
+msgid "Arrow colors"
+msgstr "Couleurs des flèches"
+
+msgid "Arrow color"
+msgstr "Couleur des flèches"
+
+msgid "Arrow background color"
+msgstr "Couleur d'arrière-plan des flèches"
+
+msgid "Carousel is enabled. Set block layout to Grid to control visible columns."
+msgstr "Le carrousel est activé. Définissez la disposition du bloc sur Grille pour contrôler les colonnes visibles."
+
+msgid "Carousel is enabled. Column width is managed automatically."
+msgstr "Le carrousel est activé. La largeur des colonnes est gérée automatiquement."
+
+msgid "Carousel is enabled. The number of visible columns is detected automatically from the gallery settings."
+msgstr "Le carrousel est activé. Le nombre de colonnes visibles est détecté automatiquement à partir des réglages de la galerie."
+
+msgid "Any Block Carousel Slider"
+msgstr "Any Block Carousel Slider"
+
+msgid "https://wordpress.org/plugins/native-blocks-carousel/"
+msgstr "https://wordpress.org/plugins/native-blocks-carousel/"
+
+msgid "Transform any WordPress block into a responsive carousel using native CSS scroll-snap. Lightweight JS handles navigation, loops, and autoplay."
+msgstr "Transformez n'importe quel bloc WordPress en carrousel réactif grâce au CSS scroll-snap natif. Un script léger gère la navigation, les boucles et la lecture automatique."
+
+msgid "WEB LAZER"
+msgstr "WEB LAZER"
+
+msgid "https://weblazer.fr"
+msgstr "https://weblazer.fr"
+
+msgid "Previous slide"
+msgstr "Diapositive précédente"
+
+msgid "Next slide"
+msgstr "Diapositive suivante"
+
+msgid "Go to slide %d"
+msgstr "Aller à la diapositive %d"
+
+msgid "Carousel navigation controls"
+msgstr "Commandes de navigation du carrousel"
+
+msgid "Carousel pagination markers"
+msgstr "Indicateurs de pagination du carrousel"
+
+msgid "Auto mode is recommended to preserve item dimensions. Set Grid layout to Auto to prevent columns from stretching."
+msgstr "Le mode Auto est recommandé pour préserver les dimensions des éléments. Réglez la disposition de la Grille sur Auto pour éviter l'étirement des colonnes."
+
+msgid "Grid mode (fixed columns) is recommended for Post Templates. Set Grid layout to Manual to define the exact column count."
+msgstr "Le mode Grille (colonnes fixes) est recommandé pour les Modèles de publication. Réglez la disposition de la Grille sur Manuel pour définir le nombre exact de colonnes."
+
+msgid "Grid layout detected. You can control the exact number of visible columns."
+msgstr "Disposition en grille détectée. Vous pouvez contrôler le nombre exact de colonnes visibles."
+
+msgid "Auto mode detected. Item width is fixed and responsive."
+msgstr "Mode Auto détecté. La largeur des éléments est fixe et réactive."
+
+msgid "Automatic detection"
+msgstr "Détection automatique"
+
+msgid "Manual mode (fixed columns)"
+msgstr "Mode Manuel (colonnes fixes)"
+
+msgid "Auto mode (fixed width)"
+msgstr "Mode Auto (largeur fixe)"
+
+msgid "Users can swipe past multiple slides quickly."
+msgstr "Les utilisateurs peuvent faire défiler plusieurs diapositives rapidement."
+
+msgid "Scrolling will stop on every slide, preventing users from skipping multiple slides at once."
+msgstr "Le défilement s'arrêtera à chaque diapositive, empêchant les utilisateurs de sauter plusieurs diapositives à la fois."
+
+msgid "Transform any WordPress block into a performant carousel with native CSS scroll-snap. Lightweight JavaScript handles navigation, loops, and autoplay. Works with Gallery, Post Template, and Group blocks."
+msgstr "Transformez n'importe quel bloc WordPress en carrousel performant grâce au CSS scroll-snap natif. Un script JavaScript léger gère la navigation, les boucles et la lecture automatique. Fonctionne avec les blocs Galerie, Modèle de publication et Groupe."
+
+msgid "Time in milliseconds between each slide transition."
+msgstr "Temps en millisecondes entre chaque transition de diapositive."
+
+msgid "Autoplay is disabled. Users must navigate manually."
+msgstr "La lecture automatique est désactivée. Les utilisateurs doivent naviguer manuellement."
+
+msgid "The carousel will automatically scroll through slides."
+msgstr "Le carrousel fera défiler automatiquement les diapositives."
+
+msgid "Loop is disabled. The carousel stops at the end."
+msgstr "Le mode boucle est désactivé. Le carrousel s'arrête à la fin."
+
+msgid "The carousel will loop infinitely, returning to the first slide after the last."
+msgstr "Le carrousel défilera en boucle infinie, revenant à la première diapositive après la dernière."
+
+msgid "https://profiles.wordpress.org/weblazer/"
+msgstr "https://profiles.wordpress.org/weblazer/"
+
+msgid "weblazer"
+msgstr "weblazer"
+
+msgid "Pagination markers are hidden for a cleaner layout."
+msgstr "Les indicateurs de pagination sont masqués pour une mise en page plus épurée."
+
+msgid "Pagination markers are displayed below the carousel."
+msgstr "Les indicateurs de pagination sont affichés sous le carrousel."
+
+msgid "Arrows are hidden. Users can navigate via swipe or scroll."
+msgstr "Les flèches sont masquées. Les utilisateurs peuvent naviguer par balayage ou défilement."
+
+msgid "Navigation arrows are visible on the carousel."
+msgstr "Les flèches de navigation sont visibles sur le carrousel."
+
+msgid "Enable to convert this block into a carousel with navigation. You can then choose Manual mode (column count) or Auto mode (minimum column width)."
+msgstr "Activez pour convertir ce bloc en carrousel avec navigation. Vous pourrez ensuite choisir le mode Manuel (nombre de colonnes) ou le mode Auto (largeur minimale de colonne)."
+
+msgid "Carousel is enabled. Items scroll horizontally."
+msgstr "Le carrousel est activé. Les éléments défilent horizontalement."
+
+msgid "Carousel is enabled. Configure the column count or minimum width in the grid settings."
+msgstr "Le carrousel est activé. Configurez le nombre de colonnes ou la largeur minimale dans les réglages de la grille."
+
+msgid "Vous aimez Any Block Carousel Slider ?"
+msgstr "Vous aimez Any Block Carousel Slider ?"
+
+msgid "Merci d'utiliser notre extension ! Si elle vous fait gagner du temps dans la création de vos carrousels Gutenberg, pourriez-vous prendre 1 minute pour lui laisser une note de 5 étoiles sur WordPress.org ? Cela aide énormément le développement indépendant !"
+msgstr "Merci d'utiliser notre extension ! Si elle vous fait gagner du temps dans la création de vos carrousels Gutenberg, pourriez-vous prendre 1 minute pour lui laisser une note de 5 étoiles sur WordPress.org ? Cela aide énormément le développement indépendant !"
+
+msgid "Laisser un avis 5 étoiles"
+msgstr "Laisser un avis 5 étoiles"
+
+msgid "Remettre à plus tard (14j)"
+msgstr "Remettre à plus tard (14j)"
+
+msgid "Déjà fait / Ne plus afficher"
+msgstr "Déjà fait / Ne plus afficher"

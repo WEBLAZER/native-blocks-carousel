@@ -6,7 +6,7 @@
  * Compatible with Block Editor and frontend
  *
  * @package AnyBlockCarouselSlider
- * @version 1.0.4.1
+ * @version 2.2.0
  * @author weblazer35
  */
 
@@ -46,6 +46,7 @@
 
 .abcs {
 	position: relative !important;
+	--carousel-gap-x: var(--carousel-block-gap-x, var(--wp--style--unstable-gallery-gap, var(--wp--style--block-gap, 1rem)));
 }
 
 /* Ensure the direct parent is also positioned relative */
@@ -136,10 +137,9 @@
 .wp-block-gallery.abcs>.wp-block-image,
 .block-editor-block-list__layout .wp-block-gallery.abcs>.wp-block-image,
 .editor-styles-wrapper .wp-block-gallery.abcs>.wp-block-image {
-	flex: 0 0 auto;
-	width: calc(16.666% - var(--wp--style--block-gap, 1rem) * 5 / 6);
-	min-width: calc(16.666% - var(--wp--style--block-gap, 1rem) * 5 / 6);
-	max-width: 100%;
+	flex: 0 0 auto !important;
+	flex-grow: 0 !important;
+	flex-shrink: 0 !important;
 	scroll-snap-align: start;
 }
 
@@ -481,10 +481,20 @@
 	min-width: 100% !important;
 }
 
-/* Mobile (default) - 2 columns for Gallery */
+/* Mobile (default <600px) - 2 columns for Gallery */
 .wp-block-gallery.abcs .wp-block-image {
-	width: calc(50% - var(--wp--style--block-gap, 1rem) / 2) !important;
-	min-width: calc(50% - var(--wp--style--block-gap, 1rem) / 2) !important;
+	--carousel-grid-item-width: calc(50% - var(--carousel-gap-x, 1rem) / 2);
+	flex: 0 0 var(--carousel-grid-item-width) !important;
+	flex-grow: 0 !important;
+	flex-shrink: 0 !important;
+	width: var(--carousel-grid-item-width) !important;
+	min-width: var(--carousel-grid-item-width) !important;
+	max-width: var(--carousel-grid-item-width) !important;
+}
+
+.wp-block-gallery.abcs.abcs-cols-1 .wp-block-image,
+.wp-block-gallery.abcs.columns-1 .wp-block-image {
+	--carousel-grid-item-width: 100%;
 }
 
 /* From 600px onwards - behaviour determined by column count */
@@ -559,41 +569,55 @@
 	}
 
 	/* Gallery columns */
-	.wp-block-gallery.abcs.abcs-cols-1 .wp-block-image {
+	.wp-block-gallery.abcs.abcs-cols-1 .wp-block-image,
+	.wp-block-gallery.abcs.columns-1 .wp-block-image {
 		--carousel-grid-item-width: 100%;
 	}
 
-	.wp-block-gallery.abcs.abcs-cols-2 .wp-block-image {
-		--carousel-grid-item-width: calc(50% - var(--wp--style--block-gap, 1rem) / 2);
+	.wp-block-gallery.abcs.abcs-cols-2 .wp-block-image,
+	.wp-block-gallery.abcs.columns-2 .wp-block-image {
+		--carousel-grid-item-width: calc(50% - var(--carousel-gap-x, 1rem) / 2);
 	}
 
-	.wp-block-gallery.abcs.abcs-cols-3 .wp-block-image {
-		--carousel-grid-item-width: calc(33.33333% - var(--wp--style--block-gap, 1rem) * 2 / 3);
+	.wp-block-gallery.abcs.abcs-cols-3 .wp-block-image,
+	.wp-block-gallery.abcs.columns-3 .wp-block-image,
+	.wp-block-gallery.abcs.columns-default .wp-block-image {
+		--carousel-grid-item-width: calc(33.33333% - var(--carousel-gap-x, 1rem) * 2 / 3);
 	}
 
-	.wp-block-gallery.abcs.abcs-cols-4 .wp-block-image {
-		--carousel-grid-item-width: calc(25% - var(--wp--style--block-gap, 1rem) * 3 / 4);
+	.wp-block-gallery.abcs.abcs-cols-4 .wp-block-image,
+	.wp-block-gallery.abcs.columns-4 .wp-block-image {
+		--carousel-grid-item-width: calc(25% - var(--carousel-gap-x, 1rem) * 3 / 4);
 	}
 
-	.wp-block-gallery.abcs.abcs-cols-5 .wp-block-image {
-		--carousel-grid-item-width: calc(20% - var(--wp--style--block-gap, 1rem) * 4 / 5);
+	.wp-block-gallery.abcs.abcs-cols-5 .wp-block-image,
+	.wp-block-gallery.abcs.columns-5 .wp-block-image {
+		--carousel-grid-item-width: calc(20% - var(--carousel-gap-x, 1rem) * 4 / 5);
 	}
 
-	.wp-block-gallery.abcs.abcs-cols-6 .wp-block-image {
-		--carousel-grid-item-width: calc(16.66667% - var(--wp--style--block-gap, 1rem) * 5 / 6);
+	.wp-block-gallery.abcs.abcs-cols-6 .wp-block-image,
+	.wp-block-gallery.abcs.columns-6 .wp-block-image {
+		--carousel-grid-item-width: calc(16.66667% - var(--carousel-gap-x, 1rem) * 5 / 6);
 	}
 
-	.wp-block-gallery.abcs.abcs-cols-7 .wp-block-image {
-		--carousel-grid-item-width: calc(14.285% - var(--wp--style--block-gap, 1rem) * 6 / 7);
+	.wp-block-gallery.abcs.abcs-cols-7 .wp-block-image,
+	.wp-block-gallery.abcs.columns-7 .wp-block-image {
+		--carousel-grid-item-width: calc(14.285% - var(--carousel-gap-x, 1rem) * 6 / 7);
 	}
 
-	.wp-block-gallery.abcs.abcs-cols-8 .wp-block-image {
-		--carousel-grid-item-width: calc(12.5% - var(--wp--style--block-gap, 1rem) * 7 / 8);
+	.wp-block-gallery.abcs.abcs-cols-8 .wp-block-image,
+	.wp-block-gallery.abcs.columns-8 .wp-block-image {
+		--carousel-grid-item-width: calc(12.5% - var(--carousel-gap-x, 1rem) * 7 / 8);
 	}
 
-	.wp-block-gallery.abcs[class*="abcs-cols-"] .wp-block-image {
+	.wp-block-gallery.abcs[class*="abcs-cols-"] .wp-block-image,
+	.wp-block-gallery.abcs[class*="columns-"] .wp-block-image {
+		flex: 0 0 var(--carousel-grid-item-width) !important;
+		flex-grow: 0 !important;
+		flex-shrink: 0 !important;
 		width: var(--carousel-grid-item-width) !important;
 		min-width: var(--carousel-grid-item-width) !important;
+		max-width: var(--carousel-grid-item-width) !important;
 	}
 
 	/* Group columns */

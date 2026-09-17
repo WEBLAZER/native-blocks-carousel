@@ -204,13 +204,27 @@ class Renderer implements ServiceInterface
     {
         $block_gap = $block['attrs']['style']['spacing']['blockGap'] ?? null;
 
+        $gap_x = null;
+
         if (\is_array($block_gap)) {
+            $gap_x = $block_gap['left'] ?? $block_gap['right'] ?? $block_gap['top'] ?? null;
             $block_gap = $block_gap['left'] ?? $block_gap['top'] ?? null;
+        } elseif (\is_string($block_gap) && '' !== \trim($block_gap)) {
+            $parts = \preg_split('/\s+/', \trim($block_gap));
+            if (\count($parts) >= 2) {
+                $gap_x = $parts[1]; // Second value in CSS shorthand (top left/right) is horizontal gap
+                $block_gap = $parts[1];
+            } else {
+                $gap_x = $parts[0];
+                $block_gap = $parts[0];
+            }
         }
 
-        if ($block_gap && \is_string($block_gap) && 0 === \strpos($block_gap, 'var:preset|spacing|')) {
-            $preset_slug = \str_replace('var:preset|spacing|', '', $block_gap);
-            $block_gap = "var(--wp--preset--spacing--{$preset_slug})";
+        $gap_x = $this->convertSpacingPreset($gap_x);
+        $block_gap = $this->convertSpacingPreset($block_gap);
+
+        if (null !== $gap_x && '' !== $gap_x) {
+            $custom_styles['--carousel-block-gap-x'] = ('0' === $gap_x || 0 === $gap_x) ? '0px' : $gap_x;
         }
 
         if (null !== $block_gap && '' !== $block_gap) {

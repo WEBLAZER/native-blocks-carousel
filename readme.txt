@@ -1,14 +1,14 @@
 === Any Block Carousel Slider ===
 Contributors: weblazer
-Tags: carousel, slider, block, gutenberg, woocommerce
+Tags: carousel, slider, gutenberg, query-loop, woocommerce
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.1.1
+Stable tag: 2.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Transform any WordPress block into a responsive carousel using native CSS scroll-snap. Lightweight JS handles navigation, loops, and autoplay.
+Turn Gutenberg Query Loop, Group & Gallery blocks into responsive CSS carousels. Lightweight, zero dependencies, loop & autoplay.
 
 == Description ==
 
@@ -16,7 +16,7 @@ Transform any WordPress block into a responsive carousel using native CSS scroll
 
 == Try it out ==
 Experience the plugin in seconds without installing anything! Launch our interactive demo:
-[Launch Playround Demo](https://playground.wordpress.net/?blueprint-url=https://native-blocks-carousel.weblazer.fr/playground/blueprint.json)
+[Launch Playground Demo](https://playground.wordpress.net/?blueprint-url=https://native-blocks-carousel.weblazer.fr/playground/blueprint.json)
 
 Unlike many all-in-one carousel slider blocks that require you to add a dedicated "Carousel" block and rebuild every slide, **Any Block Carousel Slider** hooks straight into the Gutenberg blocks you already use. The result: a Query Loop/Post Template, Group, or Gallery block can become a carousel slider in one click, without content duplication or extra maintenance.
 
@@ -174,6 +174,13 @@ Yes! Navigation buttons, pagination dots, and scroll behavior all use standard H
 5. Native Gallery block displayed in carousel slider mode.
 
 == Changelog ==
+
+= 2.2.0 - 2026-09-17 =
+* ✨ Feature: Added non-intrusive admin review prompt requesting user feedback and 5-star ratings on WordPress.org after 14 days of use.
+* 🐛 Fix: Resolved Gallery block width calculation issues when row and column gaps differ (--carousel-gap-x).
+* 📱 Responsive: Enhanced mobile layout for Gallery blocks (defaults to 2 columns per view with gap calculations below 600px).
+* 🌐 I18n: Added complete French (fr_FR) translation support for admin notices, block settings, and WordPress.org strings.
+* 📝 ASO: Updated plugin title, tags, and short description for better WordPress.org search discoverability.
 
 = 2.1.1 - 2026-08-25 =
 * 🔧 Maintenance: Updated WordPress compatibility up to 7.1.

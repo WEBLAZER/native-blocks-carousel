@@ -62,6 +62,7 @@ class Plugin
                     $theme_styles
                 ),
                 new Renderer(),
+                new ReviewNotice(),
             ];
 
             self::$instance = new self($services);
