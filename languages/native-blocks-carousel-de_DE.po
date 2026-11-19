@@ -1,0 +1,279 @@
+# Translation of Plugins - Any Block Carousel Slider - Stable (latest release) in German
+# This file is distributed under the same license as the Plugins - Any Block Carousel Slider - Stable (latest release) package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Plugins - Any Block Carousel Slider - Stable (latest release)\n"
+"PO-Revision-Date: 2026-09-28 16:36:00+0000\n"
+"Language: de_DE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: GlotPress/4.1.0\n"
+
+#: includes/ReviewNotice.php:98
+msgid "Déjà fait / Ne plus afficher"
+msgstr "Bereits erledigt / Nicht mehr anzeigen"
+
+#: includes/ReviewNotice.php:95
+msgid "Remettre à plus tard (14j)"
+msgstr "Später erinnern (14 Tage)"
+
+#: includes/ReviewNotice.php:92
+msgid "Laisser un avis 5 étoiles"
+msgstr "Eine 5-Sterne-Rezension hinterlassen"
+
+#: includes/ReviewNotice.php:88
+msgid ""
+"Merci d'utiliser notre extension ! Si elle vous fait gagner du temps dans la"
+" création de vos carrousels Gutenberg, pourriez-vous prendre 1 minute pour "
+"lui laisser une note de 5 étoiles sur WordPress.org ? Cela aide énormément "
+"le développement indépendant !"
+msgstr ""
+"Vielen Dank, dass du unser Plugin verwendest! Wenn es dir bei der Erstellung"
+" deiner Gutenberg-Karussells Zeit spart, könntest du dir eine Minute nehmen "
+"und eine 5-Sterne-Rezension auf WordPress.org hinterlassen? Das hilft der "
+"unabhängigen Entwicklung enorm!"
+
+#: includes/ReviewNotice.php:84
+msgid "Vous aimez Any Block Carousel Slider ?"
+msgstr "Gefällt dir Any Block Carousel Slider?"
+
+#: assets/js/carousel-editor.js:954
+msgid "Arrow background color"
+msgstr "Pfeil-Hintergrundfarbe"
+
+#: assets/js/carousel-editor.js:949
+msgid "Arrow color"
+msgstr "Pfeilfarbe"
+
+#: assets/js/carousel-editor.js:943
+msgid "Arrow colors"
+msgstr "Pfeilfarben"
+
+#: assets/js/carousel-editor.js:927
+msgid "Arrow offset (px)"
+msgstr "Pfeilversatz (px)"
+
+#: assets/js/carousel-editor.js:922
+msgid "Position"
+msgstr "Position"
+
+#: assets/js/carousel-editor.js:885
+msgid "Arrow Design"
+msgstr "Pfeildesign"
+
+#: assets/js/carousel-editor.js:871
+msgid "Arrow style & position"
+msgstr "Pfeilstil und -position"
+
+#: assets/js/carousel-editor.js:825
+msgid "Users can swipe past multiple slides quickly."
+msgstr "Du kannst schnell über mehrere Slides wischen."
+
+#: assets/js/carousel-editor.js:821
+msgid ""
+"Scrolling will stop on every slide, preventing users from skipping multiple "
+"slides at once."
+msgstr ""
+"Das Scrollen stoppt bei jedem Slide, sodass du nicht mehrere Slides auf "
+"einmal überspringen kannst."
+
+#: assets/js/carousel-editor.js:814
+msgid "Force stop on each slide (Snap Stop)"
+msgstr "Stopp bei jedem Slide erzwingen (Snap Stop)"
+
+#: assets/js/carousel-editor.js:770
+msgid "Markers alignment"
+msgstr "Ausrichtung der Markierungen"
+
+#: assets/js/carousel-editor.js:746
+msgid "Markers style"
+msgstr "Stil der Markierungen"
+
+#: assets/js/carousel-editor.js:740
+msgid "Markers layout & style"
+msgstr "Layout und Stil der Markierungen"
+
+#: assets/js/carousel-editor.js:238
+msgid "Right"
+msgstr "Rechts"
+
+#: assets/js/carousel-editor.js:234
+msgid "Center"
+msgstr "Zentriert"
+
+#: assets/js/carousel-editor.js:230
+msgid "Left"
+msgstr "Links"
+
+#: assets/js/carousel-editor.js:223
+msgid "Lines"
+msgstr "Linien"
+
+#: assets/js/carousel-editor.js:219
+msgid "Dots"
+msgstr "Punkte"
+
+#. Description of the plugin
+#: any-block-carousel-slider.php
+msgid ""
+"Transform any WordPress block into a performant carousel with native CSS "
+"scroll-snap. Lightweight JavaScript handles navigation, loops, and autoplay."
+" Works with Gallery, Post Template, and Group blocks."
+msgstr ""
+"Verwandle jeden WordPress-Block mit nativem CSS Scroll Snap in ein "
+"leistungsfähiges Karussell. Leichtgewichtiges JavaScript übernimmt "
+"Navigation, Endlosschleifen und Autoplay. Funktioniert mit Galerie-, "
+"Beitrags-Template- und Gruppenblöcken."
+
+#: assets/js/carousel-editor.js:861
+msgid "Time in milliseconds between each slide transition."
+msgstr "Zeit in Millisekunden zwischen den einzelnen Slide-Übergängen."
+
+#: assets/js/carousel-editor.js:852
+msgid "Autoplay delay (ms)"
+msgstr "Autoplay-Verzögerung (ms)"
+
+#: assets/js/carousel-editor.js:844
+msgid "Autoplay is disabled. Users must navigate manually."
+msgstr "Autoplay ist deaktiviert. Du musst manuell navigieren."
+
+#: assets/js/carousel-editor.js:840
+msgid "The carousel will automatically scroll through slides."
+msgstr "Das Karussell scrollt automatisch durch die Slides."
+
+#: assets/js/carousel-editor.js:833
+msgid "Enable autoplay"
+msgstr "Autoplay aktivieren"
+
+#: assets/js/carousel-editor.js:806
+msgid "Loop is disabled. The carousel stops at the end."
+msgstr "Die Endlosschleife ist deaktiviert. Das Karussell stoppt am Ende."
+
+#: assets/js/carousel-editor.js:802
+msgid ""
+"The carousel will loop infinitely, returning to the first slide after the "
+"last."
+msgstr ""
+"Das Karussell läuft in einer Endlosschleife und kehrt nach dem letzten Slide"
+" zum ersten zurück."
+
+#: assets/js/carousel-editor.js:795
+msgid "Enable loop"
+msgstr "Endlosschleife aktivieren"
+
+#. Author URI of the plugin
+#: any-block-carousel-slider.php
+msgid "https://profiles.wordpress.org/weblazer/"
+msgstr "https://profiles.wordpress.org/weblazer/"
+
+#. Author of the plugin
+#: any-block-carousel-slider.php
+msgid "weblazer"
+msgstr "weblazer"
+
+#. Plugin URI of the plugin
+#: any-block-carousel-slider.php
+msgid "https://wordpress.org/plugins/native-blocks-carousel/"
+msgstr "https://wordpress.org/plugins/native-blocks-carousel/"
+
+#. Plugin Name of the plugin
+#: any-block-carousel-slider.php
+msgid "Any Block Carousel Slider"
+msgstr "Any Block Carousel Slider"
+
+#: assets/js/carousel-editor.js:730
+msgid "Pagination markers are hidden for a cleaner layout."
+msgstr ""
+"Die Markierungen der Seitennummerierung sind für ein übersichtlicheres "
+"Layout ausgeblendet."
+
+#: assets/js/carousel-editor.js:726
+msgid "Pagination markers are displayed below the carousel."
+msgstr ""
+"Die Markierungen der Seitennummerierung werden unter dem Karussell "
+"angezeigt."
+
+#: assets/js/carousel-editor.js:719
+msgid "Display pagination markers"
+msgstr "Markierungen der Seitennummerierung anzeigen"
+
+#: assets/js/carousel-editor.js:711
+msgid "Arrows are hidden. Users can navigate via swipe or scroll."
+msgstr ""
+"Die Pfeile sind ausgeblendet. Du kannst durch Wischen oder Scrollen "
+"navigieren."
+
+#: assets/js/carousel-editor.js:707
+msgid "Navigation arrows are visible on the carousel."
+msgstr "Die Navigationspfeile sind im Karussell sichtbar."
+
+#: assets/js/carousel-editor.js:700
+msgid "Display navigation arrows"
+msgstr "Navigationspfeile anzeigen"
+
+#: assets/js/carousel-editor.js:693
+msgid ""
+"Enable to convert this block into a carousel with navigation. You can then "
+"choose Manual mode (column count) or Auto mode (minimum column width)."
+msgstr ""
+"Aktiviere diese Option, um diesen Block in ein Karussell mit Navigation "
+"umzuwandeln. Anschließend kannst du den manuellen Modus (Spaltenanzahl) oder"
+" den automatischen Modus (Mindestbreite der Spalten) auswählen."
+
+#: assets/js/carousel-editor.js:689
+msgid "Carousel is enabled. Items scroll horizontally."
+msgstr "Das Karussell ist aktiviert. Die Elemente scrollen horizontal."
+
+#: assets/js/carousel-editor.js:685
+msgid ""
+"Carousel is enabled. Configure the column count or minimum width in the grid"
+" settings."
+msgstr ""
+"Das Karussell ist aktiviert. Konfiguriere die Spaltenanzahl oder "
+"Mindestbreite in den Rastereinstellungen."
+
+#: assets/js/carousel-editor.js:670
+msgid ""
+"Carousel is enabled. The number of visible columns is detected automatically"
+" from the gallery settings."
+msgstr ""
+"Das Karussell ist aktiviert. Die Anzahl der sichtbaren Spalten wird "
+"automatisch aus den Galerieeinstellungen erkannt."
+
+#: assets/js/carousel-editor.js:664
+msgid "Enable carousel"
+msgstr "Karussell aktivieren"
+
+#: assets/js/carousel-editor.js:212
+msgid "Angles"
+msgstr "Winkel"
+
+#: assets/js/carousel-editor.js:208
+msgid "Arrow"
+msgstr "Pfeil"
+
+#: includes/Activator.php:38
+msgid "PHP version too low"
+msgstr "PHP-Version zu niedrig"
+
+#: includes/Activator.php:37
+msgid "This plugin requires PHP 7.4 or later."
+msgstr "Dieses Plugin erfordert PHP 7.4 oder höher."
+
+#: includes/Activator.php:31
+msgid "WordPress version too low"
+msgstr "WordPress-Version zu niedrig"
+
+#: includes/Activator.php:30
+msgid "This plugin requires WordPress 6.0 or later."
+msgstr "Dieses Plugin erfordert WordPress 6.0 oder höher."
+
+#: assets/js/carousel-editor.js:660
+msgid "Carousel"
+msgstr "Karussell"
+
+#: assets/js/carousel-editor.js:204
+msgid "Chevron"
+msgstr "Chevron"

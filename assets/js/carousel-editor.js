@@ -1739,9 +1739,10 @@
                 e.preventDefault();
                 e.stopPropagation();
                 const slide = children[slideIndex];
-                if (slide) {
+                if (slide && children[0]) {
+                  const targetScroll = slide.offsetLeft - children[0].offsetLeft;
                   carousel.scrollTo({
-                    left: slide.offsetLeft - carousel.offsetLeft,
+                    left: targetScroll,
                     behavior: 'smooth'
                   });
                 }
@@ -1755,19 +1756,21 @@
           parent.appendChild(markersContainer);
 
           const onScroll = function () {
+            if (!children[0]) return;
             const scrollLeft = carousel.scrollLeft;
+            const scrollPos = Math.abs(scrollLeft);
             const maxScroll = carousel.scrollWidth - carousel.offsetWidth;
             let activeIndex = 0;
 
-            if (scrollLeft >= maxScroll - 10) {
+            if (scrollPos >= maxScroll - 10) {
               activeIndex = children.length - 1;
-            } else if (scrollLeft <= 10) {
+            } else if (scrollPos <= 10) {
               activeIndex = 0;
             } else {
               let minDistance = Infinity;
               children.forEach((slide, idx) => {
-                const slidePos = slide.offsetLeft - carousel.offsetLeft;
-                const distance = Math.abs(slidePos - scrollLeft);
+                const slideTarget = slide.offsetLeft - children[0].offsetLeft;
+                const distance = Math.abs(slideTarget - scrollLeft);
                 if (distance < minDistance) {
                   minDistance = distance;
                   activeIndex = idx;

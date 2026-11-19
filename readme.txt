@@ -4,7 +4,7 @@ Tags: carousel, slider, gutenberg, query-loop, woocommerce
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.2.0
+Stable tag: 2.2.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -174,6 +174,13 @@ Yes! Navigation buttons, pagination dots, and scroll behavior all use standard H
 5. Native Gallery block displayed in carousel slider mode.
 
 == Changelog ==
+
+= 2.2.1 - 2026-11-19 =
+* 🌐 RTL: Full Right-to-Left language support (Persian, Arabic, Hebrew) with native scroll normalization.
+* 🐛 Fix: Fixed navigation arrows state and loop behavior in RTL direction.
+* 🎯 Markers: Fixed pagination dots click alignment and real-time active slide tracking for both LTR and RTL.
+* ⌨️ A11y & Autoplay: Adapted keyboard navigation and autoplay scrolling to RTL reading direction.
+* 🌍 I18n: Added German (de_DE) and Spanish (es_ES) language packs.
 
 = 2.2.0 - 2026-09-17 =
 * ✨ Feature: Added non-intrusive admin review prompt requesting user feedback and 5-star ratings on WordPress.org after 14 days of use.

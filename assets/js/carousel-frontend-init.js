@@ -305,6 +305,55 @@
 	};
 
 	/**
+	 * Détecte si un carrousel est dans un contexte RTL.
+	 */
+	const isRtlMode = (carousel) => {
+		return window.getComputedStyle(carousel).direction === 'rtl';
+	};
+
+	/**
+	 * Retourne la position de défilement normalisée (distance en pixels depuis le début).
+	 */
+	const getScrollProgress = (carousel) => {
+		return Math.abs(carousel.scrollLeft);
+	};
+
+	/**
+	 * Vérifie si le carrousel est à son point de départ.
+	 */
+	const isAtStart = (carousel, threshold = 5) => {
+		return getScrollProgress(carousel) <= threshold;
+	};
+
+	/**
+	 * Vérifie si le carrousel est à la fin.
+	 */
+	const isAtEnd = (carousel, threshold = 5) => {
+		const maxScroll = carousel.scrollWidth - carousel.offsetWidth;
+		return getScrollProgress(carousel) >= maxScroll - threshold;
+	};
+
+	/**
+	 * Réinitialise le carrousel au début (Slide 1).
+	 */
+	const scrollToStart = (carousel, behavior = 'auto') => {
+		carousel.style.scrollBehavior = behavior;
+		carousel.scrollTo({ left: 0, behavior });
+		carousel.style.scrollBehavior = '';
+	};
+
+	/**
+	 * Déplace le carrousel tout à la fin (Dernière slide).
+	 */
+	const scrollToEnd = (carousel, behavior = 'auto') => {
+		const isRtl = isRtlMode(carousel);
+		const maxScroll = carousel.scrollWidth - carousel.offsetWidth;
+		carousel.style.scrollBehavior = behavior;
+		carousel.scrollTo({ left: isRtl ? -maxScroll : maxScroll, behavior });
+		carousel.style.scrollBehavior = '';
+	};
+
+	/**
 	 * Configure l'accessibilité du conteneur du carrousel (A11y).
 	 */
 	const setupA11y = (carousel) => {
@@ -337,29 +386,42 @@
 
 		// Gestion du défilement avec les touches directionnelles Gauche / Droite
 		carousel.addEventListener('keydown', (e) => {
+			const isLoopEnabled = carousel.getAttribute('data-abcs-loop') === 'true';
+			const isRtl = isRtlMode(carousel);
+
 			if (e.key === 'ArrowLeft') {
 				e.preventDefault();
-				const isLoopEnabled = carousel.getAttribute('data-abcs-loop') === 'true';
-				const atStart = carousel.scrollLeft <= 5;
-				if (isLoopEnabled && atStart) {
-					carousel.style.scrollBehavior = 'auto';
-					carousel.scrollTo({ left: carousel.scrollWidth, behavior: 'auto' });
-					carousel.style.scrollBehavior = '';
+				if (isRtl) {
+					if (isLoopEnabled && isAtEnd(carousel)) {
+						scrollToStart(carousel);
+					} else {
+						const slideWidth = getSlideWidth(carousel);
+						carousel.scrollBy({ left: -slideWidth, behavior: 'smooth' });
+					}
 				} else {
-					const slideWidth = getSlideWidth(carousel);
-					carousel.scrollBy({ left: -slideWidth, behavior: 'smooth' });
+					if (isLoopEnabled && isAtStart(carousel)) {
+						scrollToEnd(carousel);
+					} else {
+						const slideWidth = getSlideWidth(carousel);
+						carousel.scrollBy({ left: -slideWidth, behavior: 'smooth' });
+					}
 				}
 			} else if (e.key === 'ArrowRight') {
 				e.preventDefault();
-				const isLoopEnabled = carousel.getAttribute('data-abcs-loop') === 'true';
-				const atEnd = carousel.scrollLeft + carousel.offsetWidth >= carousel.scrollWidth - 5;
-				if (isLoopEnabled && atEnd) {
-					carousel.style.scrollBehavior = 'auto';
-					carousel.scrollTo({ left: 0, behavior: 'auto' });
-					carousel.style.scrollBehavior = '';
+				if (isRtl) {
+					if (isLoopEnabled && isAtStart(carousel)) {
+						scrollToEnd(carousel);
+					} else {
+						const slideWidth = getSlideWidth(carousel);
+						carousel.scrollBy({ left: slideWidth, behavior: 'smooth' });
+					}
 				} else {
-					const slideWidth = getSlideWidth(carousel);
-					carousel.scrollBy({ left: slideWidth, behavior: 'smooth' });
+					if (isLoopEnabled && isAtEnd(carousel)) {
+						scrollToStart(carousel);
+					} else {
+						const slideWidth = getSlideWidth(carousel);
+						carousel.scrollBy({ left: slideWidth, behavior: 'smooth' });
+					}
 				}
 			}
 		});
@@ -402,62 +464,88 @@
 	const injectNavigationButtons = (carousel, parent) => {
 		const arrowStyle = resolveCarouselArrowStyleFromElement(carousel);
 		const arrowColor = resolveButtonColorForCarousel(carousel);
+		const isRtl = isRtlMode(carousel);
 
 		const prevBtn = document.createElement('button');
 		prevBtn.className = 'abcs-nav-btn abcs-nav-btn--prev';
 		prevBtn.setAttribute('type', 'button');
-		prevBtn.setAttribute('aria-label', 'Previous slide');
+		prevBtn.setAttribute('aria-label', isRtl ? 'Next slide' : 'Previous slide');
 		prevBtn.innerHTML = generateArrowMarkup('left', arrowColor, arrowStyle);
 
 		const nextBtn = document.createElement('button');
 		nextBtn.className = 'abcs-nav-btn abcs-nav-btn--next';
 		nextBtn.setAttribute('type', 'button');
-		nextBtn.setAttribute('aria-label', 'Next slide');
+		nextBtn.setAttribute('aria-label', isRtl ? 'Previous slide' : 'Next slide');
 		nextBtn.innerHTML = generateArrowMarkup('right', arrowColor, arrowStyle);
 
 		parent.appendChild(prevBtn);
 		parent.appendChild(nextBtn);
 
+		// prevBtn : bouton physique à gauche (flèche vers la gauche)
 		prevBtn.addEventListener('click', () => {
 			const isLoopEnabled = carousel.getAttribute('data-abcs-loop') === 'true';
-			const atStart = carousel.scrollLeft <= 5;
+			const isRtlCurrent = isRtlMode(carousel);
 
-			if (isLoopEnabled && atStart) {
-				carousel.style.scrollBehavior = 'auto';
-				carousel.scrollTo({ left: carousel.scrollWidth, behavior: 'auto' });
-				carousel.style.scrollBehavior = '';
+			if (isRtlCurrent) {
+				// En RTL, aller vers la gauche = avancer vers la fin
+				if (isLoopEnabled && isAtEnd(carousel)) {
+					scrollToStart(carousel);
+				} else {
+					const slideWidth = getSlideWidth(carousel);
+					carousel.scrollBy({ left: -slideWidth, behavior: 'smooth' });
+				}
 			} else {
-				const slideWidth = getSlideWidth(carousel);
-				carousel.scrollBy({ left: -slideWidth, behavior: 'smooth' });
+				// En LTR, aller vers la gauche = reculer vers le début
+				if (isLoopEnabled && isAtStart(carousel)) {
+					scrollToEnd(carousel);
+				} else {
+					const slideWidth = getSlideWidth(carousel);
+					carousel.scrollBy({ left: -slideWidth, behavior: 'smooth' });
+				}
 			}
 		});
 
+		// nextBtn : bouton physique à droite (flèche vers la droite)
 		nextBtn.addEventListener('click', () => {
 			const isLoopEnabled = carousel.getAttribute('data-abcs-loop') === 'true';
-			const atEnd = carousel.scrollLeft + carousel.offsetWidth >= carousel.scrollWidth - 5;
+			const isRtlCurrent = isRtlMode(carousel);
 
-			if (isLoopEnabled && atEnd) {
-				carousel.style.scrollBehavior = 'auto';
-				carousel.scrollTo({ left: 0, behavior: 'auto' });
-				carousel.style.scrollBehavior = '';
+			if (isRtlCurrent) {
+				// En RTL, aller vers la droite = reculer vers le début
+				if (isLoopEnabled && isAtStart(carousel)) {
+					scrollToEnd(carousel);
+				} else {
+					const slideWidth = getSlideWidth(carousel);
+					carousel.scrollBy({ left: slideWidth, behavior: 'smooth' });
+				}
 			} else {
-				const slideWidth = getSlideWidth(carousel);
-				carousel.scrollBy({ left: slideWidth, behavior: 'smooth' });
+				// En LTR, aller vers la droite = avancer vers la fin
+				if (isLoopEnabled && isAtEnd(carousel)) {
+					scrollToStart(carousel);
+				} else {
+					const slideWidth = getSlideWidth(carousel);
+					carousel.scrollBy({ left: slideWidth, behavior: 'smooth' });
+				}
 			}
 		});
 
 		const updateButtonStates = () => {
 			const isLoopEnabled = carousel.getAttribute('data-abcs-loop') === 'true';
-			const threshold = 5;
-			const atStart = carousel.scrollLeft <= threshold;
-			const atEnd = carousel.scrollLeft + carousel.offsetWidth >= carousel.scrollWidth - threshold;
+			const isRtlCurrent = isRtlMode(carousel);
 
 			if (isLoopEnabled) {
 				prevBtn.disabled = false;
 				nextBtn.disabled = false;
 			} else {
-				prevBtn.disabled = atStart;
-				nextBtn.disabled = atEnd;
+				if (isRtlCurrent) {
+					// En RTL : fin à gauche (prevBtn), début à droite (nextBtn)
+					prevBtn.disabled = isAtEnd(carousel);
+					nextBtn.disabled = isAtStart(carousel);
+				} else {
+					// En LTR : début à gauche (prevBtn), fin à droite (nextBtn)
+					prevBtn.disabled = isAtStart(carousel);
+					nextBtn.disabled = isAtEnd(carousel);
+				}
 			}
 		};
 
@@ -493,9 +581,10 @@
 
 			marker.addEventListener('click', () => {
 				const slide = children[i];
-				if (slide) {
+				if (slide && children[0]) {
+					const targetScroll = slide.offsetLeft - children[0].offsetLeft;
 					carousel.scrollTo({
-						left: slide.offsetLeft - carousel.offsetLeft,
+						left: targetScroll,
 						behavior: 'smooth'
 					});
 				}
@@ -517,28 +606,24 @@
 	 * Suit la diapositive active et met en valeur la puce correspondante.
 	 */
 	const setupActiveMarkerTracking = (carousel, markers, children) => {
-		if (!('IntersectionObserver' in window) || !markers.length) {
-			if (markers.length) {
-				markers[0].classList.add('is-active');
-				markers[0].setAttribute('aria-selected', 'true');
-			}
-			return;
-		}
+		if (!markers.length || !children.length) return;
 
-		const observer = new IntersectionObserver(() => {
-			const scrollLeft = carousel.scrollLeft;
-			const maxScroll = carousel.scrollWidth - carousel.offsetWidth;
+		const updateActiveMarker = () => {
+			if (!children[0]) return;
+
 			let activeIndex = 0;
 
-			if (scrollLeft >= maxScroll - 10) {
+			if (isAtEnd(carousel)) {
 				activeIndex = children.length - 1;
-			} else if (scrollLeft <= 10) {
+			} else if (isAtStart(carousel)) {
 				activeIndex = 0;
 			} else {
+				const currentScroll = carousel.scrollLeft;
 				let minDistance = Infinity;
+
 				children.forEach((slide, idx) => {
-					const slidePos = slide.offsetLeft - carousel.offsetLeft;
-					const distance = Math.abs(slidePos - scrollLeft);
+					const slideTarget = slide.offsetLeft - children[0].offsetLeft;
+					const distance = Math.abs(slideTarget - currentScroll);
 					if (distance < minDistance) {
 						minDistance = distance;
 						activeIndex = idx;
@@ -555,17 +640,30 @@
 					marker.setAttribute('aria-selected', 'false');
 				}
 			});
-		}, {
-			root: carousel,
-			threshold: [0, 0.25, 0.5, 0.75, 1],
-			rootMargin: '0px'
-		});
+		};
 
-		children.forEach(child => {
-			observer.observe(child);
-		});
+		// État initial
+		updateActiveMarker();
 
-		carousel._abcsMarkerObserver = observer;
+		// Mise à jour sur scroll en temps réel
+		carousel.addEventListener('scroll', updateActiveMarker, { passive: true });
+
+		// Fallback IntersectionObserver pour observer les slides
+		if ('IntersectionObserver' in window) {
+			const observer = new IntersectionObserver(() => {
+				updateActiveMarker();
+			}, {
+				root: carousel,
+				threshold: [0, 0.25, 0.5, 0.75, 1],
+				rootMargin: '0px'
+			});
+
+			children.forEach(child => {
+				observer.observe(child);
+			});
+
+			carousel._abcsMarkerObserver = observer;
+		}
 	};
 
 	/**
@@ -674,16 +772,10 @@
 		let isResetting = false;
 		const autoplayDelay = parseInt(carousel.getAttribute('data-abcs-autoplay-delay'), 10) || 3000;
 
-		const isAtEnd = () => {
-			return carousel.scrollLeft + carousel.offsetWidth >= carousel.scrollWidth - 5;
-		};
-
 		const resetToStart = () => {
 			if (isResetting) return;
 			isResetting = true;
-			carousel.style.scrollBehavior = 'auto';
-			carousel.scrollTo({ left: 0, behavior: 'auto' });
-			carousel.style.scrollBehavior = '';
+			scrollToStart(carousel, 'auto');
 			if (carousel._abcsUpdateButtonStates) {
 				carousel._abcsUpdateButtonStates();
 			}
@@ -698,7 +790,7 @@
 		const handleScroll = () => {
 			if (isResetting) return;
 
-			const atEnd = isAtEnd();
+			const atEnd = isAtEnd(carousel);
 			const isAutoplayActive = isAutoScrollingMap.get(carousel);
 
 			if (scrollTimeout) {
@@ -707,7 +799,7 @@
 
 			if (wasAtEnd && atEnd && isAutoplayActive) {
 				scrollTimeout = setTimeout(() => {
-					if (isAtEnd() && !isResetting) {
+					if (isAtEnd(carousel) && !isResetting) {
 						setTimeout(() => {
 							if (!isResetting) {
 								resetToStart();
@@ -755,36 +847,24 @@
 			let isAutoScrolling = false;
 			const RESUME_DELAY = 2000;
 
-			const isAtEnd = () => {
-				if (isLoopEnabled) return false;
-				const threshold = 5;
-				return carousel.scrollLeft + carousel.offsetWidth >= carousel.scrollWidth - threshold;
-			};
-
 			const scrollToNext = () => {
 				const slideWidth = getSlideWidth(carousel);
 				if (slideWidth === 0) return;
+				const isRtl = isRtlMode(carousel);
 
-				const currentScroll = carousel.scrollLeft;
-				const nextScroll = currentScroll + slideWidth;
-
-				if (!isLoopEnabled) {
-					const threshold = 5;
-					const isAtEndNow = currentScroll + carousel.offsetWidth >= carousel.scrollWidth - threshold;
-					if (isAtEndNow) {
-						if (intervalId) {
-							clearInterval(intervalId);
-							intervalId = null;
-							autoplayIntervals.delete(carousel);
-						}
-						return;
+				if (!isLoopEnabled && isAtEnd(carousel)) {
+					if (intervalId) {
+						clearInterval(intervalId);
+						intervalId = null;
+						autoplayIntervals.delete(carousel);
 					}
+					return;
 				}
 
 				isAutoScrolling = true;
 				isAutoScrollingMap.set(carousel, true);
-				carousel.scrollTo({
-					left: nextScroll,
+				carousel.scrollBy({
+					left: isRtl ? -slideWidth : slideWidth,
 					behavior: 'smooth'
 				});
 
@@ -795,7 +875,7 @@
 			};
 
 			const startAutoplay = () => {
-				if (intervalId || (!isLoopEnabled && isAtEnd())) return;
+				if (intervalId || (!isLoopEnabled && isAtEnd(carousel))) return;
 
 				intervalId = setInterval(() => {
 					if (!isPaused) {
@@ -811,7 +891,7 @@
 			};
 
 			const resumeAutoplay = () => {
-				if (!isLoopEnabled && isAtEnd()) return;
+				if (!isLoopEnabled && isAtEnd(carousel)) return;
 				isPaused = false;
 				autoplayPaused.delete(carousel);
 			};
@@ -841,7 +921,7 @@
 			};
 			const handleMouseLeave = () => {
 				isHoverPaused = false;
-				if (isLoopEnabled || !isAtEnd()) {
+				if (isLoopEnabled || !isAtEnd(carousel)) {
 					resumeAutoplay();
 				}
 			};
