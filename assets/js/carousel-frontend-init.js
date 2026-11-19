@@ -103,6 +103,36 @@
 	};
 
 	/**
+	 * Resolves a single horizontal gap value from computed styles.
+	 * Handles Safari returning dual values for gap shorthand (e.g. "19.2px 19.2px").
+	 */
+	const resolveSingleHorizontalGap = (computedStyle) => {
+		if (!computedStyle) return null;
+
+		const columnGap = computedStyle.columnGap;
+		if (columnGap && columnGap !== 'normal' && columnGap.trim() !== '') {
+			const parts = columnGap.trim().split(/\s+/);
+			return parts[0];
+		}
+
+		const gap = computedStyle.gap;
+		if (gap && gap !== 'normal' && gap.trim() !== '') {
+			const parts = gap.trim().split(/\s+/);
+			// CSS shorthand syntax is: gap: <row-gap> <column-gap>
+			// For horizontal carousels, use column-gap (2nd value) if present, else row-gap (1st value)
+			return parts.length > 1 ? parts[1] : parts[0];
+		}
+
+		const rowGap = computedStyle.rowGap;
+		if (rowGap && rowGap !== 'normal' && rowGap.trim() !== '') {
+			const parts = rowGap.trim().split(/\s+/);
+			return parts[0];
+		}
+
+		return null;
+	};
+
+	/**
 	 * Injects padding variables by reading computed values directly.
 	 */
 	const injectPaddingVariables = () => {
@@ -111,9 +141,9 @@
 		carousels.forEach(carousel => {
 			const computedStyle = window.getComputedStyle(carousel);
 
-			const computedGap = computedStyle.gap || computedStyle.columnGap || computedStyle.rowGap;
-			if (computedGap && computedGap !== 'normal' && computedGap.trim() !== '') {
-				carousel.style.setProperty('--wp--style--block-gap', computedGap);
+			const singleHorizontalGap = resolveSingleHorizontalGap(computedStyle);
+			if (singleHorizontalGap) {
+				carousel.style.setProperty('--wp--style--block-gap', singleHorizontalGap);
 			}
 
 			const parent = carousel.parentElement;

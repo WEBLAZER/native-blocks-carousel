@@ -176,6 +176,7 @@ Yes! Navigation buttons, pagination dots, and scroll behavior all use standard H
 == Changelog ==
 
 = 2.2.2 - 2026-11-19 =
+* 🍏 Safari: Fixed dual gap values shorthand in Safari (e.g. "19.2px 19.2px") that invalidated CSS calc() slide widths.
 * 🔄 Autoplay: Fixed loop rewind when slides reach the end of the carousel (especially for full-width post content).
 * 🧹 Clean: Standardized all internal code comments to English.
 

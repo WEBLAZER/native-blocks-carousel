@@ -991,9 +991,20 @@
         const node = props?.clientId ? document.querySelector(`[data-block="${props.clientId}"]`) : null;
         const carouselNode = node && node.classList.contains('abcs') ? node : node?.querySelector?.('.abcs');
         if (carouselNode) {
-          const computedGap = window.getComputedStyle(carouselNode).gap || window.getComputedStyle(carouselNode).columnGap;
-          if (computedGap && computedGap !== 'normal') {
-            customStyles['--wp--style--block-gap'] = computedGap;
+          const compStyle = window.getComputedStyle(carouselNode);
+          const rawColGap = compStyle.columnGap;
+          const rawGap = compStyle.gap;
+          let resolvedGap = null;
+
+          if (rawColGap && rawColGap !== 'normal' && rawColGap.trim() !== '') {
+            resolvedGap = rawColGap.trim().split(/\s+/)[0];
+          } else if (rawGap && rawGap !== 'normal' && rawGap.trim() !== '') {
+            const parts = rawGap.trim().split(/\s+/);
+            resolvedGap = parts.length > 1 ? parts[1] : parts[0];
+          }
+
+          if (resolvedGap) {
+            customStyles['--wp--style--block-gap'] = resolvedGap;
           }
         }
       }
