@@ -4,7 +4,7 @@ Tags: carousel, slider, gutenberg, query-loop, woocommerce
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.2.1
+Stable tag: 2.2.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -174,6 +174,10 @@ Yes! Navigation buttons, pagination dots, and scroll behavior all use standard H
 5. Native Gallery block displayed in carousel slider mode.
 
 == Changelog ==
+
+= 2.2.2 - 2026-11-19 =
+* 🔄 Autoplay: Fixed loop rewind when slides reach the end of the carousel (especially for full-width post content).
+* 🧹 Clean: Standardized all internal code comments to English.
 
 = 2.2.1 - 2026-11-19 =
 * 🌐 RTL: Full Right-to-Left language support (Persian, Arabic, Hebrew) with native scroll normalization.
