@@ -1265,7 +1265,7 @@
           }
         });
       } catch (e) {
-        // Ignorer les contextes non accessibles
+        // Ignore inaccessible contexts
       }
     });
   }
@@ -1841,7 +1841,7 @@
             });
           }
         } catch (e) {
-          // Ignorer les contextes non accessibles
+          // Ignore inaccessible contexts
         }
       });
     }

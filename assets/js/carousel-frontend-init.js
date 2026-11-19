@@ -28,21 +28,21 @@
 	};
 
 	/**
-	 * Extrait la valeur minimumColumnWidth depuis grid-template-columns
-	 * WordPress génère : grid-template-columns: repeat(auto-fill, minmax(min(38rem, 100%), 1fr))
+	 * Extracts minimumColumnWidth value from grid-template-columns.
+	 * WordPress generates: grid-template-columns: repeat(auto-fill, minmax(min(38rem, 100%), 1fr))
 	 */
 	const extractMinWidthFromGridTemplateColumns = (gridTemplateColumns) => {
 		if (!gridTemplateColumns || gridTemplateColumns === 'none') {
 			return null;
 		}
 
-		// Recherche de minmax(min(XXX, 100%), 1fr)
+		// Search for minmax(min(XXX, 100%), 1fr)
 		const match = gridTemplateColumns.match(/minmax\(min\(([^,]+),\s*100%\)/);
 		return match && match[1] ? match[1].trim() : null;
 	};
 
 	/**
-	 * Recherche la règle CSS grid-template-columns pour un carrousel dans les feuilles de style.
+	 * Searches stylesheets for the grid-template-columns CSS rule of a carousel.
 	 */
 	const findGridTemplateColumnsRule = (carousel) => {
 		const containerClass = Array.from(carousel.classList).find(cls => cls.startsWith('wp-container-'));
@@ -68,7 +68,7 @@
 					}
 				}
 			} catch (e) {
-				// Ignorer les erreurs CORS pour les feuilles de style externes
+				// Ignore CORS errors for external stylesheets
 				continue;
 			}
 		}
@@ -77,7 +77,7 @@
 	};
 
 	/**
-	 * Injecte --carousel-min-width pour les carrousels utilisant le mode minimumColumnWidth.
+	 * Injects --carousel-min-width for carousels using minimumColumnWidth mode.
 	 */
 	const injectMinWidthVariables = () => {
 		const carousels = document.querySelectorAll('.abcs.abcs-min-width');
@@ -103,7 +103,7 @@
 	};
 
 	/**
-	 * Injecte les variables de padding en lisant directement les valeurs calculées.
+	 * Injects padding variables by reading computed values directly.
 	 */
 	const injectPaddingVariables = () => {
 		const carousels = document.querySelectorAll('.abcs');
@@ -174,7 +174,7 @@
 	};
 
 	/**
-	 * Convertit une couleur CSS en hexadécimal pour les SVG.
+	 * Converts CSS color string to hexadecimal for SVGs.
 	 */
 	const convertColorToHexForSvg = (color) => {
 		if (!color) return '#ffffff';
@@ -277,7 +277,7 @@
 	};
 
 	/**
-	 * Calcule la distance de défilement pour une diapositive.
+	 * Calculates scroll step width for a slide.
 	 */
 	const getSlideWidth = (carousel) => {
 		const firstChild = carousel.firstElementChild;
@@ -305,28 +305,28 @@
 	};
 
 	/**
-	 * Détecte si un carrousel est dans un contexte RTL.
+	 * Detects whether carousel is in an RTL (Right-to-Left) context.
 	 */
 	const isRtlMode = (carousel) => {
 		return window.getComputedStyle(carousel).direction === 'rtl';
 	};
 
 	/**
-	 * Retourne la position de défilement normalisée (distance en pixels depuis le début).
+	 * Returns normalized scroll position (distance in pixels from start).
 	 */
 	const getScrollProgress = (carousel) => {
 		return Math.abs(carousel.scrollLeft);
 	};
 
 	/**
-	 * Vérifie si le carrousel est à son point de départ.
+	 * Checks if carousel is at its start position.
 	 */
 	const isAtStart = (carousel, threshold = 5) => {
 		return getScrollProgress(carousel) <= threshold;
 	};
 
 	/**
-	 * Vérifie si le carrousel est à la fin.
+	 * Checks if carousel is at its end position.
 	 */
 	const isAtEnd = (carousel, threshold = 5) => {
 		const maxScroll = carousel.scrollWidth - carousel.offsetWidth;
@@ -334,7 +334,7 @@
 	};
 
 	/**
-	 * Réinitialise le carrousel au début (Slide 1).
+	 * Resets carousel scroll position to start (Slide 1).
 	 */
 	const scrollToStart = (carousel, behavior = 'auto') => {
 		carousel.style.scrollBehavior = behavior;
@@ -343,7 +343,7 @@
 	};
 
 	/**
-	 * Déplace le carrousel tout à la fin (Dernière slide).
+	 * Scrolls carousel all the way to the end (Last slide).
 	 */
 	const scrollToEnd = (carousel, behavior = 'auto') => {
 		const isRtl = isRtlMode(carousel);
@@ -354,15 +354,15 @@
 	};
 
 	/**
-	 * Configure l'accessibilité du conteneur du carrousel (A11y).
+	 * Sets up accessibility attributes for carousel container (A11y).
 	 */
 	const setupA11y = (carousel) => {
-		// Rendre le conteneur focalisable au clavier
+		// Make container keyboard focusable
 		carousel.setAttribute('tabindex', '0');
 		carousel.setAttribute('aria-roledescription', 'carousel');
 		carousel.setAttribute('aria-label', carousel.getAttribute('aria-label') || 'Carousel');
 
-		// Assigner le rôle slide à chaque enfant direct (sauf boutons et puces)
+		// Assign slide role to every direct element child (excluding buttons and markers)
 		const setSlidesA11y = () => {
 			Array.from(carousel.children).forEach((child, index) => {
 				if (
@@ -378,13 +378,13 @@
 
 		setSlidesA11y();
 
-		// Observer les changements pour appliquer l'A11y sur les nouveaux slides
+		// Observe DOM changes to apply A11y on dynamically added slides
 		if (typeof MutationObserver !== 'undefined') {
 			const observer = new MutationObserver(setSlidesA11y);
 			observer.observe(carousel, { childList: true });
 		}
 
-		// Gestion du défilement avec les touches directionnelles Gauche / Droite
+		// Handle left/right arrow key navigation
 		carousel.addEventListener('keydown', (e) => {
 			const isLoopEnabled = carousel.getAttribute('data-abcs-loop') === 'true';
 			const isRtl = isRtlMode(carousel);
@@ -428,7 +428,7 @@
 	};
 
 	/**
-	 * Injecte les boutons de navigation et les puces pour tous les carrousels.
+	 * Injects navigation buttons and pagination markers for all carousels.
 	 */
 	const injectNavigationUI = () => {
 		const carousels = document.querySelectorAll('.abcs');
@@ -459,7 +459,7 @@
 	};
 
 	/**
-	 * Crée et insère les boutons Précédent/Suivant.
+	 * Creates and inserts Previous/Next navigation buttons.
 	 */
 	const injectNavigationButtons = (carousel, parent) => {
 		const arrowStyle = resolveCarouselArrowStyleFromElement(carousel);
@@ -481,13 +481,13 @@
 		parent.appendChild(prevBtn);
 		parent.appendChild(nextBtn);
 
-		// prevBtn : bouton physique à gauche (flèche vers la gauche)
+		// prevBtn: physical left button (left arrow icon)
 		prevBtn.addEventListener('click', () => {
 			const isLoopEnabled = carousel.getAttribute('data-abcs-loop') === 'true';
 			const isRtlCurrent = isRtlMode(carousel);
 
 			if (isRtlCurrent) {
-				// En RTL, aller vers la gauche = avancer vers la fin
+				// In RTL, moving left means advancing toward the end
 				if (isLoopEnabled && isAtEnd(carousel)) {
 					scrollToStart(carousel);
 				} else {
@@ -495,7 +495,7 @@
 					carousel.scrollBy({ left: -slideWidth, behavior: 'smooth' });
 				}
 			} else {
-				// En LTR, aller vers la gauche = reculer vers le début
+				// In LTR, moving left means rewinding toward the start
 				if (isLoopEnabled && isAtStart(carousel)) {
 					scrollToEnd(carousel);
 				} else {
@@ -505,13 +505,13 @@
 			}
 		});
 
-		// nextBtn : bouton physique à droite (flèche vers la droite)
+		// nextBtn: physical right button (right arrow icon)
 		nextBtn.addEventListener('click', () => {
 			const isLoopEnabled = carousel.getAttribute('data-abcs-loop') === 'true';
 			const isRtlCurrent = isRtlMode(carousel);
 
 			if (isRtlCurrent) {
-				// En RTL, aller vers la droite = reculer vers le début
+				// In RTL, moving right means rewinding toward the start
 				if (isLoopEnabled && isAtStart(carousel)) {
 					scrollToEnd(carousel);
 				} else {
@@ -519,7 +519,7 @@
 					carousel.scrollBy({ left: slideWidth, behavior: 'smooth' });
 				}
 			} else {
-				// En LTR, aller vers la droite = avancer vers la fin
+				// In LTR, moving right means advancing toward the end
 				if (isLoopEnabled && isAtEnd(carousel)) {
 					scrollToStart(carousel);
 				} else {
@@ -538,11 +538,11 @@
 				nextBtn.disabled = false;
 			} else {
 				if (isRtlCurrent) {
-					// En RTL : fin à gauche (prevBtn), début à droite (nextBtn)
+					// In RTL: end is on the left (prevBtn), start is on the right (nextBtn)
 					prevBtn.disabled = isAtEnd(carousel);
 					nextBtn.disabled = isAtStart(carousel);
 				} else {
-					// En LTR : début à gauche (prevBtn), fin à droite (nextBtn)
+					// In LTR: start is on the left (prevBtn), end is on the right (nextBtn)
 					prevBtn.disabled = isAtStart(carousel);
 					nextBtn.disabled = isAtEnd(carousel);
 				}
@@ -558,7 +558,7 @@
 	};
 
 	/**
-	 * Crée et insère les puces de pagination (markers).
+	 * Creates and inserts pagination markers (dots).
 	 */
 	const injectPaginationMarkers = (carousel, parent) => {
 		const children = Array.from(carousel.children).filter(child => {
@@ -603,7 +603,7 @@
 	};
 
 	/**
-	 * Suit la diapositive active et met en valeur la puce correspondante.
+	 * Tracks the active slide and highlights the corresponding marker dot.
 	 */
 	const setupActiveMarkerTracking = (carousel, markers, children) => {
 		if (!markers.length || !children.length) return;
@@ -642,13 +642,13 @@
 			});
 		};
 
-		// État initial
+		// Initial state
 		updateActiveMarker();
 
-		// Mise à jour sur scroll en temps réel
+		// Real-time update on scroll
 		carousel.addEventListener('scroll', updateActiveMarker, { passive: true });
 
-		// Fallback IntersectionObserver pour observer les slides
+		// Fallback IntersectionObserver for observing slides
 		if ('IntersectionObserver' in window) {
 			const observer = new IntersectionObserver(() => {
 				updateActiveMarker();
@@ -667,7 +667,7 @@
 	};
 
 	/**
-	 * Met à jour les icônes de navigation.
+	 * Updates navigation icons.
 	 */
 	const applyArrowIconsToCarousels = (color, docContext, overrideConfig) => {
 		const baseDoc = docContext || document;
@@ -707,7 +707,7 @@
 						}
 					});
 				} catch (e) {
-					// Ignorer
+					// Ignore
 				}
 			});
 		}
@@ -750,7 +750,7 @@
 		});
 	};
 
-	// Stockage des intervalles et statuts hors fonctions
+	// Out-of-function storage for intervals and statuses
 	const autoplayIntervals = new WeakMap();
 	const autoplayPaused = new WeakMap();
 	const interactionTimeout = new WeakMap();
@@ -759,7 +759,7 @@
 	const isAutoScrollingMap = new WeakMap();
 
 	/**
-	 * Configuration de la boucle de défilement infini pour l'autoplay.
+	 * Setup infinite loop reset for autoplay.
 	 */
 	const setupLoopReset = (carousel) => {
 		if (loopResetSetup.has(carousel)) return;
@@ -788,28 +788,7 @@
 		let wasAtEnd = false;
 
 		const handleScroll = () => {
-			if (isResetting) return;
-
-			const atEnd = isAtEnd(carousel);
-			const isAutoplayActive = isAutoScrollingMap.get(carousel);
-
-			if (scrollTimeout) {
-				clearTimeout(scrollTimeout);
-			}
-
-			if (wasAtEnd && atEnd && isAutoplayActive) {
-				scrollTimeout = setTimeout(() => {
-					if (isAtEnd(carousel) && !isResetting) {
-						setTimeout(() => {
-							if (!isResetting) {
-								resetToStart();
-							}
-						}, autoplayDelay);
-					}
-				}, 200);
-			}
-
-			wasAtEnd = atEnd;
+			// Automatic loop wrapping is now handled deterministically inside scrollToNext()
 		};
 
 		carousel.addEventListener('scroll', handleScroll, { passive: true });
@@ -852,8 +831,19 @@
 				if (slideWidth === 0) return;
 				const isRtl = isRtlMode(carousel);
 
-				if (!isLoopEnabled && isAtEnd(carousel)) {
-					if (intervalId) {
+				// If the end of the carousel is reached
+				if (isAtEnd(carousel)) {
+					if (isLoopEnabled) {
+						// Smooth loop wrapping back to the beginning
+						isAutoScrolling = true;
+						isAutoScrollingMap.set(carousel, true);
+						scrollToStart(carousel, 'smooth');
+						setTimeout(() => {
+							isAutoScrolling = false;
+							isAutoScrollingMap.set(carousel, false);
+						}, 700);
+					} else if (intervalId) {
+						// Without loop, stop autoplay
 						clearInterval(intervalId);
 						intervalId = null;
 						autoplayIntervals.delete(carousel);
