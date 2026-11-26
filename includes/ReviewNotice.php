@@ -91,6 +91,9 @@ class ReviewNotice implements ServiceInterface
                     <a href="<?php echo \esc_url($done_url); ?>" target="_blank" rel="noopener noreferrer" class="button button-primary">
                         ⭐ <?php \esc_html_e('Laisser un avis 5 étoiles', 'native-blocks-carousel'); ?>
                     </a>
+                    <a href="https://ko-fi.com/weblazer" target="_blank" rel="noopener noreferrer" class="button button-secondary">
+                        <?php \esc_html_e('Buy me a coffee ☕', 'native-blocks-carousel'); ?>
+                    </a>
                     <a href="<?php echo \esc_url($later_url); ?>" class="button button-secondary">
                         ⏰ <?php \esc_html_e('Remettre à plus tard (14j)', 'native-blocks-carousel'); ?>
                     </a>

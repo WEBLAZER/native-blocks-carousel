@@ -5,7 +5,7 @@ Tags: carousel, slider, gutenberg, query-loop, woocommerce
 Requires at least: 6.0
 Tested up to: 7.2
 Requires PHP: 7.4
-Stable tag: 2.2.3
+Stable tag: 2.2.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -179,6 +179,9 @@ Yes! Navigation buttons, pagination dots, and scroll behavior all use standard H
 6. Columns block converted into a responsive carousel slider.
 
 == Changelog ==
+
+= 2.2.4 - 2026-11-26 =
+* ☕ Support: Added Ko-fi donation link to the review notice and plugins screen to support independent development.
 
 = 2.2.3 - 2026-11-26 =
 * ✨ Feature: Added full support for the Columns block (`core/columns`), enabling responsive swipeable carousels on multi-column layouts.
