@@ -7,13 +7,16 @@
   const { createHigherOrderComponent } = wp.compose;
   const { Fragment, useEffect, useMemo, createElement, RawHTML } = wp.element;
   const { InspectorControls, BlockListBlock, PanelColorSettings } = wp.blockEditor;
-  const { PanelBody, ToggleControl, RangeControl, Tooltip, ColorPalette, __experimentalToggleGroupControl: ToggleGroupControl, __experimentalToggleGroupControlOption: ToggleGroupControlOption, __experimentalToggleGroupControlOptionIcon: ToggleGroupControlOptionIcon } = wp.components;
+  const { PanelBody, ToggleControl, RangeControl, Tooltip, ColorPalette } = wp.components;
+  const ToggleGroupControl = wp.components.ToggleGroupControl || wp.components.__experimentalToggleGroupControl;
+  const ToggleGroupControlOption = wp.components.ToggleGroupControlOption || wp.components.__experimentalToggleGroupControlOption;
+  const ToggleGroupControlOptionIcon = wp.components.ToggleGroupControlOptionIcon || wp.components.__experimentalToggleGroupControlOptionIcon;
   const { __ } = wp.i18n;
 
   /**
    * Supported blocks for the carousel.
    */
-  const SUPPORTED_BLOCKS = ['core/group', 'core/post-template', 'core/gallery'];
+  const SUPPORTED_BLOCKS = ['core/group', 'core/post-template', 'core/gallery', 'core/columns'];
 
   const SHARED = window.AnyBlockCarouselSliderShared || {};
   const DEFAULT_ARROW_STYLE = SHARED.DEFAULT_ARROW_STYLE || 'chevron';
@@ -105,6 +108,10 @@
       attributes: {
         ...settings.attributes,
         carouselEnabled: {
+          type: 'boolean',
+          default: false,
+        },
+        carouselMobileOnly: {
           type: 'boolean',
           default: false,
         },
@@ -287,7 +294,8 @@
             cls !== 'carousel-min-width' &&
             !cls.startsWith('abcs-icon-') &&
             cls !== 'abcs-hide-arrows' &&
-            cls !== 'abcs-hide-markers'
+            cls !== 'abcs-hide-markers' &&
+            cls !== 'abcs-mobile-only'
         );
 
         if (enabled) {
@@ -306,6 +314,22 @@
             }
             // Otherwise default to 3 columns
             else {
+              filteredClasses.push('abcs-cols-3');
+            }
+          }
+
+          // For columns, detect and add the abcs-cols-X class
+          if (name === 'core/columns') {
+            let columnCount = attributes.columns;
+            if (!columnCount && window.wp && window.wp.data && props.clientId) {
+              const blockObj = window.wp.data.select('core/block-editor').getBlock(props.clientId);
+              if (blockObj && Array.isArray(blockObj.innerBlocks)) {
+                columnCount = blockObj.innerBlocks.length;
+              }
+            }
+            if (columnCount && columnCount >= 1 && columnCount <= 8) {
+              filteredClasses.push(`abcs-cols-${columnCount}`);
+            } else {
               filteredClasses.push('abcs-cols-3');
             }
           }
@@ -337,15 +361,20 @@
             }
           }
         } else {
-          // Remove the 'abcs' class
+          // Remove the 'abcs' and 'abcs-mobile-only' classes
           const index = filteredClasses.indexOf('abcs');
           if (index > -1) {
             filteredClasses.splice(index, 1);
+          }
+          const mobileOnlyIndex = filteredClasses.indexOf('abcs-mobile-only');
+          if (mobileOnlyIndex > -1) {
+            filteredClasses.splice(mobileOnlyIndex, 1);
           }
         }
 
         setAttributes({
           className: filteredClasses.join(' ').trim(),
+          carouselMobileOnly: enabled ? attributes.carouselMobileOnly : false,
         });
       };
 
@@ -379,6 +408,22 @@
           }
           // Otherwise default to 3 columns
           else {
+            expectedColsClass = 'abcs-cols-3';
+          }
+        }
+
+        // Columns handling
+        if (name === 'core/columns') {
+          let columnCount = attributes.columns;
+          if (!columnCount && window.wp && window.wp.data && props.clientId) {
+            const blockObj = window.wp.data.select('core/block-editor').getBlock(props.clientId);
+            if (blockObj && Array.isArray(blockObj.innerBlocks)) {
+              columnCount = blockObj.innerBlocks.length;
+            }
+          }
+          if (columnCount && columnCount >= 1 && columnCount <= 8) {
+            expectedColsClass = `abcs-cols-${columnCount}`;
+          } else {
             expectedColsClass = 'abcs-cols-3';
           }
         }
@@ -671,6 +716,11 @@
                     'Carousel is enabled. The number of visible columns is detected automatically from the gallery settings.',
                     'native-blocks-carousel'
                   )
+                  : name === 'core/columns'
+                    ? __(
+                      'Carousel is enabled. Columns scroll horizontally with responsive navigation.',
+                      'native-blocks-carousel'
+                    )
                   : (name === 'core/group' || name === 'core/post-template') && attributes.layout?.type === 'grid'
                     ? attributes.layout?.minimumColumnWidth
                       ? __(
@@ -695,6 +745,32 @@
                   'native-blocks-carousel'
                 ),
             }),
+            carouselEnabled
+              ? createElement(ToggleControl, {
+                label: __('Mobile only', 'native-blocks-carousel'),
+                checked: !!attributes.carouselMobileOnly,
+                __nextHasNoMarginBottom: true,
+                onChange: (value) => {
+                  setAttributes({ carouselMobileOnly: value });
+                  const currentClasses = attributes.className || '';
+                  const classArray = currentClasses.split(' ').filter(Boolean);
+                  const filtered = classArray.filter(c => c !== 'abcs-mobile-only');
+                  if (value) {
+                    filtered.push('abcs-mobile-only');
+                  }
+                  setAttributes({ className: filtered.join(' ') });
+                },
+                help: attributes.carouselMobileOnly
+                  ? __(
+                    'Carousel is active only on mobile (< 782px). Desktop displays standard layout.',
+                    'native-blocks-carousel'
+                  )
+                  : __(
+                    'Carousel is active on all screen sizes.',
+                    'native-blocks-carousel'
+                  ),
+              })
+              : null,
             carouselEnabled
               ? createElement(ToggleControl, {
                 label: __('Display navigation arrows', 'native-blocks-carousel'),
@@ -1021,8 +1097,8 @@
       // 2. Inject --wp--style--block-gap for every carousel
       let blockGap = attributes.style?.spacing?.blockGap;
 
-      // Exception for Gallery: use the horizontal gap (left) for the carousel
-      if (name === 'core/gallery' && blockGap && typeof blockGap === 'object') {
+      // Exception for Gallery and Columns: use the horizontal gap (left) for the carousel
+      if ((name === 'core/gallery' || name === 'core/columns') && blockGap && typeof blockGap === 'object') {
         blockGap = blockGap.left || blockGap.top || null;
       }
 
@@ -1123,6 +1199,7 @@
           'data-abcs-loop': attributes.carouselLoop ? 'true' : 'false',
           'data-abcs-autoplay': attributes.carouselAutoplay ? 'true' : 'false',
           'data-abcs-autoplay-delay': attributes.carouselAutoplayDelay || 3000,
+          'data-abcs-mobile-only': attributes.carouselMobileOnly ? 'true' : 'false',
           'data-abcs-snap-stop': attributes.carouselSnapStop ? 'true' : 'false',
           'data-abcs-markers-align': attributes.carouselMarkersAlign || 'center',
           'data-abcs-markers-style': attributes.carouselMarkersStyle || 'dots',
@@ -1654,6 +1731,12 @@
       if (textVar) {
         arrowColor = convertColorToHexForSvg(textVar, carousel.ownerDocument);
       }
+    }
+
+    if (carousel.classList.contains('abcs-mobile-only')) {
+      parent.classList.add('abcs-parent-mobile-only');
+    } else {
+      parent.classList.remove('abcs-parent-mobile-only');
     }
 
     // 1. Manage Navigation Arrows

@@ -3,8 +3,8 @@
  * Plugin Name: Any Block Carousel Slider
  * Plugin URI: https://wordpress.org/plugins/native-blocks-carousel/
  * GitHub Plugin URI: https://github.com/WEBLAZER/native-blocks-carousel
- * Description: Transform any WordPress block into a performant carousel with native CSS scroll-snap. Lightweight JavaScript handles navigation, loops, and autoplay. Works with Gallery, Post Template, and Group blocks.
- * Version: 2.2.2
+ * Description: Transform any WordPress block into a performant carousel with native CSS scroll-snap. Lightweight JavaScript handles navigation, loops, and autoplay. Works with Columns, Gallery, Post Template, and Group blocks.
+ * Version: 2.2.3
  * Author: weblazer
  * Author URI: https://profiles.wordpress.org/weblazer/
  * License: GPL v2 or later
@@ -12,7 +12,6 @@
  * Text Domain: native-blocks-carousel
  * Domain Path: /languages
  * Requires at least: 6.0
- * Tested up to: 7.1
  * Requires PHP: 7.4
  *
  * @package AnyBlockCarouselSlider
@@ -28,7 +27,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('ANY_BLOCK_CAROUSEL_SLIDER_VERSION', '2.2.2');
+define('ANY_BLOCK_CAROUSEL_SLIDER_VERSION', '2.2.3');
 define('ANY_BLOCK_CAROUSEL_SLIDER_PLUGIN_FILE', __FILE__);
 define('ANY_BLOCK_CAROUSEL_SLIDER_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('ANY_BLOCK_CAROUSEL_SLIDER_PLUGIN_PATH', plugin_dir_path(__FILE__));

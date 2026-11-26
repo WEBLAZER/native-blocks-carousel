@@ -310,7 +310,9 @@
 	 * Calculates scroll step width for a slide.
 	 */
 	const getSlideWidth = (carousel) => {
-		const firstChild = carousel.firstElementChild;
+		const firstChild = Array.from(carousel.children).find(child => {
+			return !child.classList.contains('abcs-nav-btn') && !child.classList.contains('abcs-markers');
+		}) || carousel.firstElementChild;
 		if (!firstChild) {
 			return 0;
 		}
@@ -364,11 +366,28 @@
 	};
 
 	/**
+	 * Checks if user prefers reduced motion (A11y / WCAG).
+	 */
+	const prefersReducedMotion = () => {
+		return typeof window !== 'undefined' &&
+			typeof window.matchMedia === 'function' &&
+			window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	};
+
+	/**
+	 * Returns scroll behavior respecting user motion preferences.
+	 */
+	const getScrollBehavior = (preferred = 'smooth') => {
+		return prefersReducedMotion() ? 'auto' : preferred;
+	};
+
+	/**
 	 * Resets carousel scroll position to start (Slide 1).
 	 */
 	const scrollToStart = (carousel, behavior = 'auto') => {
-		carousel.style.scrollBehavior = behavior;
-		carousel.scrollTo({ left: 0, behavior });
+		const effectiveBehavior = prefersReducedMotion() ? 'auto' : behavior;
+		carousel.style.scrollBehavior = effectiveBehavior;
+		carousel.scrollTo({ left: 0, behavior: effectiveBehavior });
 		carousel.style.scrollBehavior = '';
 	};
 
@@ -378,8 +397,9 @@
 	const scrollToEnd = (carousel, behavior = 'auto') => {
 		const isRtl = isRtlMode(carousel);
 		const maxScroll = carousel.scrollWidth - carousel.offsetWidth;
-		carousel.style.scrollBehavior = behavior;
-		carousel.scrollTo({ left: isRtl ? -maxScroll : maxScroll, behavior });
+		const effectiveBehavior = prefersReducedMotion() ? 'auto' : behavior;
+		carousel.style.scrollBehavior = effectiveBehavior;
+		carousel.scrollTo({ left: isRtl ? -maxScroll : maxScroll, behavior: effectiveBehavior });
 		carousel.style.scrollBehavior = '';
 	};
 
@@ -416,6 +436,10 @@
 
 		// Handle left/right arrow key navigation
 		carousel.addEventListener('keydown', (e) => {
+			const isMobileOnly = carousel.getAttribute('data-abcs-mobile-only') === 'true' || carousel.classList.contains('abcs-mobile-only');
+			if (isMobileOnly && window.innerWidth >= 782) {
+				return;
+			}
 			const isLoopEnabled = carousel.getAttribute('data-abcs-loop') === 'true';
 			const isRtl = isRtlMode(carousel);
 
@@ -426,14 +450,14 @@
 						scrollToStart(carousel);
 					} else {
 						const slideWidth = getSlideWidth(carousel);
-						carousel.scrollBy({ left: -slideWidth, behavior: 'smooth' });
+						carousel.scrollBy({ left: -slideWidth, behavior: getScrollBehavior('smooth') });
 					}
 				} else {
 					if (isLoopEnabled && isAtStart(carousel)) {
 						scrollToEnd(carousel);
 					} else {
 						const slideWidth = getSlideWidth(carousel);
-						carousel.scrollBy({ left: -slideWidth, behavior: 'smooth' });
+						carousel.scrollBy({ left: -slideWidth, behavior: getScrollBehavior('smooth') });
 					}
 				}
 			} else if (e.key === 'ArrowRight') {
@@ -443,14 +467,14 @@
 						scrollToEnd(carousel);
 					} else {
 						const slideWidth = getSlideWidth(carousel);
-						carousel.scrollBy({ left: slideWidth, behavior: 'smooth' });
+						carousel.scrollBy({ left: slideWidth, behavior: getScrollBehavior('smooth') });
 					}
 				} else {
 					if (isLoopEnabled && isAtEnd(carousel)) {
 						scrollToStart(carousel);
 					} else {
 						const slideWidth = getSlideWidth(carousel);
-						carousel.scrollBy({ left: slideWidth, behavior: 'smooth' });
+						carousel.scrollBy({ left: slideWidth, behavior: getScrollBehavior('smooth') });
 					}
 				}
 			}
@@ -470,6 +494,10 @@
 
 			const parent = carousel.parentElement;
 			if (!parent) return;
+
+			if (carousel.classList.contains('abcs-mobile-only')) {
+				parent.classList.add('abcs-parent-mobile-only');
+			}
 
 			const hideArrows = carousel.classList.contains('abcs-hide-arrows');
 			const hideMarkers = carousel.classList.contains('abcs-hide-markers');
@@ -522,7 +550,7 @@
 					scrollToStart(carousel);
 				} else {
 					const slideWidth = getSlideWidth(carousel);
-					carousel.scrollBy({ left: -slideWidth, behavior: 'smooth' });
+					carousel.scrollBy({ left: -slideWidth, behavior: getScrollBehavior('smooth') });
 				}
 			} else {
 				// In LTR, moving left means rewinding toward the start
@@ -530,7 +558,7 @@
 					scrollToEnd(carousel);
 				} else {
 					const slideWidth = getSlideWidth(carousel);
-					carousel.scrollBy({ left: -slideWidth, behavior: 'smooth' });
+					carousel.scrollBy({ left: -slideWidth, behavior: getScrollBehavior('smooth') });
 				}
 			}
 		});
@@ -546,7 +574,7 @@
 					scrollToEnd(carousel);
 				} else {
 					const slideWidth = getSlideWidth(carousel);
-					carousel.scrollBy({ left: slideWidth, behavior: 'smooth' });
+					carousel.scrollBy({ left: slideWidth, behavior: getScrollBehavior('smooth') });
 				}
 			} else {
 				// In LTR, moving right means advancing toward the end
@@ -554,7 +582,7 @@
 					scrollToStart(carousel);
 				} else {
 					const slideWidth = getSlideWidth(carousel);
-					carousel.scrollBy({ left: slideWidth, behavior: 'smooth' });
+					carousel.scrollBy({ left: slideWidth, behavior: getScrollBehavior('smooth') });
 				}
 			}
 		});
@@ -615,7 +643,7 @@
 					const targetScroll = slide.offsetLeft - children[0].offsetLeft;
 					carousel.scrollTo({
 						left: targetScroll,
-						behavior: 'smooth'
+						behavior: getScrollBehavior('smooth')
 					});
 				}
 			});
@@ -867,7 +895,7 @@
 						// Smooth loop wrapping back to the beginning
 						isAutoScrolling = true;
 						isAutoScrollingMap.set(carousel, true);
-						scrollToStart(carousel, 'smooth');
+						scrollToStart(carousel, getScrollBehavior('smooth'));
 						setTimeout(() => {
 							isAutoScrolling = false;
 							isAutoScrollingMap.set(carousel, false);
@@ -885,7 +913,7 @@
 				isAutoScrollingMap.set(carousel, true);
 				carousel.scrollBy({
 					left: isRtl ? -slideWidth : slideWidth,
-					behavior: 'smooth'
+					behavior: getScrollBehavior('smooth')
 				});
 
 				setTimeout(() => {
@@ -894,11 +922,16 @@
 				}, 700);
 			};
 
+			const isMobileOnly = carousel.getAttribute('data-abcs-mobile-only') === 'true' || carousel.classList.contains('abcs-mobile-only');
+
 			const startAutoplay = () => {
 				if (intervalId || (!isLoopEnabled && isAtEnd(carousel))) return;
+				if (prefersReducedMotion()) return;
+				if (isMobileOnly && window.innerWidth >= 782) return;
 
 				intervalId = setInterval(() => {
-					if (!isPaused) {
+					if (isMobileOnly && window.innerWidth >= 782) return;
+					if (!isPaused && !prefersReducedMotion()) {
 						scrollToNext();
 					}
 				}, autoplayDelay);
@@ -952,10 +985,39 @@
 			carousel.addEventListener('touchstart', handleInteraction, { passive: true });
 			carousel.addEventListener('mousedown', handleInteraction);
 
+			let motionMediaQuery = null;
+			let motionListener = null;
+			if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+				try {
+					motionMediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+					motionListener = (e) => {
+						if (e.matches) {
+							pauseAutoplay();
+						} else if (!isHoverPaused && (isLoopEnabled || !isAtEnd(carousel))) {
+							resumeAutoplay();
+						}
+					};
+					if (typeof motionMediaQuery.addEventListener === 'function') {
+						motionMediaQuery.addEventListener('change', motionListener);
+					} else if (typeof motionMediaQuery.addListener === 'function') {
+						motionMediaQuery.addListener(motionListener);
+					}
+				} catch (e) {
+					// Ignore older environments
+				}
+			}
+
 			startAutoplay();
 			autoplayInitialized.add(carousel);
 
 			carousel._abcsAutoplayCleanup = () => {
+				if (motionMediaQuery && motionListener) {
+					if (typeof motionMediaQuery.removeEventListener === 'function') {
+						motionMediaQuery.removeEventListener('change', motionListener);
+					} else if (typeof motionMediaQuery.removeListener === 'function') {
+						motionMediaQuery.removeListener(motionListener);
+					}
+				}
 				if (intervalId) {
 					clearInterval(intervalId);
 					intervalId = null;

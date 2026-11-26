@@ -1,0 +1,26 @@
+# Python tools & temporary translation files
+*.py
+*.html
+glossary*
+parse_glossary*
+audit_po*
+build_*
+spanish-translation-guide.md
+positionnement-technique-et-commercial.md
+wp-plugins-native-blocks-carousel-stable-readme-*.po
+*.code-workspace
+test-export.xml
+
+# Root duplicates (files are in includes/ and assets/)
+/Renderer.php
+/carousel-editor.js
+/carousel-frontend-init.js
+/carousel.css
+/native-blocks-carousel-*.po
+/native-blocks-carousel-*.mo
+
+# Assets directory WordPress.org files (tracked in .wordpress-org/)
+assets/*.png
+assets/*.gif
+assets/*.svg
+assets/*.ai

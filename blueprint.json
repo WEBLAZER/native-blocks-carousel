@@ -11,14 +11,14 @@
 			"step": "installPlugin",
 			"pluginData": {
 				"resource": "url",
-				"url": "https://native-blocks-carousel.weblazer.fr/playground/plugin.zip?v=1789642607"
+				"url": "https://native-blocks-carousel.weblazer.fr/playground/plugin.zip?v=1795197724"
 			}
 		},
 		{
 			"step": "installTheme",
 			"themeData": {
 				"resource": "url",
-				"url": "https://native-blocks-carousel.weblazer.fr/playground/theme.zip?v=1789642607"
+				"url": "https://native-blocks-carousel.weblazer.fr/playground/theme.zip?v=1795197724"
 			}
 		},
 		{
@@ -37,7 +37,7 @@
 			"step": "importWxr",
 			"file": {
 				"resource": "url",
-				"url": "https://native-blocks-carousel.weblazer.fr/playground/demo-home.xml?v=1789642607"
+				"url": "https://native-blocks-carousel.weblazer.fr/playground/demo-home.xml?v=1795197724"
 			}
 		},
 		{

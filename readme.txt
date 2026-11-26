@@ -1,18 +1,19 @@
 === Any Block Carousel Slider ===
 Contributors: weblazer
+Donate link: https://ko-fi.com/weblazer
 Tags: carousel, slider, gutenberg, query-loop, woocommerce
 Requires at least: 6.0
-Tested up to: 7.1
+Tested up to: 7.2
 Requires PHP: 7.4
-Stable tag: 2.2.2
+Stable tag: 2.2.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Turn Gutenberg Query Loop, Group & Gallery blocks into responsive CSS carousels. Lightweight, zero dependencies, loop & autoplay.
+Turn Gutenberg Columns, Query Loop, Group & Gallery blocks into responsive CSS carousels. Lightweight, zero dependencies, loop & autoplay.
 
 == Description ==
 
-**Any Block Carousel Slider** is a Gutenberg carousel slider block plugin that instantly converts supported native WordPress blocks (Query Loop/Post Template, Group, Gallery) into a responsive carousel slider. Simply enable the "Carousel" toggle in the Gutenberg editor: your content stays 100% native, your DOM stays lightweight, and your Lighthouse performance scores remain intact. This includes WooCommerce product listings rendered via the Query Loop/Post Template block, so you can showcase products without relying on the legacy Products block.
+**Any Block Carousel Slider** is a Gutenberg carousel slider block plugin that instantly converts supported native WordPress blocks (Columns, Query Loop/Post Template, Group, Gallery) into a responsive carousel slider. Simply enable the "Carousel" toggle in the Gutenberg editor: your content stays 100% native, your DOM stays lightweight, and your Lighthouse performance scores remain intact. This includes WooCommerce product listings rendered via the Query Loop/Post Template block, so you can showcase products without relying on the legacy Products block.
 
 == Try it out ==
 Experience the plugin in seconds without installing anything! Launch our interactive demo:
@@ -30,6 +31,7 @@ Unlike many all-in-one carousel slider blocks that require you to add a dedicate
 
 = What you can do in 30 seconds =
 
+* **Columns on mobile**: Transform any Columns block into a touch-friendly swipeable carousel on mobile instead of stacking columns vertically.
 * **Blog / Magazine**: Display your latest posts in a Query Loop carousel with native filters and badges.
 * **Portfolios & testimonials**: Keep your Group blocks and make them scrollable without rebuilding every slide.
 * **Advanced galleries**: Turn the Gallery block into a responsive slider while keeping all native settings.
@@ -47,6 +49,8 @@ Unlike many all-in-one carousel slider blocks that require you to add a dedicate
 
 = Key features =
 
+* **Columns block support** – Native `core/columns` support with individual slide snapping and responsive column count.
+* **Mobile-only option** – Choose to run the carousel exclusively on mobile devices (< 782px) while maintaining your native Gutenberg layout on desktop.
 * **CSS-powered scroll** – Smooth carousel slider with `scroll-snap` and lightweight JavaScript navigation controls. No heavy libraries.
 * **Loop functionality** – Enable infinite scrolling with seamless reset to start/end when reaching boundaries.
 * **Autoplay support** – Automatic slide progression with configurable delay and pause on hover/interaction.
@@ -172,8 +176,20 @@ Yes! Navigation buttons, pagination dots, and scroll behavior all use standard H
 3. Query Loop / Post Template carousel slider rendered with 100% CSS.
 4. Group block converted into a responsive carousel.
 5. Native Gallery block displayed in carousel slider mode.
+6. Columns block converted into a responsive carousel slider.
 
 == Changelog ==
+
+= 2.2.3 - 2026-11-26 =
+* ✨ Feature: Added full support for the Columns block (`core/columns`), enabling responsive swipeable carousels on multi-column layouts.
+* ✨ Feature: Added new "Mobile only" option to transform blocks into carousels on mobile screens (< 782px) while preserving 100% native WordPress layout on desktop.
+* 🎨 CSS: Complete architecture refactoring with a unified mathematical column sizing formula (`--abcs-cols`) and shared responsive calculations.
+* 🎨 Theme Styles: Enhanced button color detection to support block-level button styles (`styles.blocks.core/button`) alongside element-level styles (`styles.elements.button`).
+* ♿ A11y & Motion: Integrated `prefers-reduced-motion` detection in JavaScript. Disables autoplay and switches smooth scrolling to instant scrolling for users sensitive to motion.
+* 🚀 Compatibility: Verified compatibility up to WordPress 7.2.
+* 🛠️ Gutenberg: Hardened `ToggleGroupControl` integration with resilient fallback for upcoming WordPress editor releases.
+* 🌐 I18n: Updated translation catalogs (POT, PO, MO) for French, German, and Spanish.
+* 🧹 Plugin Check: Removed redundant "Tested up to" declaration from main PHP file header to adhere to modern WordPress standards.
 
 = 2.2.2 - 2026-11-19 =
 * 🍏 Safari: Fixed dual gap values shorthand in Safari (e.g. "19.2px 19.2px") that invalidated CSS calc() slide widths.

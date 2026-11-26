@@ -2,16 +2,15 @@
  * Any Block Carousel Slider - Styles CSS
  *
  * Transform any WordPress block into a carousel with the .abcs class
- * Compatible with post loops and all WordPress blocks
- * Compatible with Block Editor and frontend
+ * Compatible with all native Gutenberg blocks, query loops, and FSE
  *
  * @package AnyBlockCarouselSlider
- * @version 2.2.2
+ * @version 2.2.3
  * @author weblazer35
  */
 
 /* ==========================================================================
-   VARIABLES CSS
+   1. VARIABLES CSS & DESIGN TOKENS
    ========================================================================== */
 
 :root {
@@ -24,13 +23,12 @@
 	--carousel-transition-duration: 0.3s;
 	--carousel-transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
-	/* Colors - automatically detected from theme styles by PHP */
-	/* Values below act as fallbacks if no theme styles are found */
-	--carousel-button-bg: var(--wp--style--elements--button--color--background, #007cba);
-	--carousel-button-color: var(--wp--style--elements--button--color--text, #fff);
+	/* Fallback button colors (PHP overrides with theme palette when possible) */
+	--carousel-button-bg: var(--wp--style--blocks--core-button--color--background, var(--wp--style--elements--button--color--background, #007cba));
+	--carousel-button-color: var(--wp--style--blocks--core-button--color--text, var(--wp--style--elements--button--color--text, #ffffff));
 	--carousel-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
-	/* Carousel padding - automatically set by PHP/JavaScript */
+	/* Inline padding detection fallbacks */
 	--carousel-padding-left: 0px;
 	--carousel-padding-right: 0px;
 	--carousel-padding-top: 0px;
@@ -38,18 +36,14 @@
 }
 
 /* ==========================================================================
-   CAROUSEL PRINCIPAL
+   2. PARENT & WRAPPER POSITIONING
    ========================================================================== */
-
-/* Force every parent containing a carousel to use position: relative */
-/* Required so navigation buttons and markers are positioned correctly */
 
 .abcs {
 	position: relative !important;
 	--carousel-gap-x: var(--carousel-block-gap-x, var(--wp--style--unstable-gallery-gap, var(--wp--style--block-gap, 1rem)));
 }
 
-/* Ensure the direct parent is also positioned relative */
 *:has(> .abcs) {
 	position: relative !important;
 	overflow: visible;
@@ -57,10 +51,13 @@
 	box-sizing: border-box;
 }
 
-/* Main carousel styles - grouped selectors for editor compatibility */
-.abcs,
-.block-editor-block-list__layout .abcs,
-.editor-styles-wrapper .abcs {
+/* ==========================================================================
+   3. CORE CAROUSEL ENGINE (STANDARD CAROUSELS)
+   ========================================================================== */
+
+.abcs:not(.abcs-mobile-only),
+.block-editor-block-list__layout .abcs:not(.abcs-mobile-only),
+.editor-styles-wrapper .abcs:not(.abcs-mobile-only) {
 	position: relative !important;
 	width: 100%;
 	max-width: 100%;
@@ -83,225 +80,401 @@
 
 	-ms-overflow-style: none;
 	scrollbar-width: none;
-	-webkit-scrollbar: none;
 
 	isolation: isolate;
 	contain: layout !important;
 	transform: translateZ(0);
 }
 
-/* ==========================================================================
-   CAROUSEL ITEMS
-   ========================================================================== */
+.abcs:not(.abcs-mobile-only)::-webkit-scrollbar {
+	display: none !important;
+}
 
-.abcs>*,
-.block-editor-block-list__layout .abcs>*,
-.editor-styles-wrapper .abcs>* {
+/* Generic carousel item behaviour */
+.abcs:not(.abcs-mobile-only) > *,
+.block-editor-block-list__layout .abcs:not(.abcs-mobile-only) > *,
+.editor-styles-wrapper .abcs:not(.abcs-mobile-only) > * {
 	position: relative;
 	flex: 0 0 auto;
 	width: 100%;
 	height: auto;
 	scroll-snap-align: start;
-	/* scroll-snap-stop: always; */
 	margin: 0px !important;
 	padding: 0px;
 }
 
-.abcs .wp-block-group[style*="border-radius"] {
+.abcs:not(.abcs-mobile-only) .wp-block-group[style*="border-radius"] {
 	overflow: hidden;
 }
 
-.abcs .wp-block-group.has-global-padding {
+.abcs:not(.abcs-mobile-only) .wp-block-group.has-global-padding {
 	padding-left: initial;
 	padding-right: initial;
 }
 
-
-.abcs .has-background,
-.block-editor-block-list__layout .abcs .has-background,
-.editor-styles-wrapper .abcs .has-background {
+.abcs:not(.abcs-mobile-only) .has-background,
+.block-editor-block-list__layout .abcs:not(.abcs-mobile-only) .has-background,
+.editor-styles-wrapper .abcs:not(.abcs-mobile-only) .has-background {
 	height: 100%;
 }
 
 /* ==========================================================================
-   GALERIES EN MODE CAROUSEL
+   4. BLOCK ADAPTERS (GRID, GALLERY, COLUMNS)
    ========================================================================== */
 
-.wp-block-gallery.abcs,
-.block-editor-block-list__layout .wp-block-gallery.abcs,
-.editor-styles-wrapper .wp-block-gallery.abcs {
+/* Grid adapter (Cover, Group, Query Loop) */
+.is-layout-grid.abcs:not(.abcs-mobile-only),
+.block-editor-block-list__layout .is-layout-grid.abcs:not(.abcs-mobile-only),
+.editor-styles-wrapper .is-layout-grid.abcs:not(.abcs-mobile-only) {
+	display: flex !important;
+	grid-template-columns: none !important;
+	flex-wrap: nowrap !important;
+}
+
+/* Gallery adapter */
+.wp-block-gallery.abcs:not(.abcs-mobile-only),
+.block-editor-block-list__layout .wp-block-gallery.abcs:not(.abcs-mobile-only),
+.editor-styles-wrapper .wp-block-gallery.abcs:not(.abcs-mobile-only) {
+	display: flex !important;
 	flex-wrap: nowrap !important;
 	columns: auto !important;
 }
 
-.wp-block-gallery.abcs>.wp-block-image,
-.block-editor-block-list__layout .wp-block-gallery.abcs>.wp-block-image,
-.editor-styles-wrapper .wp-block-gallery.abcs>.wp-block-image {
+.wp-block-gallery.abcs:not(.abcs-mobile-only) > .wp-block-image,
+.block-editor-block-list__layout .wp-block-gallery.abcs:not(.abcs-mobile-only) > .wp-block-image,
+.editor-styles-wrapper .wp-block-gallery.abcs:not(.abcs-mobile-only) > .wp-block-image {
 	flex: 0 0 auto !important;
 	flex-grow: 0 !important;
 	flex-shrink: 0 !important;
 	scroll-snap-align: start;
 }
 
-.wp-block-gallery.abcs>.wp-block-image img,
-.block-editor-block-list__layout .wp-block-gallery.abcs>.wp-block-image img,
-.editor-styles-wrapper .wp-block-gallery.abcs>.wp-block-image img {
+.wp-block-gallery.abcs:not(.abcs-mobile-only) > .wp-block-image img,
+.block-editor-block-list__layout .wp-block-gallery.abcs:not(.abcs-mobile-only) > .wp-block-image img,
+.editor-styles-wrapper .wp-block-gallery.abcs:not(.abcs-mobile-only) > .wp-block-image img {
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
 }
 
-/* ==========================================================================
-   GRILLES (GRID LAYOUT) EN MODE CAROUSEL
-   ========================================================================== */
-
-.is-layout-grid.abcs,
-.block-editor-block-list__layout .is-layout-grid.abcs,
-.editor-styles-wrapper .is-layout-grid.abcs {
+/* Columns block adapter */
+.wp-block-columns.abcs:not(.abcs-mobile-only),
+.block-editor-block-list__layout .wp-block-columns.abcs:not(.abcs-mobile-only),
+.editor-styles-wrapper .wp-block-columns.abcs:not(.abcs-mobile-only) {
 	display: flex !important;
-	grid-template-columns: none !important;
-	flex-wrap: nowrap !important;
+	flex-flow: row nowrap !important;
+	overflow-x: scroll;
+	scroll-snap-type: x mandatory;
 }
 
-.is-layout-grid.abcs>*,
-.block-editor-block-list__layout .is-layout-grid.abcs>*,
-.editor-styles-wrapper .is-layout-grid.abcs>* {
-	flex: 0 0 auto;
-	width: var(--carousel-grid-item-width, calc(33.333% - var(--wp--style--block-gap, 1rem) * 2 / 3));
-	min-width: var(--carousel-grid-item-width, calc(33.333% - var(--wp--style--block-gap, 1rem) * 2 / 3));
-	max-width: 100%;
+.wp-block-columns.abcs:not(.abcs-mobile-only) > .wp-block-column,
+.block-editor-block-list__layout .wp-block-columns.abcs:not(.abcs-mobile-only) > .wp-block-column,
+.editor-styles-wrapper .wp-block-columns.abcs:not(.abcs-mobile-only) > .wp-block-column {
+	flex: 0 0 auto !important;
+	flex-grow: 0 !important;
+	flex-shrink: 0 !important;
+	scroll-snap-align: start;
 }
 
-/* Grid Item Position - Respecter grid-column span */
-.is-layout-grid.abcs>*[style*="grid-column-end:span 2"],
-.is-layout-grid.abcs>*[style*="grid-column:span 2"] {
+/* Grid Item Spanning (grid-column span 2, 3, 4) */
+.is-layout-grid.abcs:not(.abcs-mobile-only) > *[style*="grid-column-end:span 2"],
+.is-layout-grid.abcs:not(.abcs-mobile-only) > *[style*="grid-column:span 2"] {
 	width: calc(var(--carousel-grid-item-width, 33.333%) * 2 + var(--wp--style--block-gap, 1rem)) !important;
 }
 
-.is-layout-grid.abcs>*[style*="grid-column-end:span 3"],
-.is-layout-grid.abcs>*[style*="grid-column:span 3"] {
+.is-layout-grid.abcs:not(.abcs-mobile-only) > *[style*="grid-column-end:span 3"],
+.is-layout-grid.abcs:not(.abcs-mobile-only) > *[style*="grid-column:span 3"] {
 	width: calc(var(--carousel-grid-item-width, 33.333%) * 3 + var(--wp--style--block-gap, 1rem) * 2) !important;
 }
 
-.is-layout-grid.abcs>*[style*="grid-column-end:span 4"],
-.is-layout-grid.abcs>*[style*="grid-column:span 4"] {
+.is-layout-grid.abcs:not(.abcs-mobile-only) > *[style*="grid-column-end:span 4"],
+.is-layout-grid.abcs:not(.abcs-mobile-only) > *[style*="grid-column:span 4"] {
 	width: calc(var(--carousel-grid-item-width, 33.333%) * 4 + var(--wp--style--block-gap, 1rem) * 3) !important;
 }
 
-/* Helper classes to define the number of visible columns in the carousel grid */
-/* Simplified: use a generic rule with --carousel-grid-item-width variable */
-.is-layout-grid.abcs[class*="abcs-cols-"]>* {
-	width: var(--carousel-grid-item-width);
-	min-width: var(--carousel-grid-item-width);
-}
-
-/* Define --carousel-grid-item-width for each column count */
-.is-layout-grid.abcs.abcs-cols-1>* {
-	--carousel-grid-item-width: 100%;
-}
-
-.is-layout-grid.abcs.abcs-cols-2>* {
-	--carousel-grid-item-width: calc(50% - var(--wp--style--block-gap, 1rem) / 2);
-}
-
-.is-layout-grid.abcs.abcs-cols-3>* {
-	--carousel-grid-item-width: calc(33.333% - var(--wp--style--block-gap, 1rem) * 2 / 3);
-}
-
-.is-layout-grid.abcs.abcs-cols-4>* {
-	--carousel-grid-item-width: calc(25% - var(--wp--style--block-gap, 1rem) * 3 / 4);
-}
-
-.is-layout-grid.abcs.abcs-cols-5>* {
-	--carousel-grid-item-width: calc(20% - var(--wp--style--block-gap, 1rem) * 4 / 5);
-}
-
-.is-layout-grid.abcs.abcs-cols-6>* {
-	--carousel-grid-item-width: calc(16.666% - var(--wp--style--block-gap, 1rem) * 5 / 6);
-}
-
-.is-layout-grid.abcs.abcs-cols-7>* {
-	--carousel-grid-item-width: calc(14.285% - var(--wp--style--block-gap, 1rem) * 6 / 7);
-}
-
-.is-layout-grid.abcs.abcs-cols-8>* {
-	--carousel-grid-item-width: calc(12.5% - var(--wp--style--block-gap, 1rem) * 7 / 8);
-}
-
-.is-layout-grid.abcs.abcs-cols-9>* {
-	--carousel-grid-item-width: calc(11.111% - var(--wp--style--block-gap, 1rem) * 8 / 9);
-}
-
-.is-layout-grid.abcs.abcs-cols-10>* {
-	--carousel-grid-item-width: calc(10% - var(--wp--style--block-gap, 1rem) * 9 / 10);
-}
-
-.is-layout-grid.abcs.abcs-cols-11>* {
-	--carousel-grid-item-width: calc(9.090% - var(--wp--style--block-gap, 1rem) * 10 / 11);
-}
-
-.is-layout-grid.abcs.abcs-cols-12>* {
-	--carousel-grid-item-width: calc(8.333% - var(--wp--style--block-gap, 1rem) * 11 / 12);
-}
-
-.is-layout-grid.abcs.abcs-cols-13>* {
-	--carousel-grid-item-width: calc(7.692% - var(--wp--style--block-gap, 1rem) * 12 / 13);
-}
-
-.is-layout-grid.abcs.abcs-cols-14>* {
-	--carousel-grid-item-width: calc(7.142% - var(--wp--style--block-gap, 1rem) * 13 / 14);
-}
-
-.is-layout-grid.abcs.abcs-cols-15>* {
-	--carousel-grid-item-width: calc(6.666% - var(--wp--style--block-gap, 1rem) * 14 / 15);
-}
-
-.is-layout-grid.abcs.abcs-cols-16>* {
-	--carousel-grid-item-width: calc(6.25% - var(--wp--style--block-gap, 1rem) * 15 / 16);
-}
-
-/* abcs-min-width: use the minimum width defined in the grid */
-.is-layout-grid.abcs.abcs-min-width>*,
-.block-editor-block-list__layout .is-layout-grid.abcs.abcs-min-width>*,
-.editor-styles-wrapper .is-layout-grid.abcs.abcs-min-width>*,
-.wp-block-post-template.abcs.abcs-min-width .wp-block-post,
-.block-editor-block-list__layout .wp-block-post-template.abcs.abcs-min-width .wp-block-post,
-.editor-styles-wrapper .wp-block-post-template.abcs.abcs-min-width .wp-block-post,
-.wp-block-group.abcs.abcs-min-width>*,
-.block-editor-block-list__layout .wp-block-group.abcs.abcs-min-width>*,
-.editor-styles-wrapper .wp-block-group.abcs.abcs-min-width>* {
+/* Auto width mode (abcs-min-width) */
+.abcs:not(.abcs-mobile-only).abcs-min-width > *,
+.wp-block-post-template.abcs:not(.abcs-mobile-only).abcs-min-width .wp-block-post,
+.wp-block-gallery.abcs:not(.abcs-mobile-only).abcs-min-width > .wp-block-image,
+.wp-block-columns.abcs:not(.abcs-mobile-only).abcs-min-width > .wp-block-column {
 	flex: 0 0 auto !important;
 	width: min(var(--carousel-min-width, 200px), 100%) !important;
 	min-width: min(var(--carousel-min-width, 200px), 100%) !important;
 	max-width: 100% !important;
-}
-
-/* ==========================================================================
-   SCROLL SNAP POUR MODE AUTO (Grid item position: Auto)
-   ========================================================================== */
-
-.abcs.abcs-min-width>*,
-.block-editor-block-list__layout .abcs.abcs-min-width>*,
-.editor-styles-wrapper .abcs.abcs-min-width>*,
-.wp-block-post-template.abcs:not(.is-layout-grid) .wp-block-post,
-.block-editor-block-list__layout .wp-block-post-template.abcs:not(.is-layout-grid) .wp-block-post,
-.editor-styles-wrapper .wp-block-post-template.abcs:not(.is-layout-grid) .wp-block-post,
-.wp-block-post-template.abcs.abcs-min-width .wp-block-post,
-.block-editor-block-list__layout .wp-block-post-template.abcs.abcs-min-width .wp-block-post,
-.editor-styles-wrapper .wp-block-post-template.abcs.abcs-min-width .wp-block-post,
-.wp-block-group.abcs.abcs-min-width>*,
-.block-editor-block-list__layout .wp-block-group.abcs.abcs-min-width>*,
-.editor-styles-wrapper .wp-block-group.abcs.abcs-min-width>*,
-.wp-block-gallery.abcs.abcs-min-width>.wp-block-image,
-.block-editor-block-list__layout .wp-block-gallery.abcs.abcs-min-width>.wp-block-image,
-.editor-styles-wrapper .wp-block-gallery.abcs.abcs-min-width>.wp-block-image {
 	scroll-snap-align: start !important;
 }
 
 /* ==========================================================================
-   NAVIGATION BUTTONS
+   5. UNIVERSAL COLUMN FORMULAS (--abcs-cols)
    ========================================================================== */
 
+/* Target columns mapping */
+.abcs.abcs-cols-1, .wp-block-gallery.abcs.columns-1 { --abcs-cols: 1; }
+.abcs.abcs-cols-2, .wp-block-gallery.abcs.columns-2 { --abcs-cols: 2; }
+.abcs.abcs-cols-3, .wp-block-gallery.abcs.columns-3, .wp-block-gallery.abcs.columns-default { --abcs-cols: 3; }
+.abcs.abcs-cols-4, .wp-block-gallery.abcs.columns-4 { --abcs-cols: 4; }
+.abcs.abcs-cols-5, .wp-block-gallery.abcs.columns-5 { --abcs-cols: 5; }
+.abcs.abcs-cols-6, .wp-block-gallery.abcs.columns-6 { --abcs-cols: 6; }
+.abcs.abcs-cols-7, .wp-block-gallery.abcs.columns-7 { --abcs-cols: 7; }
+.abcs.abcs-cols-8, .wp-block-gallery.abcs.columns-8 { --abcs-cols: 8; }
+.abcs.abcs-cols-9 { --abcs-cols: 9; }
+.abcs.abcs-cols-10 { --abcs-cols: 10; }
+.abcs.abcs-cols-11 { --abcs-cols: 11; }
+.abcs.abcs-cols-12 { --abcs-cols: 12; }
+.abcs.abcs-cols-13 { --abcs-cols: 13; }
+.abcs.abcs-cols-14 { --abcs-cols: 14; }
+.abcs.abcs-cols-15 { --abcs-cols: 15; }
+.abcs.abcs-cols-16 { --abcs-cols: 16; }
+
+/* Mathematical column sizing formula:
+   (100% - total_gaps) / column_count */
+.abcs {
+	--carousel-grid-item-width: calc((100% - (var(--carousel-gap-x, 1rem) * (var(--abcs-cols, 1) - 1))) / var(--abcs-cols, 1));
+}
+
+/* ==========================================================================
+   6. RESPONSIVE BREAKPOINTS (SHARED CAROUSEL SIZING)
+   ========================================================================== */
+
+/* Mobile (< 600px): 1 slide per view (100% width) across all blocks */
+@media (max-width: 599px) {
+	.abcs:not(.abcs-min-width) > *,
+	.wp-block-columns.abcs > .wp-block-column,
+	.wp-block-group.is-layout-grid.abcs > *,
+	.wp-block-post-template.abcs .wp-block-post {
+		flex: 0 0 100% !important;
+		width: 100% !important;
+		min-width: 100% !important;
+		max-width: 100% !important;
+	}
+
+	/* Gallery on mobile defaults to 2 columns (50% width), or 1 column if columns-1 */
+	.wp-block-gallery.abcs .wp-block-image {
+		--carousel-grid-item-width: calc(50% - var(--carousel-gap-x, 1rem) / 2);
+		flex: 0 0 var(--carousel-grid-item-width) !important;
+		width: var(--carousel-grid-item-width) !important;
+		min-width: var(--carousel-grid-item-width) !important;
+		max-width: var(--carousel-grid-item-width) !important;
+	}
+
+	.wp-block-gallery.abcs.abcs-cols-1 .wp-block-image,
+	.wp-block-gallery.abcs.columns-1 .wp-block-image {
+		flex: 0 0 100% !important;
+		width: 100% !important;
+		min-width: 100% !important;
+		max-width: 100% !important;
+	}
+}
+
+/* Tablet breakpoint (600px - 781px):
+   - 1 column / Columns block: 100% width
+   - Grids & Groups (2+ cols): 2 columns (50% width) for optimal legibility
+   - Gallery: defined columns (or 2 columns minimum) */
+@media (min-width: 600px) and (max-width: 781px) {
+	.abcs.abcs-cols-1 > *,
+	.is-layout-grid.abcs.abcs-cols-1 > *,
+	.wp-block-group.is-layout-grid.abcs.abcs-cols-1 > *,
+	.wp-block-post-template.abcs.abcs-cols-1 .wp-block-post,
+	.wp-block-columns.abcs > .wp-block-column,
+	.abcs:not([class*="abcs-cols-"]):not(.abcs-min-width) > * {
+		flex: 0 0 100% !important;
+		width: 100% !important;
+		min-width: 100% !important;
+		max-width: 100% !important;
+	}
+
+	.is-layout-grid.abcs:not(.abcs-cols-1) > *,
+	.wp-block-post-template.is-layout-grid.abcs:not(.abcs-cols-1) .wp-block-post,
+	.wp-block-group.is-layout-grid.abcs:not(.abcs-cols-1) > * {
+		width: calc(50% - var(--wp--style--block-gap, 1rem) / 2) !important;
+		min-width: calc(50% - var(--wp--style--block-gap, 1rem) / 2) !important;
+		flex: 0 0 calc(50% - var(--wp--style--block-gap, 1rem) / 2) !important;
+	}
+
+	.wp-block-gallery.abcs[class*="abcs-cols-"] .wp-block-image,
+	.wp-block-gallery.abcs[class*="columns-"] .wp-block-image {
+		flex: 0 0 var(--carousel-grid-item-width) !important;
+		width: var(--carousel-grid-item-width) !important;
+		min-width: var(--carousel-grid-item-width) !important;
+		max-width: var(--carousel-grid-item-width) !important;
+	}
+}
+
+/* Desktop breakpoint (>= 782px): Standard carousels take their full column count */
+@media (min-width: 782px) {
+	.is-layout-grid.abcs:not(.abcs-mobile-only)[class*="abcs-cols-"] > *,
+	.wp-block-group.is-layout-grid.abcs:not(.abcs-mobile-only)[class*="abcs-cols-"] > *,
+	.wp-block-post-template.is-layout-grid.abcs:not(.abcs-mobile-only)[class*="abcs-cols-"] .wp-block-post,
+	.wp-block-columns.abcs:not(.abcs-mobile-only)[class*="abcs-cols-"] > .wp-block-column,
+	.wp-block-gallery.abcs:not(.abcs-mobile-only)[class*="abcs-cols-"] .wp-block-image,
+	.wp-block-gallery.abcs:not(.abcs-mobile-only)[class*="columns-"] .wp-block-image {
+		flex: 0 0 var(--carousel-grid-item-width) !important;
+		flex-grow: 0 !important;
+		flex-shrink: 0 !important;
+		width: var(--carousel-grid-item-width) !important;
+		min-width: var(--carousel-grid-item-width) !important;
+		max-width: var(--carousel-grid-item-width) !important;
+	}
+
+	/* Default sizes without explicit abcs-cols on desktop */
+	.wp-block-post-template.is-layout-grid.abcs:not(.abcs-min-width):not(.abcs-mobile-only):not([class*="abcs-cols-"]) .wp-block-post,
+	.wp-block-group.is-layout-grid.abcs:not(.abcs-min-width):not(.abcs-mobile-only):not([class*="abcs-cols-"]) > *,
+	.wp-block-columns.abcs:not(.abcs-mobile-only):not([class*="abcs-cols-"]) > .wp-block-column {
+		width: 100% !important;
+		min-width: 100% !important;
+	}
+}
+
+/* Control buttons & markers sizing on mobile devices */
+@media (max-width: 782px) {
+	:root {
+		--carousel-button-size: 2.75rem;
+		--carousel-button-offset: 0.5rem;
+		--carousel-marker-size: 0.75rem;
+	}
+}
+
+@media (max-width: 600px) {
+	:root {
+		--carousel-button-size: 2.5rem;
+		--carousel-button-offset: 0.5rem;
+		--carousel-marker-size: 0.75rem;
+		--carousel-marker-gap: 0.75rem;
+	}
+
+	.abcs {
+		gap: var(--wp--style--block-gap, 0.5rem);
+		padding: 0.75rem 0px;
+	}
+
+	.abcs.abcs-min-width > *,
+	.wp-block-post-template.abcs.abcs-min-width .wp-block-post,
+	.wp-block-group.abcs.abcs-min-width > *,
+	.wp-block-gallery.abcs.abcs-min-width > .wp-block-image {
+		width: 100% !important;
+		min-width: 100% !important;
+		max-width: 100% !important;
+	}
+}
+
+@media (max-width: 480px) {
+	:root {
+		--carousel-button-size: 2rem;
+		--carousel-button-offset: 0.25rem;
+		--carousel-marker-size: 0.75rem;
+		--carousel-marker-gap: 0.75rem;
+		--carousel-marker-bottom-offset: -1.5rem;
+	}
+
+	.abcs {
+		gap: var(--wp--style--block-gap, 0.25rem);
+		padding: 1rem 0px;
+	}
+}
+
+@media (max-width: 375px) {
+	:root {
+		--carousel-button-size: 1.75rem;
+		--carousel-marker-size: 0.75rem;
+	}
+}
+
+/* ==========================================================================
+   7. MOBILE-ONLY MODE (< 782px)
+   Acts as a pure switch: active on mobile (< 782px), inactive on desktop (>= 782px)
+   ========================================================================== */
+
+@media (max-width: 781px) {
+	/* Activate carousel container engine on mobile */
+	.abcs.abcs-mobile-only,
+	.block-editor-block-list__layout .abcs.abcs-mobile-only,
+	.editor-styles-wrapper .abcs.abcs-mobile-only {
+		position: relative !important;
+		width: 100% !important;
+		max-width: 100% !important;
+		box-sizing: border-box !important;
+		display: flex !important;
+		flex-flow: row nowrap !important;
+		align-items: stretch !important;
+		justify-content: flex-start !important;
+		gap: var(--wp--style--block-gap, 1rem) !important;
+		padding-top: var(--carousel-padding-top, 1rem);
+		padding-bottom: var(--carousel-padding-bottom, 1rem);
+		padding-left: var(--carousel-padding-left, 0px);
+		padding-right: var(--carousel-padding-right, 0px);
+
+		overflow-x: scroll !important;
+		overflow-y: visible !important;
+		scroll-snap-type: x mandatory !important;
+		scroll-behavior: smooth !important;
+		-webkit-overflow-scrolling: touch !important;
+
+		scroll-padding-left: var(--carousel-scroll-padding-left, 0) !important;
+		scroll-padding-right: var(--carousel-scroll-padding-right, 0) !important;
+
+		-ms-overflow-style: none !important;
+		scrollbar-width: none !important;
+		contain: layout !important;
+		transform: translateZ(0);
+	}
+
+	.abcs.abcs-mobile-only::-webkit-scrollbar {
+		display: none !important;
+	}
+
+	/* Reset block layouts to horizontal flex on mobile */
+	.is-layout-grid.abcs.abcs-mobile-only {
+		display: flex !important;
+		grid-template-columns: none !important;
+		flex-wrap: nowrap !important;
+	}
+
+	.wp-block-gallery.abcs.abcs-mobile-only {
+		display: flex !important;
+		flex-wrap: nowrap !important;
+		columns: auto !important;
+	}
+
+	.wp-block-columns.abcs.abcs-mobile-only {
+		display: flex !important;
+		flex-flow: row nowrap !important;
+		overflow-x: scroll !important;
+		scroll-snap-type: x mandatory !important;
+	}
+
+	.abcs.abcs-mobile-only > * {
+		position: relative !important;
+		scroll-snap-align: start !important;
+		margin: 0px !important;
+		box-sizing: border-box !important;
+	}
+
+	.wp-block-gallery.abcs.abcs-mobile-only > .wp-block-image img {
+		width: 100% !important;
+		height: 100% !important;
+		object-fit: cover !important;
+	}
+}
+
+/* On desktop (>= 782px), mobile-only carousels stay 100% native: hide nav controls */
+@media (min-width: 782px) {
+	.abcs.abcs-mobile-only ~ .abcs-nav-btn,
+	.abcs.abcs-mobile-only .abcs-nav-btn,
+	.abcs-parent-mobile-only > .abcs-nav-btn,
+	.abcs-fallback-parent:has(.abcs.abcs-mobile-only) > .abcs-nav-btn,
+	.abcs.abcs-mobile-only ~ .abcs-markers,
+	.abcs.abcs-mobile-only .abcs-markers,
+	.abcs-parent-mobile-only > .abcs-markers,
+	.abcs-fallback-parent:has(.abcs.abcs-mobile-only) > .abcs-markers {
+		display: none !important;
+	}
+}
+
+/* ==========================================================================
+   8. NAVIGATION BUTTONS & PAGINATION MARKERS
+   ========================================================================== */
+
+/* Buttons */
 .abcs-nav-btn {
 	position: absolute;
 	z-index: var(--carousel-z-index);
@@ -365,18 +538,24 @@
 	transform: translate(50%, -50%);
 }
 
-/* Hide navigation buttons */
-.abcs.abcs-hide-arrows ~ .abcs-nav-btn {
-	display: none !important;
-	opacity: 0 !important;
-	visibility: hidden !important;
-	pointer-events: none !important;
+/* RTL Support for navigation buttons */
+[dir="rtl"] .abcs-nav-btn--prev {
+	left: auto;
+	right: calc(var(--carousel-padding-right, 0px) + var(--carousel-button-offset, 0px));
+	transform: translate(50%, -50%) rotate(180deg);
 }
 
-/* ==========================================================================
-   PAGINATION MARKERS (DOTS)
-   ========================================================================== */
+[dir="rtl"] .abcs-nav-btn--next {
+	right: auto;
+	left: calc(var(--carousel-padding-left, 0px) + var(--carousel-button-offset, 0px));
+	transform: translate(-50%, -50%) rotate(180deg);
+}
 
+.abcs.abcs-hide-arrows ~ .abcs-nav-btn {
+	display: none !important;
+}
+
+/* Markers / Dots */
 .abcs-markers {
 	position: absolute;
 	z-index: var(--carousel-z-index);
@@ -421,39 +600,19 @@
 	cursor: default;
 }
 
-/* Hide pagination markers */
 .abcs.abcs-hide-markers ~ .abcs-markers {
 	display: none !important;
-	opacity: 0 !important;
-	visibility: hidden !important;
-	pointer-events: none !important;
 }
 
-/* ==========================================================================
-   SNAP STOP, ALIGNMENT & STYLE OPTIONS
-   ========================================================================== */
-
-/* Snap Stop */
-.abcs.abcs-snap-stop > *,
-.block-editor-block-list__layout .abcs.abcs-snap-stop > *,
-.editor-styles-wrapper .abcs.abcs-snap-stop > * {
+/* Snap stop & Markers styles */
+.abcs.abcs-snap-stop > * {
 	scroll-snap-stop: always !important;
 }
 
-/* Markers alignment options */
-.abcs.abcs-markers-align-left ~ .abcs-markers {
-	justify-content: flex-start !important;
-}
+.abcs.abcs-markers-align-left ~ .abcs-markers { justify-content: flex-start !important; }
+.abcs.abcs-markers-align-center ~ .abcs-markers { justify-content: center !important; }
+.abcs.abcs-markers-align-right ~ .abcs-markers { justify-content: flex-end !important; }
 
-.abcs.abcs-markers-align-center ~ .abcs-markers {
-	justify-content: center !important;
-}
-
-.abcs.abcs-markers-align-right ~ .abcs-markers {
-	justify-content: flex-end !important;
-}
-
-/* Markers style options (dots/lines) */
 .abcs.abcs-markers-style-lines ~ .abcs-markers .abcs-marker {
 	border-radius: 2px !important;
 	width: 24px !important;
@@ -461,339 +620,7 @@
 }
 
 /* ==========================================================================
-   RESPONSIVE DESIGN - ALIGNMENT WITH WORDPRESS
-   ========================================================================== */
-
-/* Rules derived from analysing WordPress CSS:
-   - Primary breakpoint: 600px (mobile/tablet)
-   - Secondary breakpoint: 782px (tablet/desktop)
-   - Behaviour matches native WordPress blocks
-*/
-
-/* ==========================================================================
-   POST TEMPLATE, GALLERY, GROUP - RESPONSIVE COLUMNS
-   ========================================================================== */
-
-/* Mobile (default) - 1 column for Post Template and Group */
-.wp-block-post-template.is-layout-grid.abcs:not(.abcs-min-width) .wp-block-post,
-.wp-block-group.is-layout-grid.abcs:not(.abcs-min-width)>* {
-	width: 100% !important;
-	min-width: 100% !important;
-}
-
-/* Mobile (default <600px) - 2 columns for Gallery */
-.wp-block-gallery.abcs .wp-block-image {
-	--carousel-grid-item-width: calc(50% - var(--carousel-gap-x, 1rem) / 2);
-	flex: 0 0 var(--carousel-grid-item-width) !important;
-	flex-grow: 0 !important;
-	flex-shrink: 0 !important;
-	width: var(--carousel-grid-item-width) !important;
-	min-width: var(--carousel-grid-item-width) !important;
-	max-width: var(--carousel-grid-item-width) !important;
-}
-
-.wp-block-gallery.abcs.abcs-cols-1 .wp-block-image,
-.wp-block-gallery.abcs.columns-1 .wp-block-image {
-	--carousel-grid-item-width: 100%;
-}
-
-/* From 600px onwards - behaviour determined by column count */
-/* Generic rule for all block types with column classes */
-@media (min-width: 600px) {
-
-	/* Post Template columns */
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-2 .wp-block-post {
-		--carousel-grid-item-width: calc(50% - var(--wp--style--block-gap, 1.25em) / 2);
-	}
-
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-3 .wp-block-post {
-		--carousel-grid-item-width: calc(33.33333% - var(--wp--style--block-gap, 1.25em) * 2 / 3);
-	}
-
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-4 .wp-block-post {
-		--carousel-grid-item-width: calc(25% - var(--wp--style--block-gap, 1.25em) * 3 / 4);
-	}
-
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-5 .wp-block-post {
-		--carousel-grid-item-width: calc(20% - var(--wp--style--block-gap, 1.25em) * 4 / 5);
-	}
-
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-6 .wp-block-post {
-		--carousel-grid-item-width: calc(16.66667% - var(--wp--style--block-gap, 1.25em) * 5 / 6);
-	}
-
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-7 .wp-block-post {
-		--carousel-grid-item-width: calc(14.285% - var(--wp--style--block-gap, 1.25em) * 6 / 7);
-	}
-
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-8 .wp-block-post {
-		--carousel-grid-item-width: calc(12.5% - var(--wp--style--block-gap, 1.25em) * 7 / 8);
-	}
-
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-9 .wp-block-post {
-		--carousel-grid-item-width: calc(11.111% - var(--wp--style--block-gap, 1.25em) * 8 / 9);
-	}
-
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-10 .wp-block-post {
-		--carousel-grid-item-width: calc(10% - var(--wp--style--block-gap, 1.25em) * 9 / 10);
-	}
-
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-11 .wp-block-post {
-		--carousel-grid-item-width: calc(9.090% - var(--wp--style--block-gap, 1.25em) * 10 / 11);
-	}
-
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-12 .wp-block-post {
-		--carousel-grid-item-width: calc(8.333% - var(--wp--style--block-gap, 1.25em) * 11 / 12);
-	}
-
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-13 .wp-block-post {
-		--carousel-grid-item-width: calc(7.692% - var(--wp--style--block-gap, 1.25em) * 12 / 13);
-	}
-
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-14 .wp-block-post {
-		--carousel-grid-item-width: calc(7.142% - var(--wp--style--block-gap, 1.25em) * 13 / 14);
-	}
-
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-15 .wp-block-post {
-		--carousel-grid-item-width: calc(6.666% - var(--wp--style--block-gap, 1.25em) * 14 / 15);
-	}
-
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-16 .wp-block-post {
-		--carousel-grid-item-width: calc(6.25% - var(--wp--style--block-gap, 1.25em) * 15 / 16);
-	}
-
-	/* Apply width and min-width using the variable */
-	.wp-block-post-template.is-layout-grid.abcs[class*="abcs-cols-"] .wp-block-post {
-		width: var(--carousel-grid-item-width) !important;
-		min-width: var(--carousel-grid-item-width) !important;
-	}
-
-	/* Gallery columns */
-	.wp-block-gallery.abcs.abcs-cols-1 .wp-block-image,
-	.wp-block-gallery.abcs.columns-1 .wp-block-image {
-		--carousel-grid-item-width: 100%;
-	}
-
-	.wp-block-gallery.abcs.abcs-cols-2 .wp-block-image,
-	.wp-block-gallery.abcs.columns-2 .wp-block-image {
-		--carousel-grid-item-width: calc(50% - var(--carousel-gap-x, 1rem) / 2);
-	}
-
-	.wp-block-gallery.abcs.abcs-cols-3 .wp-block-image,
-	.wp-block-gallery.abcs.columns-3 .wp-block-image,
-	.wp-block-gallery.abcs.columns-default .wp-block-image {
-		--carousel-grid-item-width: calc(33.33333% - var(--carousel-gap-x, 1rem) * 2 / 3);
-	}
-
-	.wp-block-gallery.abcs.abcs-cols-4 .wp-block-image,
-	.wp-block-gallery.abcs.columns-4 .wp-block-image {
-		--carousel-grid-item-width: calc(25% - var(--carousel-gap-x, 1rem) * 3 / 4);
-	}
-
-	.wp-block-gallery.abcs.abcs-cols-5 .wp-block-image,
-	.wp-block-gallery.abcs.columns-5 .wp-block-image {
-		--carousel-grid-item-width: calc(20% - var(--carousel-gap-x, 1rem) * 4 / 5);
-	}
-
-	.wp-block-gallery.abcs.abcs-cols-6 .wp-block-image,
-	.wp-block-gallery.abcs.columns-6 .wp-block-image {
-		--carousel-grid-item-width: calc(16.66667% - var(--carousel-gap-x, 1rem) * 5 / 6);
-	}
-
-	.wp-block-gallery.abcs.abcs-cols-7 .wp-block-image,
-	.wp-block-gallery.abcs.columns-7 .wp-block-image {
-		--carousel-grid-item-width: calc(14.285% - var(--carousel-gap-x, 1rem) * 6 / 7);
-	}
-
-	.wp-block-gallery.abcs.abcs-cols-8 .wp-block-image,
-	.wp-block-gallery.abcs.columns-8 .wp-block-image {
-		--carousel-grid-item-width: calc(12.5% - var(--carousel-gap-x, 1rem) * 7 / 8);
-	}
-
-	.wp-block-gallery.abcs[class*="abcs-cols-"] .wp-block-image,
-	.wp-block-gallery.abcs[class*="columns-"] .wp-block-image {
-		flex: 0 0 var(--carousel-grid-item-width) !important;
-		flex-grow: 0 !important;
-		flex-shrink: 0 !important;
-		width: var(--carousel-grid-item-width) !important;
-		min-width: var(--carousel-grid-item-width) !important;
-		max-width: var(--carousel-grid-item-width) !important;
-	}
-
-	/* Group columns */
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-2>* {
-		--carousel-grid-item-width: calc(50% - var(--wp--style--block-gap, 1rem) / 2);
-	}
-
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-3>* {
-		--carousel-grid-item-width: calc(33.33333% - var(--wp--style--block-gap, 1rem) * 2 / 3);
-	}
-
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-4>* {
-		--carousel-grid-item-width: calc(25% - var(--wp--style--block-gap, 1rem) * 3 / 4);
-	}
-
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-5>* {
-		--carousel-grid-item-width: calc(20% - var(--wp--style--block-gap, 1rem) * 4 / 5);
-	}
-
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-6>* {
-		--carousel-grid-item-width: calc(16.66667% - var(--wp--style--block-gap, 1rem) * 5 / 6);
-	}
-
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-7>* {
-		--carousel-grid-item-width: calc(14.285% - var(--wp--style--block-gap, 1rem) * 6 / 7);
-	}
-
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-8>* {
-		--carousel-grid-item-width: calc(12.5% - var(--wp--style--block-gap, 1rem) * 7 / 8);
-	}
-
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-9>* {
-		--carousel-grid-item-width: calc(11.111% - var(--wp--style--block-gap, 1rem) * 8 / 9);
-	}
-
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-10>* {
-		--carousel-grid-item-width: calc(10% - var(--wp--style--block-gap, 1rem) * 9 / 10);
-	}
-
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-11>* {
-		--carousel-grid-item-width: calc(9.090% - var(--wp--style--block-gap, 1rem) * 10 / 11);
-	}
-
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-12>* {
-		--carousel-grid-item-width: calc(8.333% - var(--wp--style--block-gap, 1rem) * 11 / 12);
-	}
-
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-13>* {
-		--carousel-grid-item-width: calc(7.692% - var(--wp--style--block-gap, 1rem) * 12 / 13);
-	}
-
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-14>* {
-		--carousel-grid-item-width: calc(7.142% - var(--wp--style--block-gap, 1rem) * 13 / 14);
-	}
-
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-15>* {
-		--carousel-grid-item-width: calc(6.666% - var(--wp--style--block-gap, 1rem) * 14 / 15);
-	}
-
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-16>* {
-		--carousel-grid-item-width: calc(6.25% - var(--wp--style--block-gap, 1rem) * 15 / 16);
-	}
-
-	.wp-block-group.is-layout-grid.abcs[class*="abcs-cols-"]>* {
-		width: var(--carousel-grid-item-width) !important;
-		min-width: var(--carousel-grid-item-width) !important;
-	}
-}
-
-/* Tablet behavior: force 2 columns for Post Template and Group (3+ columns) */
-@media (min-width: 600px) and (max-width: 1200px) {
-
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-3 .wp-block-post,
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-4 .wp-block-post,
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-5 .wp-block-post,
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-6 .wp-block-post,
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-7 .wp-block-post,
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-8 .wp-block-post,
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-9 .wp-block-post,
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-10 .wp-block-post,
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-11 .wp-block-post,
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-12 .wp-block-post,
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-13 .wp-block-post,
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-14 .wp-block-post,
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-15 .wp-block-post,
-	.wp-block-post-template.is-layout-grid.abcs.abcs-cols-16 .wp-block-post {
-		width: calc(50% - var(--wp--style--block-gap, 1.25em) / 2) !important;
-		min-width: calc(50% - var(--wp--style--block-gap, 1.25em) / 2) !important;
-	}
-
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-3>*,
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-4>*,
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-5>*,
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-6>*,
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-7>*,
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-8>*,
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-9>*,
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-10>*,
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-11>*,
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-12>*,
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-13>*,
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-14>*,
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-15>*,
-	.wp-block-group.is-layout-grid.abcs.abcs-cols-16>* {
-		width: calc(50% - var(--wp--style--block-gap, 1rem) / 2) !important;
-		min-width: calc(50% - var(--wp--style--block-gap, 1rem) / 2) !important;
-	}
-}
-
-/* ==========================================================================
-   OPTIMISATIONS RESPONSIVE
-   ========================================================================== */
-
-@media (max-width: 782px) {
-	:root {
-		--carousel-button-size: 2.75rem;
-		--carousel-button-offset: 0.5rem;
-		--carousel-marker-size: 0.75rem;
-	}
-}
-
-@media (max-width: 600px) {
-	:root {
-		--carousel-button-size: 2.5rem;
-		--carousel-button-offset: 0.5rem;
-		--carousel-marker-size: 0.75rem;
-		--carousel-marker-gap: 0.75rem;
-	}
-
-	.abcs {
-		gap: var(--wp--style--block-gap, 0.5rem);
-		padding: 0.75rem 0px;
-	}
-
-	.abcs.abcs-min-width>*,
-	.block-editor-block-list__layout .abcs.abcs-min-width>*,
-	.editor-styles-wrapper .abcs.abcs-min-width>*,
-	.wp-block-post-template.abcs.abcs-min-width .wp-block-post,
-	.block-editor-block-list__layout .wp-block-post-template.abcs.abcs-min-width .wp-block-post,
-	.editor-styles-wrapper .wp-block-post-template.abcs.abcs-min-width .wp-block-post,
-	.wp-block-group.abcs.abcs-min-width>*,
-	.block-editor-block-list__layout .wp-block-group.abcs.abcs-min-width>*,
-	.editor-styles-wrapper .wp-block-group.abcs.abcs-min-width>*,
-	.wp-block-gallery.abcs.abcs-min-width>.wp-block-image,
-	.block-editor-block-list__layout .wp-block-gallery.abcs.abcs-min-width>.wp-block-image,
-	.editor-styles-wrapper .wp-block-gallery.abcs.abcs-min-width>.wp-block-image {
-		width: 100% !important;
-		min-width: 100% !important;
-		max-width: 100% !important;
-	}
-}
-
-@media (max-width: 480px) {
-	:root {
-		--carousel-button-size: 2rem;
-		--carousel-button-offset: 0.25rem;
-		--carousel-marker-size: 0.75rem;
-		--carousel-marker-gap: 0.75rem;
-		--carousel-marker-bottom-offset: -1.5rem;
-	}
-
-	.abcs {
-		gap: var(--wp--style--block-gap, 0.25rem);
-		padding: 1rem 0px;
-	}
-}
-
-@media (max-width: 375px) {
-	:root {
-		--carousel-button-size: 1.75rem;
-		--carousel-marker-size: 0.75rem;
-	}
-}
-
-/* ==========================================================================
-   GUTENBERG EDITOR STYLES
+   9. GUTENBERG EDITOR CONTROLS & INSPECTOR
    ========================================================================== */
 
 .cfg-abcs-toggle-control {
@@ -829,51 +656,36 @@
 	margin-bottom: 16px;
 }
 
-.block-editor-block-list__layout .abcs>*:not(:first-child),
-.editor-styles-wrapper .abcs>*:not(:first-child) {
+.block-editor-block-list__layout .abcs > *:not(:first-child),
+.editor-styles-wrapper .abcs > *:not(:first-child) {
 	pointer-events: none;
 }
 
 /* ==========================================================================
-   PERFORMANCE ET OPTIMISATIONS
+   10. ACCESSIBILITY & RENDERING OPTIMIZATIONS
    ========================================================================== */
 
-.abcs,
-.block-editor-block-list__layout .abcs,
-.editor-styles-wrapper .abcs {
+.abcs {
 	will-change: scroll-position;
 	contain: layout style;
 }
 
-.abcs>*,
-.block-editor-block-list__layout .abcs>*,
-.editor-styles-wrapper .abcs>* {
+.abcs > * {
 	will-change: transform;
 }
 
-/* ==========================================================================
-   ACCESSIBILITY
-   ========================================================================== */
-
 @media (prefers-reduced-motion: reduce) {
-
-	.abcs,
-	.block-editor-block-list__layout .abcs,
-	.editor-styles-wrapper .abcs {
-		scroll-behavior: auto;
+	.abcs {
+		scroll-behavior: auto !important;
 	}
 
-	.abcs-nav-btn {
-		transition: none;
-	}
-
+	.abcs-nav-btn,
 	.abcs-marker {
-		transition: none;
+		transition: none !important;
 	}
 }
 
 @media (prefers-contrast: high) {
-
 	.abcs-nav-btn {
 		border-width: 3px;
 	}

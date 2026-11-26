@@ -47,25 +47,35 @@ class ThemeStyles
         $button_color = '';
 
         // Step 2: Priority 1 - Check user styles (custom styles from site-editor)
-        // User styles have the highest priority and should be used if they exist
-        // Path: styles.elements.button.color.background
-        if (isset($user_settings['styles']['elements']['button']['color']['background'])) {
+        // Check blocks.core/button first, then elements.button
+        if (isset($user_settings['styles']['blocks']['core/button']['color']['background'])) {
+            $button_bg = $user_settings['styles']['blocks']['core/button']['color']['background'];
+        } elseif (isset($user_settings['styles']['elements']['button']['color']['background'])) {
             $button_bg = $user_settings['styles']['elements']['button']['color']['background'];
         }
 
-        if (isset($user_settings['styles']['elements']['button']['color']['text'])) {
+        if (isset($user_settings['styles']['blocks']['core/button']['color']['text'])) {
+            $button_color = $user_settings['styles']['blocks']['core/button']['color']['text'];
+        } elseif (isset($user_settings['styles']['elements']['button']['color']['text'])) {
             $button_color = $user_settings['styles']['elements']['button']['color']['text'];
         }
 
         // Step 3: Priority 2 - Check theme styles (from theme.json)
-        // Only use theme styles if user styles are not defined
-        // Path: styles.elements.button.color.background
-        if (empty($button_bg) && isset($theme_settings['styles']['elements']['button']['color']['background'])) {
-            $button_bg = $theme_settings['styles']['elements']['button']['color']['background'];
+        // Check blocks.core/button first, then elements.button
+        if (empty($button_bg)) {
+            if (isset($theme_settings['styles']['blocks']['core/button']['color']['background'])) {
+                $button_bg = $theme_settings['styles']['blocks']['core/button']['color']['background'];
+            } elseif (isset($theme_settings['styles']['elements']['button']['color']['background'])) {
+                $button_bg = $theme_settings['styles']['elements']['button']['color']['background'];
+            }
         }
 
-        if (empty($button_color) && isset($theme_settings['styles']['elements']['button']['color']['text'])) {
-            $button_color = $theme_settings['styles']['elements']['button']['color']['text'];
+        if (empty($button_color)) {
+            if (isset($theme_settings['styles']['blocks']['core/button']['color']['text'])) {
+                $button_color = $theme_settings['styles']['blocks']['core/button']['color']['text'];
+            } elseif (isset($theme_settings['styles']['elements']['button']['color']['text'])) {
+                $button_color = $theme_settings['styles']['elements']['button']['color']['text'];
+            }
         }
 
         // Step 4: Priority 3 - Fallback method - extract colors from compiled CSS

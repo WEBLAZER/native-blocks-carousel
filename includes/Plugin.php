@@ -79,6 +79,27 @@ class Plugin
     public function boot(): void
     {
         \add_action('init', [$this, 'init']);
+        \add_filter('plugin_row_meta', [$this, 'registerPluginRowMeta'], 10, 2);
+    }
+
+    /**
+     * Adds custom meta links on the plugins page.
+     *
+     * @param string[] $links An array of the plugin's metadata links.
+     * @param string   $file  Path to the plugin file relative to the plugins directory.
+     * @return string[]
+     */
+    public function registerPluginRowMeta(array $links, string $file): array
+    {
+        if ($file === \plugin_basename(ANY_BLOCK_CAROUSEL_SLIDER_PLUGIN_FILE)) {
+            $links[] = sprintf(
+                '<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>',
+                \esc_url('https://ko-fi.com/weblazer'),
+                \esc_html__('Buy me a coffee ☕', 'native-blocks-carousel')
+            );
+        }
+
+        return $links;
     }
 
     /**

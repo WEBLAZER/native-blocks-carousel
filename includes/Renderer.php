@@ -69,17 +69,19 @@ class Renderer implements ServiceInterface
             $custom_styles['--carousel-button-color'] = $button_color;
         }
 
-        // Get loop and autoplay attributes
+        // Get loop, autoplay, and mobile only attributes
         $loop = $block['attrs']['carouselLoop'] ?? false;
         $autoplay = $block['attrs']['carouselAutoplay'] ?? false;
         $autoplay_delay = $block['attrs']['carouselAutoplayDelay'] ?? 3000;
+        $mobile_only = $block['attrs']['carouselMobileOnly'] ?? false;
 
         $has_styles = !empty($custom_styles);
         $has_loop_attrs = $loop;
         $has_autoplay_attrs = $autoplay;
+        $has_mobile_only_attrs = $mobile_only;
 
-        // If no styles and no loop/autoplay attributes, return early
-        if (!$has_styles && !$has_loop_attrs && !$has_autoplay_attrs) {
+        // If no styles and no loop/autoplay/mobile_only attributes, return early
+        if (!$has_styles && !$has_loop_attrs && !$has_autoplay_attrs && !$has_mobile_only_attrs) {
             return $block_content;
         }
 
@@ -105,6 +107,11 @@ class Renderer implements ServiceInterface
                     $processor->set_attribute('data-abcs-autoplay-delay', (string) $autoplay_delay);
                 }
 
+                // Add mobile only data attribute
+                if ($has_mobile_only_attrs) {
+                    $processor->set_attribute('data-abcs-mobile-only', 'true');
+                }
+
                 $modified_content = $processor->get_updated_html();
 
                 if (\is_string($modified_content)) {
@@ -116,7 +123,7 @@ class Renderer implements ServiceInterface
         // Fallback to regex if WP_HTML_Tag_Processor is not available
         $pattern = '/(<(?:div|ul|figure)\s+[^>]*class="[^"]*\babcs\b[^"]*"[^>]*?)(?:\s+style="([^"]*)")?(\s*>)/i';
 
-        $replacement = function (array $matches) use ($styles_string, $loop, $autoplay, $autoplay_delay, $has_styles, $has_loop_attrs, $has_autoplay_attrs) {
+        $replacement = function (array $matches) use ($styles_string, $loop, $autoplay, $autoplay_delay, $mobile_only, $has_styles, $has_loop_attrs, $has_autoplay_attrs, $has_mobile_only_attrs) {
             $tag_start = $matches[1];
             $existing_style = $matches[2] ?? '';
             $tag_end = $matches[3];
@@ -144,6 +151,11 @@ class Renderer implements ServiceInterface
             if ($has_autoplay_attrs) {
                 $result .= ' data-abcs-autoplay="' . \esc_attr($autoplay ? 'true' : 'false') . '"';
                 $result .= ' data-abcs-autoplay-delay="' . \esc_attr((string) $autoplay_delay) . '"';
+            }
+
+            // Add mobile only data attribute
+            if ($has_mobile_only_attrs) {
+                $result .= ' data-abcs-mobile-only="true"';
             }
 
             $result .= $tag_end;
